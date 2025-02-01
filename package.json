@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npm run-script start:${NODE_ENV:-development}",
-    "start:development": "next dev --turbopack",
+    "start:development": "next dev",
     "build": "next build",
     "start:production": "next start",
     "lint": "next lint"
