@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@layer base {
+  html {
+    @apply bg-stone-50;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 22px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
