@@ -1,53 +1,40 @@
+import { createSession, createUser } from "@/actions";
 import { Alert } from "@/components/Alert";
 import { Field } from "@/components/Field";
 import { Form } from "@/components/Form";
 import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { Submit } from "@/components/Submit";
-import prisma from "@/lib/prisma";
+import { createStatefulAction } from "@/lib/actions";
+import * as schema from "@/lib/schema";
 import { setSessionCookie } from "@/lib/session";
 import { parse } from "@/lib/validation";
-import bcrypt from "bcrypt";
-import { DateTime } from "luxon";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(12),
-});
-
-export default function Page() {
-  const action = async (state: { error: string }, payload: FormData) => {
+export default async function Page() {
+  const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
-    try {
-      const { data, error } = parse(payload, schema);
+    const data = parse(payload, {
+      email: schema.email,
+      password: schema.password,
+    });
 
-      if (error) {
-        throw error;
-      }
+    const user = await createUser({
+      email: data.email,
+      password: data.password,
+    });
 
-      data.password = await bcrypt.hash(data.password, 10);
+    const session = await createSession({
+      userId: user.id,
+    });
 
-      const user = await prisma.user.create({ data });
+    await setSessionCookie(session);
+    redirect("/characters/create");
+  });
 
-      const session = await prisma.session.create({
-        data: {
-          user: { connect: { id: user.id } },
-          expiresAt: DateTime.now().plus({ hour: 24 }).toJSDate(),
-        },
-      });
-
-      await setSessionCookie(session);
-    } catch (err) {
-      return { error: JSON.stringify(err) };
-    }
-
-    redirect("/");
-  };
   return (
-    <main className="w-96">
+    <main>
       <Stack asChild>
         <Form action={action}>
           <Stack level={3}>
@@ -59,19 +46,28 @@ export default function Page() {
             </p>
           </Stack>
 
-          <Alert type="error" />
+          <Alert />
 
           <Stack level={2} asChild>
             <fieldset>
               <Field label="E-mail" name="email">
-                <Input type="email" required />
+                <Input
+                  type="email"
+                  placeholder="e.g. me@example.com"
+                  required
+                />
               </Field>
               <Field
                 label="Password"
                 name="password"
                 hint="At least 12 characters."
               >
-                <Input type="password" minLength={12} required />
+                <Input
+                  type="password"
+                  placeholder="e.g. super-duper-secret"
+                  minLength={12}
+                  required
+                />
               </Field>
             </fieldset>
           </Stack>

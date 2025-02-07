@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  email     String    @unique
-  password  String
-  sessions  Session[]
+  id         Int         @id @default(autoincrement())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  email      String      @unique
+  password   String
+  sessions   Session[]
+  characters Character[]
 }
 
 model Session {
@@ -27,6 +28,15 @@ model Session {
   token     String   @unique @default(cuid())
   createdAt DateTime @default(now())
   expiresAt DateTime
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Character {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -3,7 +3,7 @@ import { ComponentProps, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "font-bold text-stone-600",
+  base: "font-bold",
 });
 
 type Props = ComponentProps<"a"> & { asChild?: boolean; children: ReactNode };

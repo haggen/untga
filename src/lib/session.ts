@@ -1,9 +1,11 @@
 import prisma from "@/lib/prisma";
 import { Session } from "@prisma/client";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 import "server-only";
 
-export async function getActiveSession() {
+export const getActiveSession = cache(async () => {
   const token = (await cookies()).get("session")?.value;
 
   if (!token) {
@@ -14,6 +16,16 @@ export async function getActiveSession() {
     where: { token },
     include: { user: true },
   });
+});
+
+export async function requireActiveSession() {
+  const session = await getActiveSession();
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  return session;
 }
 
 export async function setSessionCookie(session: Session) {

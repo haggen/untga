@@ -1,6 +1,6 @@
 "use client";
 
-import { Action } from "@/lib/types";
+import { State, StatefulAction } from "@/lib/actions";
 import {
   ComponentProps,
   createContext,
@@ -8,23 +8,24 @@ import {
   useActionState,
 } from "react";
 
-type Props<T extends Action> = Omit<
+type Props<T extends State> = Omit<
   ComponentProps<"form">,
   "action" | "children"
 > & {
-  action: T;
+  action: StatefulAction<T>;
   children: ReactNode;
 };
 
 export const Context = createContext({
-  state: { error: "" },
+  state: undefined as State,
   pending: false,
 });
 
-export function Form<T extends Action>({ children, ...props }: Props<T>) {
-  const [state, action, pending] = useActionState(props.action, {
-    error: "",
-  });
+export function Form<T extends State>({ children, ...props }: Props<T>) {
+  const [state, action, pending] = useActionState(
+    props.action,
+    {} as Awaited<T> // @todo figure it out later
+  );
 
   return (
     <form {...props} action={action}>

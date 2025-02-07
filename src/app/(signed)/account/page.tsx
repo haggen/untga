@@ -1,4 +1,4 @@
-import { createSession, findUserByCredentials } from "@/actions";
+import { updateUser } from "@/actions";
 import { Alert } from "@/components/Alert";
 import { Field } from "@/components/Field";
 import { Form } from "@/components/Form";
@@ -6,36 +6,35 @@ import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { Submit } from "@/components/Submit";
 import { createStatefulAction } from "@/lib/actions";
+import prisma from "@/lib/prisma";
 import * as schema from "@/lib/schema";
-import { setSessionCookie } from "@/lib/session";
+import { requireActiveSession } from "@/lib/session";
 import { parse } from "@/lib/validation";
-import { redirect } from "next/navigation";
+import { z } from "zod";
 
-export default function Page() {
+export default async function Page() {
+  const session = await requireActiveSession();
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: session.userId },
+  });
+
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
+    const session = await requireActiveSession();
+
     const data = parse(payload, {
-      email: schema.email,
-      password: schema.password,
+      email: schema.email.optional().or(z.literal("")),
+      password: schema.password.optional().or(z.literal("")),
     });
 
-    const user = await findUserByCredentials({
+    await updateUser({
+      id: session.userId,
       email: data.email,
       password: data.password,
     });
 
-    if (!user) {
-      throw new Error("E-mail not found.");
-    }
-
-    const session = await createSession({
-      userId: user.id,
-    });
-
-    await setSessionCookie(session);
-
-    redirect("/characters");
+    return { message: "Information saved successfully." };
   });
 
   return (
@@ -43,8 +42,9 @@ export default function Page() {
       <Stack asChild>
         <Form action={action}>
           <Stack level={3}>
-            <h1 className="text-2xl font-bold">Sign in</h1>
-            <p>Enter your registered e-mail and password.</p>
+            <h1 className="text-2xl font-bold">Account</h1>
+
+            <p>Here you can change your e-mail or password.</p>
           </Stack>
 
           <Alert />
@@ -55,23 +55,26 @@ export default function Page() {
                 <Input
                   type="email"
                   placeholder="e.g. me@example.com"
-                  required
+                  defaultValue={user.email}
                 />
               </Field>
-
-              <Field label="Password" name="password">
+              <Field
+                label="New password"
+                name="password"
+                hint="At least 12 characters. Leave it blank to keep using the same password."
+              >
                 <Input
                   type="password"
                   placeholder="e.g. super-duper-secret"
                   minLength={12}
-                  required
+                  autoComplete="off"
                 />
               </Field>
             </fieldset>
           </Stack>
 
           <footer>
-            <Submit>Sign in</Submit>
+            <Submit>Save</Submit>
           </footer>
         </Form>
       </Stack>

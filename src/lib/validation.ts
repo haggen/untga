@@ -3,21 +3,15 @@ import { z } from "zod";
 /**
  * Parse form fields using a schema.
  */
-export function parse<T extends z.ZodObject<z.ZodRawShape>>(
-  form: FormData,
-  schema: T
+export function parse<Shape extends z.ZodRawShape>(
+  payload: FormData,
+  shape: Shape
 ) {
-  const fields = schema.safeParse(
-    Object.fromEntries(
-      Object.keys(schema.shape).map((key) => [key, form.get(key)])
-    )
-  );
-
-  if (fields.error) {
-    return {
-      error: fields.error,
-    };
-  }
-
-  return { data: fields.data as z.infer<T> };
+  return z
+    .object(shape)
+    .parse(
+      Object.fromEntries(
+        Object.keys(shape).map((key) => [key, payload.get(key)])
+      )
+    );
 }
