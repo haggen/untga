@@ -24,3 +24,9 @@ next-env.d.ts
 
 # Database file.
 *.sqlite
+
+# Playwright artifacts.
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

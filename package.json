@@ -7,7 +7,9 @@
     "start:development": "next dev",
     "build": "next build",
     "start:production": "next start",
-    "lint": "next lint"
+    "fix": "next lint --fix",
+    "lint": "next lint",
+    "test": "playwright test"
   },
   "prisma": {
     "seed": "node --experimental-strip-types prisma/seed.ts"
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.50.1",
     "@tailwindcss/postcss": "^4.0.3",
     "@types/bcrypt": "^5.0.2",
     "@types/luxon": "^3.4.2",
