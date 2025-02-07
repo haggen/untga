@@ -9,9 +9,25 @@ import { createStatefulAction } from "@/lib/actions";
 import * as schema from "@/lib/schema";
 import { setSessionCookie } from "@/lib/session";
 import { parse } from "@/lib/validation";
+import { Metadata, ResolvingMetadata } from "next";
 import { redirect } from "next/navigation";
 
-export default async function Page() {
+type Props = {
+  params: Promise<object>;
+  searchParams: Promise<object>;
+};
+
+export async function generateMetadata(
+  {}: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { title } = await parent;
+  return {
+    title: `Registration at ${title}`,
+  };
+}
+
+export default async function Page({}: Props) {
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
@@ -38,7 +54,7 @@ export default async function Page() {
       <Stack asChild>
         <Form action={action}>
           <Stack level={3}>
-            <h1 className="text-2xl font-bold">Register</h1>
+            <h1 className="text-2xl font-bold">Registration</h1>
 
             <p>
               Welcome! To start your journey first you have to create an

@@ -24,8 +24,8 @@ export default async function Page() {
     const session = await requireActiveSession();
 
     const data = parse(payload, {
-      email: schema.email.optional().or(z.literal("")),
-      password: schema.password.optional().or(z.literal("")),
+      email: schema.email,
+      password: schema.password.or(z.literal("").transform(() => undefined)),
     });
 
     await updateUser({
@@ -34,7 +34,7 @@ export default async function Page() {
       password: data.password,
     });
 
-    return { message: "Information saved successfully." };
+    return { message: "Account information saved." };
   });
 
   return (
@@ -56,6 +56,7 @@ export default async function Page() {
                   type="email"
                   placeholder="e.g. me@example.com"
                   defaultValue={user.email}
+                  required
                 />
               </Field>
               <Field
