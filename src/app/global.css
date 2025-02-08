@@ -4,6 +4,8 @@
   html {
     @apply text-stone-600;
     @apply bg-orange-100;
+
+    font-size: 20px;
   }
 
   button {

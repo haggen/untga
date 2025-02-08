@@ -12,7 +12,7 @@ export default function Layout({ children }: Props) {
         <nav className="flex items-center justify-between">
           <Link href="/">
             <hgroup className="flex items-baseline gap-2 font-bold">
-              <h1 className="text-2xl">Untitled Game</h1>
+              <h1 className="text-2xl">Untga</h1>
               <h2 className="text-sm">A text based browser RPG.</h2>
             </hgroup>
           </Link>

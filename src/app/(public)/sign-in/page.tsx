@@ -1,4 +1,3 @@
-import { createSession, findUserByCredentials } from "@/actions";
 import { Alert } from "@/components/Alert";
 import { Field } from "@/components/Field";
 import { Form } from "@/components/Form";
@@ -6,12 +5,29 @@ import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { Submit } from "@/components/Submit";
 import { createStatefulAction } from "@/lib/actions";
-import * as schema from "@/lib/schema";
-import { setSessionCookie } from "@/lib/session";
-import { parse } from "@/lib/validation";
+import db from "@/lib/database";
+
+import { setActiveSession } from "@/lib/session";
+import { parse, schema } from "@/lib/validation";
+import { Metadata, ResolvingMetadata } from "next";
 import { redirect } from "next/navigation";
 
-export default function Page() {
+type Props = {
+  params: Promise<object>;
+  searchParams: Promise<object>;
+};
+
+export async function generateMetadata(
+  {}: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { title } = await parent;
+  return {
+    title: `Sign in at ${title}`,
+  };
+}
+
+export default function Page({}: Props) {
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
@@ -20,20 +36,24 @@ export default function Page() {
       password: schema.password,
     });
 
-    const user = await findUserByCredentials({
-      email: data.email,
-      password: data.password,
+    const user = await db.user.findByCredentials({
+      data: {
+        email: data.email,
+        password: data.password,
+      },
     });
 
     if (!user) {
       throw new Error("E-mail not found.");
     }
 
-    const session = await createSession({
-      userId: user.id,
+    const session = await db.session.create({
+      data: {
+        userId: user.id,
+      },
     });
 
-    await setSessionCookie(session);
+    await setActiveSession(session);
 
     redirect("/characters");
   });

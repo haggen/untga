@@ -1,4 +1,3 @@
-import { createCharacter } from "@/actions";
 import { Alert } from "@/components/Alert";
 import { Field } from "@/components/Field";
 import { Form } from "@/components/Form";
@@ -6,8 +5,9 @@ import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { Submit } from "@/components/Submit";
 import { createStatefulAction } from "@/lib/actions";
-import * as schema from "@/lib/schema";
+import db from "@/lib/database";
 import { requireActiveSession } from "@/lib/session";
+import { parse, schema } from "@/lib/validation";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
@@ -15,10 +15,18 @@ export default async function Page() {
 
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
+
     const session = await requireActiveSession();
-    const character = await createCharacter({
-      userId: session.userId,
-      name: schema.name.parse(payload.get("name")),
+
+    const data = parse(payload, {
+      name: schema.name,
+    });
+
+    const character = await db.character.create({
+      data: {
+        userId: session.userId,
+        name: data.name,
+      },
     });
 
     redirect(`/characters/${character.id}`);
@@ -34,7 +42,7 @@ export default async function Page() {
             <p>Start by creating your first character.</p>
           </Stack>
 
-          <Alert type="error" />
+          <Alert />
 
           <Stack level={2} asChild>
             <fieldset>

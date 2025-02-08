@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inria_Serif, Merriweather_Sans } from "next/font/google";
+import { Alegreya, Inria_Serif } from "next/font/google";
 import { ReactNode } from "react";
 import "./global.css";
 
@@ -9,14 +9,14 @@ const fontSerif = Inria_Serif({
   subsets: ["latin"],
 });
 
-const fontSans = Merriweather_Sans({
+const fontSans = Alegreya({
   variable: "--font-sans",
   weight: ["400", "700"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Untitled Game",
+  title: "Untga",
   description: "A text based browser RPG.",
 };
 

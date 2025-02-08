@@ -24,10 +24,9 @@ model User {
 }
 
 model Session {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  expiresAt DateTime
+  expiresAt DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -36,14 +35,15 @@ model Character {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  name      String
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  age       Int      @default(567648000) // 18 years in seconds.
 }
 
 model Tick {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-
-  @@index([createdAt])
+  delta     Int
+  elapsed   Int
 }

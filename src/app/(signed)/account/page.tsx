@@ -1,4 +1,3 @@
-import { updateUser } from "@/actions";
 import { Alert } from "@/components/Alert";
 import { Field } from "@/components/Field";
 import { Form } from "@/components/Form";
@@ -6,15 +5,14 @@ import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { Submit } from "@/components/Submit";
 import { createStatefulAction } from "@/lib/actions";
-import prisma from "@/lib/prisma";
-import * as schema from "@/lib/schema";
+import db from "@/lib/database";
 import { requireActiveSession } from "@/lib/session";
-import { parse } from "@/lib/validation";
+import { parse, schema } from "@/lib/validation";
 import { z } from "zod";
 
 export default async function Page() {
   const session = await requireActiveSession();
-  const user = await prisma.user.findUniqueOrThrow({
+  const user = await db.user.findUniqueOrThrow({
     where: { id: session.userId },
   });
 
@@ -28,10 +26,12 @@ export default async function Page() {
       password: schema.password.or(z.literal("").transform(() => undefined)),
     });
 
-    await updateUser({
-      id: session.userId,
-      email: data.email,
-      password: data.password,
+    await db.user.update({
+      where: { id: session.userId },
+      data: {
+        email: data.email,
+        password: data.password,
+      },
     });
 
     return { message: "Account information saved." };

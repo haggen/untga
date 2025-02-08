@@ -1,11 +1,11 @@
-import prisma from "@/lib/prisma";
+import db from "@/lib/database";
 import { requireActiveSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await requireActiveSession();
 
-  const character = await prisma.character.findFirst({
+  const character = await db.character.findFirst({
     where: { userId: session.user.id },
   });
 

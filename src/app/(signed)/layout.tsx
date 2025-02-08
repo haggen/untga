@@ -1,6 +1,6 @@
 import { Link } from "@/components/Link";
-import prisma from "@/lib/prisma";
-import { deleteSessionCookie, getActiveSession } from "@/lib/session";
+import db from "@/lib/database";
+import { expireActiveSession, getActiveSession } from "@/lib/session";
 import { DateTime } from "luxon";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -19,7 +19,7 @@ export default async function Layout({ children }: Props) {
   const handleSignOut = async () => {
     "use server";
 
-    await prisma.session.update({
+    await db.session.update({
       where: {
         id: session.id,
       },
@@ -28,7 +28,7 @@ export default async function Layout({ children }: Props) {
       },
     });
 
-    await deleteSessionCookie();
+    await expireActiveSession();
 
     redirect("/");
   };
@@ -39,7 +39,7 @@ export default async function Layout({ children }: Props) {
         <nav className="flex items-center justify-between">
           <Link href="/characters">
             <hgroup className="flex items-baseline gap-2 font-bold">
-              <h1 className="text-2xl">Untitled Game</h1>
+              <h1 className="text-2xl">Untga</h1>
               <h2 className="text-sm">A text based browser RPG.</h2>
             </hgroup>
           </Link>
