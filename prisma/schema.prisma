@@ -40,3 +40,10 @@ model Character {
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model Tick {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
