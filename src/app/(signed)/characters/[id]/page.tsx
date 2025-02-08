@@ -28,12 +28,11 @@ export default async function Page({ params }: Props) {
   return (
     <main>
       <dl className="grid grid-cols-2 gap-2">
-        <dt>Time</dt>
+        <dt>Time since the world was created</dt>
         <dd>
           {format(to(tick.elapsed, "days"), {
             maximumFractionDigits: 0,
-            singular: "day passed",
-            plural: "days passed",
+            singular: "day",
           })}
         </dd>
         <dt>Name</dt>
