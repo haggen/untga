@@ -23,7 +23,7 @@ CREATE TABLE "Character" (
     "updatedAt" DATETIME NOT NULL,
     "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "age" INTEGER NOT NULL DEFAULT 18,
+    "age" INTEGER NOT NULL DEFAULT 567648000,
     CONSTRAINT "Character_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
