@@ -9,9 +9,11 @@ This is a Next.js application with Tailwindcss and Prisma.
 ```shell
 npm install
 cp .env.example .env
-npx prisma migrate dev
+npx prisma db push
 npm start
 ```
+
+If you change the schema, you need to run `npx prisma migrate dev` afterwards.
 
 ## Legal
 
