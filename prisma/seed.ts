@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-async function main() {
+async function seed() {
   await prisma.user.create({
     data: {
       email: "me@example.com",
@@ -13,12 +13,12 @@ async function main() {
   await prisma.tick.create({
     data: {
       delta: 0,
-      elapsed: 0,
+      epoch: 0,
     },
   });
 }
 
-main()
+seed()
   .catch(async (e) => {
     console.error(e);
     process.exit(1);

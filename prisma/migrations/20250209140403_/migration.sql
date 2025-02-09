@@ -23,7 +23,7 @@ CREATE TABLE "Character" (
     "updatedAt" DATETIME NOT NULL,
     "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "age" INTEGER NOT NULL DEFAULT 567648000,
+    "age" INTEGER NOT NULL DEFAULT 157680,
     CONSTRAINT "Character_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -32,7 +32,31 @@ CREATE TABLE "Tick" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "delta" INTEGER NOT NULL,
-    "elapsed" INTEGER NOT NULL
+    "epoch" INTEGER NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Action" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    "characterId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "duration" INTEGER NOT NULL,
+    "startedAtEpoch" INTEGER,
+    "completedAtEpoch" INTEGER,
+    CONSTRAINT "Action_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Journal" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "readAt" DATETIME,
+    "characterId" INTEGER NOT NULL,
+    "description" TEXT NOT NULL,
+    "writtenAtEpoch" INTEGER NOT NULL,
+    CONSTRAINT "Journal_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex

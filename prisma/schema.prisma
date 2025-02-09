@@ -32,18 +32,42 @@ model Session {
 }
 
 model Character {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
-  age       Int      @default(567648000) // 18 years in seconds.
+  age       Int       @default(157680) // 18 years in hours.
+  actions   Action[]
+  journal   Journal[]
 }
 
 model Tick {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   delta     Int
-  elapsed   Int
+  epoch     Int
+}
+
+model Action {
+  id               Int       @id @default(autoincrement())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  characterId      Int
+  character        Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  name             String
+  duration         Int
+  startedAtEpoch   Int?
+  completedAtEpoch Int?
+}
+
+model Journal {
+  id             Int       @id @default(autoincrement())
+  createdAt      DateTime  @default(now())
+  readAt         DateTime?
+  characterId    Int
+  character      Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  description    String
+  writtenAtEpoch Int
 }

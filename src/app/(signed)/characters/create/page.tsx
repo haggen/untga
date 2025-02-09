@@ -22,10 +22,20 @@ export default async function Page() {
       name: schema.name,
     });
 
+    const tick = await db.tick.findFirstOrThrow({
+      orderBy: { id: "desc" },
+    });
+
     const character = await db.character.create({
       data: {
         userId: session.userId,
         name: data.name,
+        journal: {
+          create: {
+            writtenAtEpoch: tick.epoch,
+            description: "I'm an adult now and I'm on my own.",
+          },
+        },
       },
     });
 

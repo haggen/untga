@@ -71,6 +71,18 @@ export const db = new PrismaClient().$extends({
     user: {
       findByCredentials,
     },
+    action: {
+      pending() {
+        return { OR: [{ startedAtEpoch: null }, { completedAtEpoch: null }] };
+      },
+    },
+    tick: {
+      async latest() {
+        return await db.tick.findFirstOrThrow({
+          orderBy: { id: "desc" },
+        });
+      },
+    },
   },
   query: {
     user: {
@@ -103,6 +115,24 @@ export const db = new PrismaClient().$extends({
             break;
         }
         return await query(args);
+      },
+    },
+  },
+  result: {
+    action: {
+      status: {
+        needs: { startedAtEpoch: true, completedAtEpoch: true },
+        compute(action) {
+          if (action.completedAtEpoch) {
+            return "completed";
+          }
+
+          if (action.startedAtEpoch) {
+            return "in progress";
+          }
+
+          return "pending";
+        },
       },
     },
   },
