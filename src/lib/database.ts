@@ -5,47 +5,71 @@ import { DateTime } from "luxon";
 
 type Args<T> = { data: T | T[] } | { create: T } | { update: T };
 
-async function transform<T extends Record<string, unknown>>(
+/**
+ * Isolate data from a query operation and pass it to a handler.
+ */
+async function apply<T extends Record<string, unknown>>(
   args: Args<T>,
-  callback: (data: T) => Promise<void>
+  handler: (data: T) => Promise<void>
 ) {
   if ("create" in args) {
-    await callback(args.create);
+    await handler(args.create);
   }
 
   if ("update" in args) {
-    await callback(args.update);
+    await handler(args.update);
   }
 
   if ("data" in args) {
     if (Array.isArray(args.data)) {
       for (const data of args.data) {
-        await callback(data);
+        await handler(data);
       }
     } else {
-      await callback(args.data);
+      await handler(args.data);
     }
   }
+}
+
+/**
+ * Find a user by email and password.
+ */
+async function findByCredentials({
+  data,
+}: {
+  data: { email: string; password: string };
+}) {
+  const user = await db.user.findFirstOrThrow({
+    where: { email: data.email },
+  });
+
+  if (!(await bcrypt.compare(data.password, user.password))) {
+    throw new Error("Password doesn't match");
+  }
+
+  return user;
+}
+
+/**
+ * Encrypt user's password.
+ */
+async function encryptPassword(data: { password?: unknown }) {
+  if (typeof data.password === "string") {
+    data.password = await bcrypt.hash(data.password, 10);
+  }
+}
+
+/**
+ * Assign a default expiration date to the session data.
+ */
+async function setSessionDefaultExpiry(data: { expiresAt?: unknown }) {
+  data.expiresAt ??= DateTime.now().plus({ day: 1 }).toJSDate();
 }
 
 export const db = new PrismaClient().$extends({
   model: {
     user: {
-      async findByCredentials({
-        data,
-      }: {
-        data: { email: string; password: string };
-      }) {
-        const user = await db.user.findFirstOrThrow({
-          where: { email: data.email },
-        });
-
-        if (!(await bcrypt.compare(data.password, user.password))) {
-          throw new Error("Password doesn't match");
-        }
-
-        return user;
-      },
+      findByCredentials,
     },
   },
   query: {
@@ -59,11 +83,7 @@ export const db = new PrismaClient().$extends({
           case "updateMany":
           case "updateManyAndReturn":
           case "upsert":
-            await transform(args, async (data) => {
-              if (typeof data.password === "string") {
-                data.password = await bcrypt.hash(data.password, 10);
-              }
-            });
+            await apply(args, encryptPassword);
             break;
         }
         return await query(args);
@@ -79,10 +99,7 @@ export const db = new PrismaClient().$extends({
           case "updateMany":
           case "updateManyAndReturn":
           case "upsert":
-            await transform(args, async (data) => {
-              const expiresAt = DateTime.now().plus({ day: 1 }).toJSDate();
-              data.expiresAt ??= expiresAt;
-            });
+            await apply(args, setSessionDefaultExpiry);
             break;
         }
         return await query(args);
