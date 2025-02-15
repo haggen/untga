@@ -17,16 +17,14 @@ npm-debug.log*
 
 # Environment config.
 .env
+compose.override.yml
 
 # TypeScript artifacts.
 *.tsbuildinfo
 next-env.d.ts
 
-# Database file.
-*.sqlite
-
 # Playwright artifacts.
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+test-results
+playwright-report
+blob-report
+playwright/.cache

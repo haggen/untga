@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -27,7 +27,8 @@ model User {
 
 /// Sessions are used for authentication.
 model Session {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
+  secret    String   @unique @default(cuid())
   createdAt DateTime @default(now())
   expiresAt DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
 
@@ -37,14 +38,15 @@ model Session {
 
 /// Characters in the world.
 model Character {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
   name        String
   description String?
 
-  playerId    Int?
-  player      User?       @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  userId      Int?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   locationId  Int
   location    Location    @relation(fields: [locationId], references: [id])
   containerId Int         @unique
@@ -60,7 +62,7 @@ model Act {
   startedAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   completesAt DateTime?
-  data        Json
+  data        Json      @default("{}")
 
   characterId Int
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
@@ -84,8 +86,11 @@ model AttributeSpecification {
   updatedAt   DateTime @updatedAt
   name        String
   description String?
+  tags        String[]
 
   attributes Attribute[]
+
+  @@index([tags])
 }
 
 /// Attributes are checked against when deciding outcomes.
@@ -102,7 +107,7 @@ model Attribute {
   character       Character              @relation(fields: [characterId], references: [id])
 }
 
-/// Container hold items.
+/// Container holds items.
 model Container {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -120,8 +125,11 @@ model ItemSpecification {
   updatedAt   DateTime @updatedAt
   name        String
   description String?
+  tags        String[]
 
   items Item[]
+
+  @@index([tags])
 }
 
 /// Items in the world.
@@ -143,12 +151,15 @@ model Location {
   updatedAt   DateTime @updatedAt
   name        String
   description String?
+  tags        String[]
 
   containerId Int         @unique
   container   Container   @relation(fields: [containerId], references: [id], onDelete: Cascade)
   characters  Character[]
   entrances   Path[]      @relation("entrance")
   exits       Path[]      @relation("exit")
+
+  @@index([tags])
 }
 
 /// Paths connect locations.

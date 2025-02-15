@@ -1,0 +1,26 @@
+services:
+  app:
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - node_modules
+    environment:
+      NODE_ENV: development
+    volumes:
+      - /app/node_modules
+    networks:
+      - default
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.untga.rule=Host(`untga.local.crz.li`)"
+  db:
+    ports: 
+      - 5432:5432
+
+networks:
+  traefik:
+    external: true

@@ -1,0 +1,12 @@
+services:
+  app:
+    networks:
+      - default
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.untga.rule=Host(`example.com`)"
+
+networks:
+  traefik:
+    external: true

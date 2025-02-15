@@ -8,21 +8,21 @@ export class UnauthorizedError extends Error {
   }
 }
 
-const cookieId = "sessionId";
+const cookieId = "session";
 
-export async function getActiveSessionId() {
+export async function getActiveSessionSecret() {
   return (await cookies()).get(cookieId)?.value;
 }
 
 export async function getActiveSession() {
-  const sessionId = await getActiveSessionId();
+  const secret = await getActiveSessionSecret();
 
-  if (!sessionId) {
+  if (!secret) {
     return null;
   }
 
   return await db.session.findUnique({
-    where: { id: sessionId, expiresAt: { gt: new Date() } },
+    where: { secret, expiresAt: { gt: new Date() } },
     include: { user: true },
   });
 }
@@ -38,7 +38,7 @@ export async function getActiveSessionOrThrow() {
 }
 
 export async function setActiveSession(session: Session) {
-  (await cookies()).set(cookieId, session.id, {
+  (await cookies()).set(cookieId, session.secret, {
     expires: session.expiresAt,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -47,11 +47,6 @@ export async function setActiveSession(session: Session) {
   });
 }
 
-export async function expireActiveSession() {
-  await db.session.update({
-    where: { id: await getActiveSessionId() },
-    data: { expiresAt: new Date() },
-  });
-
+export async function clearActiveSession() {
   (await cookies()).delete(cookieId);
 }

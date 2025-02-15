@@ -94,7 +94,9 @@ async function handle<T, O extends Operation>(
 /**
  * Prisma client.
  */
-export const db = new PrismaClient().$extends({
+export const db = new PrismaClient({
+  log: ["query", "info", "warn"],
+}).$extends({
   model: {
     user: {
       async findByCredentials({
@@ -102,9 +104,13 @@ export const db = new PrismaClient().$extends({
       }: {
         data: { email: string; password: string };
       }) {
-        const user = await db.user.findFirstOrThrow({
+        const user = await db.user.findUnique({
           where: { email: data.email },
         });
+
+        if (!user) {
+          throw new Error("E-mail not found");
+        }
 
         if (!(await bcrypt.compare(data.password, user.password))) {
           throw new Error("Password doesn't match");

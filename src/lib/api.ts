@@ -1,3 +1,4 @@
+import { Prisma } from "@/lib/prisma";
 import { UnauthorizedError } from "@/lib/session";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { NextRequest, NextResponse } from "next/server";
@@ -29,6 +30,23 @@ export function withErrorHandling<T>(handler: Handler<T>): Handler<T> {
 
       if (error instanceof ZodError) {
         return NextResponse.json({ error: error.errors }, { status: 400 });
+      }
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // See https://www.prisma.io/docs/orm/reference/error-reference#error-codes
+        if (error.code === "P2025") {
+          return NextResponse.json(
+            { error: "Record not found." },
+            { status: 404 }
+          );
+        } else if (error.code.startsWith("P2")) {
+          return NextResponse.json(
+            { error: `${error.code} ${error.message.trim()}` },
+            { status: 400 }
+          );
+        } else {
+          return NextResponse.json({ error }, { status: 500 });
+        }
       }
 
       // Fix https://www.reddit.com/r/nextjs/comments/1gkxdqe/comment/m19kxgn/

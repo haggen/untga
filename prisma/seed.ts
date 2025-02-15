@@ -17,6 +17,7 @@ async function seed() {
         name: "Village",
         description: "A simple village.",
         container: { create: {} },
+        tags: ["peaceful", "starting-location"],
       },
     }),
     await db.location.create({
@@ -24,6 +25,7 @@ async function seed() {
         name: "Forest",
         description: "A dense forest.",
         container: { create: {} },
+        tags: ["hostile"],
       },
     }),
   ];
@@ -45,6 +47,7 @@ async function seed() {
     data: {
       name: "Survival",
       description: "The ability to survive in the wild.",
+      tags: ["playable-character-attribute"],
     },
   });
 }

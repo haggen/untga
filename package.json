@@ -2,16 +2,18 @@
   "name": "untga",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "npm run-script start:${NODE_ENV:-development}",
     "start:development": "next dev",
+    "prestart:development": "test -d node_modules || npm ci",
+    "prebuild": "prisma generate",
     "build": "next build",
     "start:production": "next start",
     "fix": "next lint --fix",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "playwright test",
-    "tick": "while sleep 10; do curl -sX POST http://localhost:3000/api/ticks; echo; done"
+    "test": "playwright test"
   },
   "prisma": {
     "seed": "node --experimental-strip-types prisma/seed.ts"
@@ -29,7 +31,6 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@playwright/test": "^1.50.1",
     "@tailwindcss/postcss": "^4.0.6",
     "@types/bcrypt": "^5.0.2",
     "@types/luxon": "^3.4.2",
