@@ -3,7 +3,7 @@ import { ComponentProps, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "flex items-center h-12 text-lg px-6 rounded shadow-md transition-colors",
+  base: "flex items-center h-10 text-lg px-6 rounded shadow-md transition-colors",
   variants: {
     variant: {
       default: "bg-stone-600 text-stone-100 hover:bg-stone-500",

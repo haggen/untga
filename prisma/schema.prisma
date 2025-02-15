@@ -13,61 +13,152 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// User of the system.
 model User {
-  id         Int         @id @default(autoincrement())
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  email      String      @unique
-  password   String
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String   @unique
+  password  String
+
   sessions   Session[]
   characters Character[]
 }
 
+/// Sessions are used for authentication.
 model Session {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   expiresAt DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+/// Characters in the world.
 model Character {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String?
+
+  playerId    Int?
+  player      User?       @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  locationId  Int
+  location    Location    @relation(fields: [locationId], references: [id])
+  containerId Int         @unique
+  container   Container   @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  attributes  Attribute[]
+  acts        Act[]
+  logs        Log[]
+}
+
+/// Acts can be performed by characters.
+model Act {
+  id          Int       @id @default(autoincrement())
+  startedAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completesAt DateTime?
+  data        Json
+
+  characterId Int
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+/// Log events from a player character's perspective.
+model Log {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  age       Int       @default(157680) // 18 years in hours.
-  actions   Action[]
-  journal   Journal[]
+  readAt    DateTime?
+  message   String
+
+  characterId Int
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
-model Tick {
+/// Static information of attributes.
+model AttributeSpecification {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String?
+
+  attributes Attribute[]
+}
+
+/// Attributes are checked against when deciding outcomes.
+model Attribute {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  delta     Int
-  epoch     Int
+  updatedAt DateTime @updatedAt
+  level     Int      @default(1)
+  progress  Int      @default(0)
+
+  specificationId Int
+  specification   AttributeSpecification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+  characterId     Int
+  character       Character              @relation(fields: [characterId], references: [id])
 }
 
-model Action {
-  id               Int       @id @default(autoincrement())
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  characterId      Int
-  character        Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  name             String
-  duration         Int
-  startedAtEpoch   Int?
-  completedAtEpoch Int?
+/// Container hold items.
+model Container {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  character Character?
+  location  Location?
+  items     Item[]
 }
 
-model Journal {
-  id             Int       @id @default(autoincrement())
-  createdAt      DateTime  @default(now())
-  readAt         DateTime?
-  characterId    Int
-  character      Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  description    String
-  writtenAtEpoch Int
+/// Static information of items.
+model ItemSpecification {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String?
+
+  items Item[]
+}
+
+/// Items in the world.
+model Item {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  specificationId Int
+  specification   ItemSpecification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+  containerId     Int
+  container       Container         @relation(fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+/// Locations in the world.
+model Location {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String?
+
+  containerId Int         @unique
+  container   Container   @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  characters  Character[]
+  entrances   Path[]      @relation("entrance")
+  exits       Path[]      @relation("exit")
+}
+
+/// Paths connect locations.
+model Path {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entranceId Int
+  entrance   Location @relation("entrance", fields: [entranceId], references: [id], onDelete: Cascade)
+  exitId     Int
+  exit       Location @relation("exit", fields: [exitId], references: [id], onDelete: Cascade)
 }

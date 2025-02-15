@@ -13,7 +13,7 @@ export type StatelessAction<Payload, Result> = (
   payload: Payload
 ) => Promise<Result>;
 
-function handleError(err: unknown) {
+export function handleError(err: unknown) {
   if (isRedirectError(err)) {
     throw err;
   }

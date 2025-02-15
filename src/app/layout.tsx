@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Alegreya, Inria_Serif } from "next/font/google";
+import { Inria_Serif, Lato } from "next/font/google";
 import { ReactNode } from "react";
 import "./global.css";
 
@@ -9,7 +9,7 @@ const fontSerif = Inria_Serif({
   subsets: ["latin"],
 });
 
-const fontSans = Alegreya({
+const fontSans = Lato({
   variable: "--font-sans",
   weight: ["400", "700"],
   subsets: ["latin"],
@@ -17,14 +17,14 @@ const fontSans = Alegreya({
 
 export const metadata: Metadata = {
   title: "Untga",
-  description: "A text based browser RPG.",
+  description: "A text-based browser RPG.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+type Props = Readonly<{
   children: ReactNode;
-}>) {
+}>;
+
+export default function Layout({ children }: Props) {
   return (
     <html
       lang="en"

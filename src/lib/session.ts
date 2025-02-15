@@ -1,9 +1,12 @@
-import db from "@/lib/database";
-import { Session } from "@prisma/client";
+import { db, Session } from "@/lib/prisma";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { cache } from "react";
 import "server-only";
+
+export class UnauthorizedError extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+}
 
 const cookieId = "sessionId";
 
@@ -11,7 +14,7 @@ export async function getActiveSessionId() {
   return (await cookies()).get(cookieId)?.value;
 }
 
-export const getActiveSession = cache(async () => {
+export async function getActiveSession() {
   const sessionId = await getActiveSessionId();
 
   if (!sessionId) {
@@ -22,13 +25,13 @@ export const getActiveSession = cache(async () => {
     where: { id: sessionId },
     include: { user: true },
   });
-});
+}
 
-export async function requireActiveSession() {
+export async function getActiveSessionOrThrow() {
   const session = await getActiveSession();
 
   if (!session) {
-    redirect("/sign-in");
+    throw new UnauthorizedError();
   }
 
   return session;

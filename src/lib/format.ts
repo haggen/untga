@@ -1,18 +1,24 @@
-export function format(
-  value: number,
+function number(value: number, opts: Intl.NumberFormatOptions) {
+  return new Intl.NumberFormat("en-US", opts).format(value);
+}
+
+function plural(
+  count: number,
   {
     singular,
     plural,
     ...opts
-  }: { singular?: string; plural?: string } & Intl.NumberFormatOptions
+  }: {
+    singular: string;
+    plural?: string;
+  } & Intl.NumberFormatOptions
 ) {
-  const number = new Intl.NumberFormat("en-US", opts).format(value);
-
-  if (singular) {
-    return `${number} ${
-      Math.floor(value) === 1 ? singular : plural ? plural : `${singular}s`
-    }`;
-  }
-
-  return number;
+  return `${number(count, opts)} ${
+    Math.floor(count) === 1 ? singular : plural ? plural : `${singular}s`
+  }`;
 }
+
+export const format = {
+  number,
+  plural,
+};
