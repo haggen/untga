@@ -22,7 +22,7 @@ export async function getActiveSession() {
   }
 
   return await db.session.findUnique({
-    where: { id: sessionId },
+    where: { id: sessionId, expiresAt: { gt: new Date() } },
     include: { user: true },
   });
 }

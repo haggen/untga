@@ -1,3 +1,4 @@
+import { UnauthorizedError } from "@/lib/session";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -20,6 +21,10 @@ export function withErrorHandling<T>(handler: Handler<T>): Handler<T> {
     } catch (error) {
       if (isRedirectError(error)) {
         throw error;
+      }
+
+      if (error instanceof UnauthorizedError) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
 
       if (error instanceof ZodError) {
