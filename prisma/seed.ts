@@ -30,15 +30,31 @@ async function seed() {
     }),
   ];
 
+  await db.character.create({
+    data: {
+      name: "Jeremia, a concerned villager",
+      locationId: places[0].id,
+      containerId: (await db.container.create({ data: {} })).id,
+    },
+  });
+
+  await db.character.create({
+    data: {
+      name: "Brian, the hunter",
+      locationId: places[1].id,
+      containerId: (await db.container.create({ data: {} })).id,
+    },
+  });
+
   await db.path.createMany({
     data: [
       {
         exitId: places[0].id,
-        entranceId: places[1].id,
+        entryId: places[1].id,
       },
       {
         exitId: places[1].id,
-        entranceId: places[0].id,
+        entryId: places[0].id,
       },
     ],
   });

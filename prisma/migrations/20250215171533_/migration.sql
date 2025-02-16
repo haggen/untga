@@ -28,6 +28,7 @@ CREATE TABLE "Character" (
     "deletedAt" TIMESTAMP(3),
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "tags" TEXT[],
     "userId" INTEGER,
     "locationId" INTEGER NOT NULL,
     "containerId" INTEGER NOT NULL,
@@ -133,7 +134,7 @@ CREATE TABLE "Path" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "entranceId" INTEGER NOT NULL,
+    "entryId" INTEGER NOT NULL,
     "exitId" INTEGER NOT NULL,
 
     CONSTRAINT "Path_pkey" PRIMARY KEY ("id")
@@ -194,7 +195,7 @@ ALTER TABLE "Item" ADD CONSTRAINT "Item_containerId_fkey" FOREIGN KEY ("containe
 ALTER TABLE "Location" ADD CONSTRAINT "Location_containerId_fkey" FOREIGN KEY ("containerId") REFERENCES "Container"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Path" ADD CONSTRAINT "Path_entranceId_fkey" FOREIGN KEY ("entranceId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Path" ADD CONSTRAINT "Path_entryId_fkey" FOREIGN KEY ("entryId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Path" ADD CONSTRAINT "Path_exitId_fkey" FOREIGN KEY ("exitId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;

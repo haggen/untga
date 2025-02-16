@@ -4,16 +4,16 @@ import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
+type Params = { characterId: string };
+
 export const GET = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { characterId } = parse(await params, {
+      characterId: schemas.id,
     });
 
-    const { userId } = await getActiveSessionOrThrow();
-
     const character = await db.character.findUniqueOrThrow({
-      where: { id, userId },
+      where: { id: characterId },
     });
 
     return NextResponse.json(character);
@@ -21,9 +21,9 @@ export const GET = withErrorHandling(
 );
 
 export const PATCH = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { characterId } = parse(await params, {
+      characterId: schemas.id,
     });
 
     const payload = parse(await req.json(), {
@@ -33,7 +33,7 @@ export const PATCH = withErrorHandling(
     const { userId } = await getActiveSessionOrThrow();
 
     const character = await db.character.update({
-      where: { id, userId },
+      where: { id: characterId, userId },
       data: {
         name: payload.name,
       },
@@ -44,15 +44,15 @@ export const PATCH = withErrorHandling(
 );
 
 export const DELETE = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { characterId } = parse(await params, {
+      characterId: schemas.id,
     });
 
     const { userId } = await getActiveSessionOrThrow();
 
     const character = await db.character.update({
-      where: { id, userId },
+      where: { id: characterId, userId },
       data: { deletedAt: new Date() },
     });
 

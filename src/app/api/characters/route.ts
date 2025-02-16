@@ -4,11 +4,19 @@ import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
-export const GET = withErrorHandling(async () => {
-  const { userId } = await getActiveSessionOrThrow();
+export const GET = withErrorHandling(async (req) => {
+  const { user: userId, location: locationId } = parse(
+    req.nextUrl.searchParams,
+    {
+      // Filter by character's location.
+      location: schemas.id.optional(),
+      // Filter by player.
+      user: schemas.id.optional(),
+    }
+  );
 
   const characters = await db.character.findMany({
-    where: { userId },
+    where: { userId, locationId },
   });
 
   return NextResponse.json(characters);

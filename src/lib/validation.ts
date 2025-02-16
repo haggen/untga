@@ -11,10 +11,10 @@ export const schemas = {
 };
 
 /**
- * Parse form fields using a schema.
+ * Parse payload using a schema.
  */
 export function parse<Shape extends z.ZodRawShape>(
-  payload: FormData | Record<string, unknown>,
+  payload: FormData | URLSearchParams | Record<string, unknown>,
   shape: Shape
 ) {
   return z
@@ -23,7 +23,11 @@ export function parse<Shape extends z.ZodRawShape>(
       Object.fromEntries(
         Object.keys(shape).map((key) => [
           key,
-          payload instanceof FormData ? payload.get(key) : payload[key],
+          payload instanceof FormData
+            ? payload.get(key) ?? undefined
+            : payload instanceof URLSearchParams
+            ? payload.get(key) ?? undefined
+            : payload[key],
         ])
       )
     );

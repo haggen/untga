@@ -4,20 +4,22 @@ import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
+type Params = { userId: string };
+
 export const GET = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { userId } = parse(await params, {
+      userId: schemas.id,
     });
 
     const session = await getActiveSessionOrThrow();
 
-    if (id !== session.userId) {
+    if (userId !== session.userId) {
       return NextResponse.json(null, { status: 404 });
     }
 
     const user = await db.user.findUniqueOrThrow({
-      where: { id },
+      where: { id: userId },
       omit: {
         password: true,
       },
@@ -28,9 +30,9 @@ export const GET = withErrorHandling(
 );
 
 export const PATCH = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { userId } = parse(await params, {
+      userId: schemas.id,
     });
 
     const payload = parse(await req.json(), {
@@ -40,12 +42,12 @@ export const PATCH = withErrorHandling(
 
     const session = await getActiveSessionOrThrow();
 
-    if (id !== session.userId) {
+    if (userId !== session.userId) {
       return NextResponse.json(null, { status: 404 });
     }
 
     const user = await db.user.update({
-      where: { id },
+      where: { id: userId },
       omit: {
         password: true,
       },

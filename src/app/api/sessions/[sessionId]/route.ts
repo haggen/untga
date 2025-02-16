@@ -4,16 +4,18 @@ import { clearActiveSession, getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
+type Params = { sessionId: string };
+
 export const GET = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { sessionId } = parse(await params, {
+      sessionId: schemas.id,
     });
 
     const { userId } = await getActiveSessionOrThrow();
 
     const session = await db.session.findUniqueOrThrow({
-      where: { id, userId },
+      where: { id: sessionId, userId },
       omit: {
         secret: true,
       },
@@ -24,15 +26,15 @@ export const GET = withErrorHandling(
 );
 
 export const DELETE = withErrorHandling(
-  async (req, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = parse(await params, {
-      id: schemas.id,
+  async (req, { params }: { params: Promise<Params> }) => {
+    const { sessionId } = parse(await params, {
+      sessionId: schemas.id,
     });
 
     const { userId } = await getActiveSessionOrThrow();
 
     const session = await db.session.update({
-      where: { id, userId },
+      where: { id: sessionId, userId },
       data: { expiresAt: new Date() },
       omit: {
         secret: true,

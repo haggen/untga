@@ -44,6 +44,7 @@ model Character {
   deletedAt   DateTime?
   name        String
   description String?
+  tags        String[]
 
   userId      Int?
   user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -156,7 +157,7 @@ model Location {
   containerId Int         @unique
   container   Container   @relation(fields: [containerId], references: [id], onDelete: Cascade)
   characters  Character[]
-  entrances   Path[]      @relation("entrance")
+  entries     Path[]      @relation("entry")
   exits       Path[]      @relation("exit")
 
   @@index([tags])
@@ -168,8 +169,8 @@ model Path {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  entranceId Int
-  entrance   Location @relation("entrance", fields: [entranceId], references: [id], onDelete: Cascade)
-  exitId     Int
-  exit       Location @relation("exit", fields: [exitId], references: [id], onDelete: Cascade)
+  entryId Int
+  entry   Location @relation("entry", fields: [entryId], references: [id], onDelete: Cascade)
+  exitId  Int
+  exit    Location @relation("exit", fields: [exitId], references: [id], onDelete: Cascade)
 }
