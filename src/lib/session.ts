@@ -1,12 +1,7 @@
+import { UnauthorizedError } from "@/lib/error";
 import { db, Session } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import "server-only";
-
-export class UnauthorizedError extends Error {
-  constructor() {
-    super("Unauthorized");
-  }
-}
 
 const cookieId = "session";
 

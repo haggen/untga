@@ -21,7 +21,7 @@ export const GET = withErrorHandling(
       },
     });
 
-    return NextResponse.json(session);
+    return NextResponse.json({ data: session });
   }
 );
 
@@ -43,6 +43,6 @@ export const DELETE = withErrorHandling(
 
     await clearActiveSession();
 
-    return NextResponse.json(session);
+    return NextResponse.json({ data: session });
   }
 );

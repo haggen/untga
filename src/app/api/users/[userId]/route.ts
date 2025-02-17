@@ -1,4 +1,5 @@
 import { withErrorHandling } from "@/lib/api";
+import { NotFoundError, UnauthorizedError } from "@/lib/error";
 import { db } from "@/lib/prisma";
 import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
@@ -15,17 +16,21 @@ export const GET = withErrorHandling(
     const session = await getActiveSessionOrThrow();
 
     if (userId !== session.userId) {
-      return NextResponse.json(null, { status: 404 });
+      throw new UnauthorizedError();
     }
 
-    const user = await db.user.findUniqueOrThrow({
+    const user = await db.user.findUnique({
       where: { id: userId },
       omit: {
         password: true,
       },
     });
 
-    return NextResponse.json(user);
+    if (!user) {
+      throw new NotFoundError();
+    }
+
+    return NextResponse.json({ data: user });
   }
 );
 
@@ -43,7 +48,7 @@ export const PATCH = withErrorHandling(
     const session = await getActiveSessionOrThrow();
 
     if (userId !== session.userId) {
-      return NextResponse.json(null, { status: 404 });
+      throw new UnauthorizedError();
     }
 
     const user = await db.user.update({
@@ -57,6 +62,6 @@ export const PATCH = withErrorHandling(
       },
     });
 
-    return NextResponse.json(user);
+    return NextResponse.json({ data: user });
   }
 );

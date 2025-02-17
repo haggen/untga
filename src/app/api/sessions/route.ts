@@ -7,6 +7,8 @@ import { NextResponse } from "next/server";
 export const GET = withErrorHandling(async () => {
   const { userId } = await getActiveSessionOrThrow();
 
+  const where = { userId };
+
   const sessions = await db.session.findMany({
     where: { userId },
     omit: {
@@ -15,7 +17,9 @@ export const GET = withErrorHandling(async () => {
     orderBy: [{ expiresAt: "desc" }, { createdAt: "desc" }],
   });
 
-  return NextResponse.json(sessions);
+  const total = await db.session.count({ where });
+
+  return NextResponse.json({ data: sessions, total });
 });
 
 export const POST = withErrorHandling(async (req) => {
@@ -39,5 +43,8 @@ export const POST = withErrorHandling(async (req) => {
 
   await setActiveSession(session);
 
-  return NextResponse.json({ ...session, secret: undefined }, { status: 201 });
+  return NextResponse.json(
+    { data: { ...session, secret: undefined } },
+    { status: 201 }
+  );
 });

@@ -19,5 +19,5 @@ export const POST = withErrorHandling(async (req) => {
     },
   });
 
-  return NextResponse.json(user, { status: 201 });
+  return NextResponse.json({ data: user }, { status: 201 });
 });

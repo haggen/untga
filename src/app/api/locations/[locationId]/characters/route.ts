@@ -20,6 +20,14 @@ export const GET = withErrorHandling(
       throw new NotFoundError("Location not found.");
     }
 
-    return NextResponse.json({ data: location });
+    const characters = await db.character.findMany({
+      where: { locationId },
+    });
+
+    const total = await db.character.count({
+      where: { locationId },
+    });
+
+    return NextResponse.json({ data: characters, total });
   }
 );

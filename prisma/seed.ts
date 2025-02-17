@@ -1,21 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
 
 const db = new PrismaClient();
 
 async function seed() {
-  await db.user.create({
-    data: {
-      email: "me@example.com",
-      password: await bcrypt.hash("password-123", 10),
-    },
-  });
-
   const places = [
     await db.location.create({
       data: {
         name: "Village",
-        description: "A simple village.",
+        description: "A small village.",
         container: { create: {} },
         tags: ["peaceful", "starting-location"],
       },
@@ -33,16 +25,18 @@ async function seed() {
   await db.character.create({
     data: {
       name: "Jeremia, a concerned villager",
-      locationId: places[0].id,
-      containerId: (await db.container.create({ data: {} })).id,
+      location: { connect: { id: places[0].id } },
+      container: { create: {} },
+      tags: ["npc"],
     },
   });
 
   await db.character.create({
     data: {
       name: "Brian, the hunter",
-      locationId: places[1].id,
-      containerId: (await db.container.create({ data: {} })).id,
+      location: { connect: { id: places[1].id } },
+      container: { create: {} },
+      tags: ["npc"],
     },
   });
 
@@ -59,12 +53,14 @@ async function seed() {
     ],
   });
 
-  await db.attributeSpecification.create({
-    data: {
-      name: "Survival",
-      description: "The ability to survive in the wild.",
-      tags: ["playable-character-attribute"],
-    },
+  await db.attributeSpecification.createMany({
+    data: [
+      {
+        name: "Energy",
+        description: "Energy is spent to perform certain actions.",
+        tags: ["energy", "playable-character-attribute"],
+      },
+    ],
   });
 }
 
