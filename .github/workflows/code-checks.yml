@@ -5,30 +5,8 @@ on:
   - pull_request
 
 jobs:
-  lint:
-    name: "Static analysis"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 23
-      - run: npm ci
-      - run: npm run lint
-
-  typecheck:
-    name: "Type checking"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 23
-      - run: npm ci
-      - run: npm run typecheck
-
-  codeql:
-    name: "CodeQL Analysis"
+  checks:
+    name: Lint, type checking, build and CodeQL
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -44,6 +22,5 @@ jobs:
       - run: npm run build
       - uses: github/codeql-action/init@v3
         with:
-          build-mode: manual
           languages: javascript
       - uses: github/codeql-action/analyze@v3
