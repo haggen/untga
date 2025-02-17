@@ -30,9 +30,20 @@ jobs:
   codeql:
     name: "CodeQL Analysis"
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+    strategy:
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 23
+      - run: npm ci
+      - run: npm run build
       - uses: github/codeql-action/init@v3
         with:
-          languages: typescript
+          build-mode: manual
+          languages: javascript
       - uses: github/codeql-action/analyze@v3
