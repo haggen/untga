@@ -3,7 +3,9 @@
 @layer base {
   html {
     @apply text-stone-600;
-    @apply bg-orange-100;
+    @apply bg-stone-200;
+
+    /* font-size: 20px; */
   }
 
   button {

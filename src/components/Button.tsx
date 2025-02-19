@@ -3,10 +3,11 @@ import { ComponentProps, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "flex items-center h-10 text-lg px-6 rounded shadow-md transition-colors",
+  base: "flex items-center font-bold h-10 px-6 rounded shadow-sm transition-colors",
   variants: {
     variant: {
-      default: "bg-stone-600 text-stone-100 hover:bg-stone-500",
+      default:
+        "bg-orange-600 text-orange-100 hover:bg-orange-500 hover:text-white",
     },
     disabled: {
       true: "cursor-not-allowed opacity-50",

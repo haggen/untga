@@ -1,0 +1,28 @@
+{
+    "__meta__": {
+        "about": "HTTPie session file",
+        "help": "https://httpie.io/docs#sessions",
+        "httpie": "3.2.4"
+    },
+    "auth": {
+        "password": null,
+        "type": null,
+        "username": null
+    },
+    "cookies": [
+        {
+            "domain": "untga.local.crz.li",
+            "expires": 1739914970,
+            "name": "session",
+            "path": "/",
+            "secure": false,
+            "value": "cm79l0cyi0001qr17ymyoo8r3"
+        }
+    ],
+    "headers": [
+        {
+            "name": "Accept",
+            "value": "application/json, */*;q=0.5"
+        }
+    ]
+}

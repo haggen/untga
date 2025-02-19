@@ -1,15 +1,16 @@
+import Providers from "@/components/Providers";
 import type { Metadata } from "next";
-import { Inria_Serif, Lato } from "next/font/google";
+import { Cabin, Coustard } from "next/font/google";
 import { ReactNode } from "react";
 import "./global.css";
 
-const fontSerif = Inria_Serif({
+const fontSerif = Coustard({
   variable: "--font-serif",
-  weight: ["400", "700"],
+  weight: ["400", "900"],
   subsets: ["latin"],
 });
 
-const fontSans = Lato({
+const fontSans = Cabin({
   variable: "--font-sans",
   weight: ["400", "700"],
   subsets: ["latin"],
@@ -24,13 +25,38 @@ type Props = Readonly<{
   children: ReactNode;
 }>;
 
+// const style = { filter: "url(#noise)" };
+const style = {};
+
 export default function Layout({ children }: Props) {
   return (
     <html
       lang="en"
       className={`${fontSerif.variable} ${fontSans.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body>
+        <svg xmlns="http://www.w3.org/2000/svg" height="0" width="0">
+          <defs>
+            <filter id="noise">
+              <feTurbulence
+                type="fractalNoise"
+                id="turbulence"
+                baseFrequency="1"
+                numOctaves="2"
+              />
+              <feDisplacementMap
+                id="displacement"
+                in="SourceGraphic"
+                scale="2"
+              />
+            </filter>
+          </defs>
+        </svg>
+
+        <div style={style}>
+          <Providers>{children}</Providers>
+        </div>
+      </body>
     </html>
   );
 }
