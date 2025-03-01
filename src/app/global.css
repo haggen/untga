@@ -2,10 +2,8 @@
 
 @layer base {
   html {
-    @apply text-stone-600;
-    @apply bg-stone-200;
-
-    /* font-size: 20px; */
+    background: url(/paper.png) repeat 0 / 400px 400px, var(--color-orange-200);
+    background-blend-mode: multiply;
   }
 
   button {

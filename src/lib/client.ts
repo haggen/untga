@@ -1,4 +1,4 @@
-type ReqDesc<T = unknown> = {
+type ClientReq<T = unknown> = {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers: Record<string, string>;
   payload?: T;
@@ -7,56 +7,56 @@ type ReqDesc<T = unknown> = {
   credentials?: RequestCredentials;
 };
 
-type RespDesc<T = unknown> = {
+export type ClientResp<T = unknown> = {
   status: number;
   headers: Record<string, string>;
   payload: T;
 };
 
 async function request<T>(
-  urlDesc: URL | string,
-  reqDesc: Partial<ReqDesc> = {}
+  baseUrl: URL | string,
+  clientReq: Partial<ClientReq> = {}
 ) {
-  if ("payload" in reqDesc) {
-    reqDesc.method ??= "POST";
+  if ("payload" in clientReq) {
+    clientReq.method ??= "POST";
 
-    if (reqDesc.payload instanceof FormData) {
-      reqDesc.payload = Object.fromEntries(reqDesc.payload);
+    if (clientReq.payload instanceof FormData) {
+      clientReq.payload = Object.fromEntries(clientReq.payload);
     }
   }
 
-  reqDesc.method ??= "GET";
-  reqDesc.credentials ??= "same-origin";
-  reqDesc.headers ??= {};
-  reqDesc.headers["Content-Type"] ??= "application/json; charset=utf-8";
+  clientReq.method ??= "GET";
+  clientReq.credentials ??= "same-origin";
+  clientReq.headers ??= {};
+  clientReq.headers["Content-Type"] ??= "application/json; charset=utf-8";
 
-  const url = new URL(urlDesc, window.location.origin);
+  const url = new URL(baseUrl, window.location.origin);
 
-  if (reqDesc.query) {
-    for (const [key, value] of Object.entries(reqDesc.query)) {
+  if (clientReq.query) {
+    for (const [key, value] of Object.entries(clientReq.query)) {
       url.searchParams.set(key, String(value));
     }
   }
 
   const response = await fetch(url, {
-    method: reqDesc.method,
-    headers: new Headers(reqDesc.headers),
-    body: JSON.stringify(reqDesc.payload),
-    credentials: reqDesc.credentials,
-    signal: reqDesc.signal,
+    method: clientReq.method,
+    headers: new Headers(clientReq.headers),
+    body: JSON.stringify(clientReq.payload),
+    credentials: clientReq.credentials,
+    signal: clientReq.signal,
   });
 
-  const respDesc: RespDesc<T> = {
+  const clientResp: ClientResp<T> = {
     status: response.status,
     headers: Object.fromEntries(response.headers),
     payload: await response.json(),
   };
 
   if (!response.ok) {
-    throw respDesc;
+    throw clientResp;
   }
 
-  return respDesc;
+  return clientResp;
 }
 
 export const client = { request };

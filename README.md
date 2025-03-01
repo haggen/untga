@@ -13,18 +13,23 @@ The stack is;
 1. TypeScript
 2. Next.js
 3. Tailwind CSS
-4. Prisma (SQLite)
+4. Prisma (PostgreSQL)
 
 ### Getting started
 
+Copy `compose.override.yml.development-example` as `compose.override.yml` and run:
+
 ```shell
-npm install
-cp .env.example .env
-npx prisma migrate dev
-npm start
+docker compose up -w
 ```
 
-If you change the schema, you need to re-run `npx prisma migrate dev` afterwards.
+#### IDE integration
+
+```shell
+npm install
+npx next build # To generate types.
+npx prisma generate
+```
 
 ## Legal
 

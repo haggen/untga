@@ -1,6 +1,7 @@
 import { UnauthorizedError } from "@/lib/error";
 import { db, Session } from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import "server-only";
 
 const cookieId = "session";
@@ -27,6 +28,16 @@ export async function getActiveSessionOrThrow() {
 
   if (!session) {
     throw new UnauthorizedError();
+  }
+
+  return session;
+}
+
+export async function getActiveSessionOrRedirect() {
+  const session = await getActiveSession();
+
+  if (!session) {
+    redirect("/sign-in");
   }
 
   return session;

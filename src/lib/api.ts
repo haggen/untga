@@ -48,10 +48,19 @@ export function withErrorHandling<T>(handler: Handler<T>): Handler<T> {
         return NextResponse.json({ error: error.message }, { status: 422 });
       }
 
-      // Fix https://www.reddit.com/r/nextjs/comments/1gkxdqe/comment/m19kxgn/
-      console.error(error instanceof Error ? error.stack : error);
+      if (error instanceof Error) {
+        // Fix https://www.reddit.com/r/nextjs/comments/1gkxdqe/comment/m19kxgn/
+        console.error(error.stack);
 
-      return NextResponse.json({ error }, { status: 500 });
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
+      console.error(error);
+
+      return NextResponse.json(
+        { error: JSON.stringify(error) },
+        { status: 500 }
+      );
     }
   };
 }

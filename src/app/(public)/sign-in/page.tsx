@@ -9,20 +9,22 @@ import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
+import { Session } from "@/lib/prisma";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 
 export default function Page() {
   const router = useRouter();
+
   const { mutate, data, error, isPending } = useMutation({
-    mutationKey: ["users"],
+    mutationKey: ["sessions"],
     mutationFn: (payload: FormData) =>
-      client.request("/api/users", {
+      client.request<{ data: Session }>("/api/sessions", {
         payload,
       }),
     onSuccess: () => {
-      router.push("/characters/create");
+      router.push("/characters");
     },
   });
 
@@ -40,7 +42,7 @@ export default function Page() {
         <Header>
           <ul className="flex items-center gap-6">
             <li>
-              <Anchor href="/sign-in">Sign in</Anchor>
+              <Anchor href="/registration">Register</Anchor>
             </li>
           </ul>
         </Header>
@@ -50,12 +52,12 @@ export default function Page() {
             <Stack gap={4} asChild>
               <header>
                 <Heading asChild>
-                  <h1>Registration</h1>
+                  <h1>Sign in</h1>
                 </Heading>
 
                 <p>
-                  Welcome, weary traveller! Before you can start playing, first
-                  you need to create an account.
+                  Welcome back, adventurer! Before you can resume your journey,
+                  first you need to start a new session.
                 </p>
               </header>
             </Stack>
@@ -76,19 +78,15 @@ export default function Page() {
                       <Input type="email" required />
                     </Field>
 
-                    <Field
-                      name="password"
-                      label="Password"
-                      hint="At least 12 characters."
-                    >
+                    <Field name="password" label="Password">
                       <Input type="password" required minLength={12} />
                     </Field>
                   </fieldset>
                 </Stack>
 
                 <footer>
-                  <Button type="submit" size="default" disabled={isPending}>
-                    Register
+                  <Button type="submit" disabled={isPending}>
+                    Sign in
                   </Button>
                 </footer>
               </form>

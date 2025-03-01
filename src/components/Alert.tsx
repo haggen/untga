@@ -13,9 +13,9 @@ const variants = tv({
   base: "p-6 rounded border",
   variants: {
     type: {
-      neutral: "bg-stone-200 border-stone-400",
-      positive: "bg-lime-200 text-lime-600 border-lime-400",
-      negative: "text-red-600 bg-red-200 border-red-400",
+      neutral: "bg-orange-100 border-stone-600",
+      positive: "bg-lime-200 text-lime-800 border-lime-600",
+      negative: "bg-red-200 text-red-800 border-red-600",
     },
   },
 });

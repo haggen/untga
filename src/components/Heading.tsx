@@ -6,14 +6,15 @@ const variants = tv({
   base: "font-serif",
   variants: {
     variant: {
-      default: "text-4xl",
+      default: "font-bold text-4xl",
+      small: "font-bold text-2xl",
     },
   },
 });
 
 type Props = Omit<ComponentProps<"span">, "children"> & {
   asChild?: boolean;
-  variant?: "default";
+  variant?: keyof typeof variants.variants.variant;
   children: ReactNode;
 };
 
