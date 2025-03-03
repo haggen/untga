@@ -73,7 +73,7 @@ export default function Page() {
                 <Stack gap={4} asChild>
                   <fieldset>
                     <Field name="email" label="E-mail">
-                      <Input type="email" required />
+                      <Input type="email" autoComplete="username" required />
                     </Field>
 
                     <Field
@@ -81,7 +81,12 @@ export default function Page() {
                       label="Password"
                       hint="At least 12 characters."
                     >
-                      <Input type="password" required minLength={12} />
+                      <Input
+                        type="password"
+                        autoComplete="password"
+                        required
+                        minLength={12}
+                      />
                     </Field>
                   </fieldset>
                 </Stack>

@@ -22,12 +22,12 @@ export default async function Layout({ children }: Props) {
 
             <ul className="flex items-center gap-6">
               <li>
-                <Anchor href="/characters" activeClassName="text-orange-600">
+                <Anchor href="/characters" activeClassName="text-orange-700">
                   Characters
                 </Anchor>
               </li>
               <li>
-                <Anchor href="/user" activeClassName="text-orange-600">
+                <Anchor href="/user" activeClassName="text-orange-700">
                   Profile
                 </Anchor>
               </li>

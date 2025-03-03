@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClientOptions } from "@prisma/client/runtime/client";
 import type { Operation } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
@@ -91,74 +92,86 @@ async function handle<T, O extends Operation>(
   }
 }
 
-/**
- * Prisma client.
- */
-export const db = new PrismaClient({
+const opts = {
   log: ["query", "info", "warn"],
-}).$extends({
-  model: {
-    user: {
-      async findByCredentials({
-        data,
-      }: {
-        data: { email: string; password: string };
-      }) {
-        const user = await db.user.findUnique({
-          where: { email: data.email },
-        });
+} satisfies PrismaClientOptions;
 
-        if (!user) {
-          throw new Error("E-mail not found");
-        }
+const ext = Prisma.defineExtension((client) => {
+  return client.$extends({
+    model: {
+      user: {
+        async findByCredentials({
+          data,
+        }: {
+          data: { email: string; password: string };
+        }) {
+          const user = await db.user.findUnique({
+            where: { email: data.email },
+          });
 
-        if (!(await bcrypt.compare(data.password, user.password))) {
-          throw new Error("Password doesn't match");
-        }
+          if (!user) {
+            throw new Error("E-mail not found");
+          }
 
-        return user;
+          if (!(await bcrypt.compare(data.password, user.password))) {
+            throw new Error("Password doesn't match");
+          }
+
+          return user;
+        },
       },
     },
-  },
-  query: {
-    user: {
-      async $allOperations({ operation, args, query }) {
-        switch (operation) {
-          case "create":
-          case "createMany":
-          case "createManyAndReturn":
-          case "update":
-          case "updateMany":
-          case "updateManyAndReturn":
-          case "upsert":
-            await handle(args, async (data: Prisma.UserUpdateInput) => {
-              if (typeof data.password === "string") {
-                data.password = await bcrypt.hash(data.password, 10);
-              }
-            });
-            break;
-        }
-        return await query(args);
+    query: {
+      user: {
+        async $allOperations({ operation, args, query }) {
+          switch (operation) {
+            case "create":
+            case "createMany":
+            case "createManyAndReturn":
+            case "update":
+            case "updateMany":
+            case "updateManyAndReturn":
+            case "upsert":
+              await handle(args, async (data: Prisma.UserUpdateInput) => {
+                if (typeof data.password === "string") {
+                  data.password = await bcrypt.hash(data.password, 10);
+                }
+              });
+              break;
+          }
+          return await query(args);
+        },
+      },
+      session: {
+        async $allOperations({ operation, args, query }) {
+          switch (operation) {
+            case "create":
+            case "createMany":
+            case "createManyAndReturn":
+            case "update":
+            case "updateMany":
+            case "updateManyAndReturn":
+            case "upsert":
+              await handle(args, async (data: Prisma.SessionUpdateInput) => {
+                data.expiresAt ??= DateTime.now().plus({ day: 1 }).toJSDate();
+              });
+              break;
+          }
+          return await query(args);
+        },
       },
     },
-    session: {
-      async $allOperations({ operation, args, query }) {
-        switch (operation) {
-          case "create":
-          case "createMany":
-          case "createManyAndReturn":
-          case "update":
-          case "updateMany":
-          case "updateManyAndReturn":
-          case "upsert":
-            await handle(args, async (data: Prisma.SessionUpdateInput) => {
-              data.expiresAt ??= DateTime.now().plus({ day: 1 }).toJSDate();
-            });
-            break;
-        }
-        return await query(args);
-      },
-    },
-  },
-  result: {},
+    result: {},
+  });
 });
+
+declare global {
+  // eslint-disable-next-line no-var
+  var db: ReturnType<typeof createClient>;
+}
+
+function createClient() {
+  return new PrismaClient(opts).$extends(ext);
+}
+
+export const db = (global.db ??= createClient());

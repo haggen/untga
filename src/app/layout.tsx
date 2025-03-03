@@ -30,25 +30,23 @@ export default function Layout({ children }: Props) {
   return (
     <html
       lang="en"
-      className={`${fontSerif.variable} ${fontSans.variable} antialiased text-stone-800`}
+      className={`${fontSerif.variable} ${fontSans.variable} antialiased text-gray-800`}
     >
       <body>
-        <QueryClientProvider>{children}</QueryClientProvider>
+        <div style={{ filter: "url(#filmgrain)" }}>
+          <QueryClientProvider>{children}</QueryClientProvider>
+        </div>
 
         <svg xmlns="http://www.w3.org/2000/svg" height="0" width="0">
           <defs>
-            <filter id="distorted">
+            <filter id="filmgrain">
               <feTurbulence
                 type="fractalNoise"
-                id="turbulence"
-                baseFrequency="0.5"
+                baseFrequency="1"
                 numOctaves="2"
+                stitchTiles="stitch"
               />
-              <feDisplacementMap
-                id="displacement"
-                in="SourceGraphic"
-                scale="2"
-              />
+              <feDisplacementMap in="SourceGraphic" scale="1.5" />
             </filter>
           </defs>
         </svg>

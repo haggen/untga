@@ -56,9 +56,14 @@ async function seed() {
   await db.attributeSpecification.createMany({
     data: [
       {
-        name: "Energy",
-        description: "Energy is spent to perform certain actions.",
-        tags: ["energy", "playable-character-attribute"],
+        name: "Health",
+        description: "If you have none, you're dead.",
+        tags: ["health", "player"],
+      },
+      {
+        name: "Stamina",
+        description: "Stamina is spent to perform actions.",
+        tags: ["stamina", "player"],
       },
     ],
   });

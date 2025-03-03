@@ -47,7 +47,7 @@ export const POST = withErrorHandling(
 
     const playableCharacterAttributes =
       await db.attributeSpecification.findMany({
-        where: { tags: { has: "playable-character-attribute" } },
+        where: { tags: { has: "player" } },
       });
 
     const startingLocation = await db.location.findFirstOrThrow({

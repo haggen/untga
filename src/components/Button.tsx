@@ -3,14 +3,15 @@ import { ComponentProps, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "inline-flex gap-2 items-center font-bold rounded-xs",
+  base: "inline-flex gap-2 items-center font-bold rounded-xs shadow",
   variants: {
     size: {
       default: "h-10 px-6",
       large: "h-12 px-8 text-lg",
     },
     variant: {
-      default: "bg-amber-600 text-orange-50",
+      default: "bg-orange-700 text-orange-100",
+      secondary: "inset-ring-2 ring-orange-700 text-orange-700",
     },
     disabled: {
       true: "cursor-not-allowed filter-grayscale",
