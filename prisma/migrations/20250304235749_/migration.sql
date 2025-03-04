@@ -15,6 +15,8 @@ CREATE TABLE "Session" (
     "secret" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "expiresAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "remoteAddr" TEXT NOT NULL,
+    "userAgent" TEXT NOT NULL,
     "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")

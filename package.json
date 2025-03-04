@@ -12,8 +12,7 @@
     "build": "next build",
     "fix": "next lint --fix",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "test": "playwright test"
+    "typecheck": "tsc --noEmit"
   },
   "prisma": {
     "seed": "node --experimental-strip-types prisma/seed.ts"
