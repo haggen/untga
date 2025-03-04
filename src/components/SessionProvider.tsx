@@ -5,7 +5,7 @@ import { createContext, ReactNode, useContext } from "react";
 
 type Value = Session<{ include: { user: { omit: { password: true } } } }>;
 
-const SessionContext = createContext<Value | null>(null);
+export const SessionContext = createContext<Value | null>(null);
 
 export function useSession() {
   const session = useContext(SessionContext);

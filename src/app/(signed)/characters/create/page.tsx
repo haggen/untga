@@ -8,22 +8,340 @@ import { Input } from "@/components/Input";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
-import { useMutation } from "@tanstack/react-query";
-import Link from "next/link";
+import { draw } from "@/lib/random";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CircleCheckBigIcon, Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FormEvent } from "react";
+import { FormEvent, useRef } from "react";
+
+const names = [
+  "Adalbert",
+  "Adelheid",
+  "Aedan",
+  "Aelia",
+  "Agrippa",
+  "Agrippina",
+  "Aisling",
+  "Aldric",
+  "Alfhild",
+  "Anneliese",
+  "Antonia",
+  "Arianwen",
+  "Arvid",
+  "Asbjorn",
+  "Astrid",
+  "Aulus",
+  "Balbina",
+  "Balbus",
+  "Baldwin",
+  "Beatrix",
+  "Beli",
+  "Bergdis",
+  "Bertram",
+  "Bjorn",
+  "Blathnaid",
+  "Bran",
+  "Brigid",
+  "Brunhilde",
+  "Brutus",
+  "Caitrin",
+  "Caius",
+  "Camilla",
+  "Caradoc",
+  "Carys",
+  "Cassia",
+  "Cassius",
+  "Cian",
+  "Clotilda",
+  "Clovis",
+  "Conrad",
+  "Cunegund",
+  "Dagmar",
+  "Decimus",
+  "Deirdre",
+  "Delyth",
+  "Diederik",
+  "Dietrich",
+  "Disa",
+  "Domitia",
+  "Dorothea",
+  "Drusilla",
+  "Drusus",
+  "Drystan",
+  "Duncan",
+  "Eberhard",
+  "Eckhard",
+  "Edda",
+  "Edeltraud",
+  "Einar",
+  "Eir",
+  "Eirikr",
+  "Eithne",
+  "Eluned",
+  "Emrys",
+  "Erik",
+  "Erika",
+  "Eudocia",
+  "Ewan",
+  "Fabia",
+  "Faelan",
+  "Falk",
+  "Faustus",
+  "Fenella",
+  "Fergus",
+  "Fiona",
+  "Flavia",
+  "Flavius",
+  "Frauke",
+  "Freydis",
+  "Frida",
+  "Frida",
+  "Fridolin",
+  "Frode",
+  "Gaius",
+  "Galen",
+  "Galla",
+  "Gawain",
+  "Gerd",
+  "Gerhard",
+  "Gertrude",
+  "Gisela",
+  "Gorm",
+  "Gracchus",
+  "Grainne",
+  "Gratiana",
+  "Gudrun",
+  "Gunhild",
+  "Gunnar",
+  "Gunther",
+  "Gwen",
+  "Hakon",
+  "Halfdan",
+  "Hallvard",
+  "Hannibal",
+  "Harald",
+  "Hartmann",
+  "Hedda",
+  "Helga",
+  "Helmine",
+  "Helvia",
+  "Hermann",
+  "Hilda",
+  "Hildegard",
+  "Horatius",
+  "Hortensia",
+  "Hrolf",
+  "Hugh",
+  "Idris",
+  "Idunn",
+  "Ignatius",
+  "Ingeborg",
+  "Ingram",
+  "Ingrid",
+  "Iona",
+  "Iovita",
+  "Irmgard",
+  "Irmin",
+  "Isolde",
+  "Iulia",
+  "Ivar",
+  "Ivar",
+  "Johan",
+  "Jorund",
+  "Jorunn",
+  "Jowan",
+  "Julius",
+  "Junia",
+  "Justus",
+  "Jutta",
+  "Kari",
+  "Karl",
+  "Kaspar",
+  "Katarina",
+  "Katharina",
+  "Keira",
+  "Ketill",
+  "Kieran",
+  "Kolbein",
+  "Kyna",
+  "Lachlan",
+  "Lagertha",
+  "Laoise",
+  "Leif",
+  "Leopold",
+  "Lieselotte",
+  "Liv",
+  "Livia",
+  "Livius",
+  "Lorcan",
+  "Lucilla",
+  "Lucius",
+  "Ludwig",
+  "Ludwiga",
+  "Luned",
+  "Mabon",
+  "Mael",
+  "Maeve",
+  "Magnus",
+  "Manfred",
+  "Marcella",
+  "Marcus",
+  "Margrit",
+  "Marta",
+  "Mathilda",
+  "Maximus",
+  "Meinhard",
+  "Minervina",
+  "Morrigan",
+  "Mundilfari",
+  "Myrkjartan",
+  "Nadja",
+  "Nanna",
+  "Nechtan",
+  "Neratia",
+  "Nero",
+  "Nessa",
+  "Niall",
+  "Niamh",
+  "Niklaus",
+  "Njord",
+  "Nona",
+  "Norbert",
+  "Norberta",
+  "Numerius",
+  "Octavia",
+  "Olaf",
+  "Opimius",
+  "Oriana",
+  "Orin",
+  "Orla",
+  "Orvar",
+  "Osk",
+  "Oswald",
+  "Othilia",
+  "Otho",
+  "Ottilie",
+  "Otto",
+  "Ovidia",
+  "Owain",
+  "Padria",
+  "Paulla",
+  "Placidia",
+  "Plautius",
+  "Pryderi",
+  "Publius",
+  "Pwyll",
+  "Quintina",
+  "Quintus",
+  "Ragnar",
+  "Ragnhild",
+  "Regulus",
+  "Reinhard",
+  "Rhiannon",
+  "Rike",
+  "Riordan",
+  "Romulus",
+  "Ronan",
+  "Rosamund",
+  "Roskva",
+  "Rowan",
+  "Rubria",
+  "Rudolf",
+  "Rufina",
+  "Runa",
+  "Runolf",
+  "Sabina",
+  "Saoirse",
+  "Seamus",
+  "Selwyn",
+  "Senta",
+  "Sertorius",
+  "Servilia",
+  "Servius",
+  "Sibylle",
+  "Siegfried",
+  "Sigmund",
+  "Sigrid",
+  "Sigurd",
+  "Sigyn",
+  "Snorri",
+  "Solveig",
+  "Sorcha",
+  "Steinar",
+  "Styrbjorn",
+  "Svana",
+  "Svanhild",
+  "Tacita",
+  "Tadhg",
+  "Taliesin",
+  "Tegan",
+  "Theobald",
+  "Theodora",
+  "Theresia",
+  "Thora",
+  "Thorbjorn",
+  "Thorstein",
+  "Till",
+  "Tirion",
+  "Titus",
+  "Tove",
+  "Trygve",
+  "Tullia",
+  "Tullius",
+  "Tyr",
+  "Uisdean",
+  "Ula",
+  "Ulf",
+  "Ulrich",
+  "Ulrike",
+  "Una",
+  "Urd",
+  "Uther",
+  "Valeria",
+  "Valerius",
+  "Vali",
+  "Varius",
+  "Vaughn",
+  "Vebjorn",
+  "Vedis",
+  "Venusia",
+  "Verena",
+  "Vespasia",
+  "Vespasian",
+  "Veturia",
+  "Vidar",
+  "Viggo",
+  "Virgil",
+  "Vivienne",
+  "Volker",
+  "Vortigern",
+  "Waldtraut",
+  "Wilhelm",
+  "Wilhelmine",
+  "Wolfram",
+  "Wyn",
+  "Wynn",
+  "Ylva",
+  "Yngvar",
+  "Yrsa",
+  "Yseult",
+];
 
 export default function Page() {
   const session = useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { mutate, data, error, isPending } = useMutation({
-    mutationKey: ["users", session.userId, "characters"],
     mutationFn: (payload: FormData) =>
-      client.request(`/api/users/${session.userId}/characters`, {
+      client.request(`/api/characters`, {
         payload,
       }),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["users", session.userId, "characters"],
+      });
       router.push("/characters");
     },
   });
@@ -34,6 +352,12 @@ export default function Page() {
     const payload = new FormData(form);
 
     mutate(payload);
+  };
+
+  const typeRandomName = () => {
+    if (inputRef.current) {
+      inputRef.current.value = draw(names);
+    }
   };
 
   return (
@@ -62,20 +386,34 @@ export default function Page() {
               <Alert type="positive">{JSON.stringify(data)}</Alert>
             ) : null}
 
-            <Stack gap={4} asChild>
-              <fieldset>
-                <Field name="name" label="Name">
-                  <Input type="text" required placeholder="e.g. Sigsmund III" />
-                </Field>
-              </fieldset>
-            </Stack>
+            <fieldset className="flex gap-2">
+              <Field name="name" className="grow">
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  required
+                  placeholder="e.g. Ragnar"
+                />
+              </Field>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={typeRandomName}
+              >
+                <Dices />
+              </Button>
+            </fieldset>
 
-            <footer className="flex items-center gap-4">
+            <footer className="flex items-center justify-end gap-4">
+              {/* <Button variant="secondary" asChild>
+                <Link href="/characters">
+                  <ArrowLeft aria-label="Go back" />
+                </Link>
+              </Button> */}
+
               <Button type="submit" size="default" disabled={isPending}>
                 Create
-              </Button>
-              <Button variant="secondary" asChild>
-                <Link href="/characters">Cancel</Link>
+                <CircleCheckBigIcon />
               </Button>
             </footer>
           </form>

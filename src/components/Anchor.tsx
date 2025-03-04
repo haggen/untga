@@ -6,13 +6,14 @@ import { twMerge } from "tailwind-merge";
 
 type Props = ComponentProps<"a"> & {
   activeClassName?: string;
+  exact?: boolean;
   children: ReactNode;
 };
 
-export function Anchor({ href = "", activeClassName, ...props }: Props) {
+export function Anchor({ href = "", exact, activeClassName, ...props }: Props) {
   const pathname = usePathname();
 
-  if (pathname === href) {
+  if ((exact && pathname === href) || pathname.startsWith(href)) {
     props.className = twMerge(props.className, activeClassName);
   }
 

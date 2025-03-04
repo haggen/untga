@@ -11,6 +11,7 @@ import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
 import { Session } from "@/lib/prisma";
 import { useMutation } from "@tanstack/react-query";
+import { LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 
@@ -75,18 +76,28 @@ export default function Page() {
                 <Stack gap={4} asChild>
                   <fieldset>
                     <Field name="email" label="E-mail">
-                      <Input type="email" required />
+                      <Input
+                        type="email"
+                        required
+                        placeholder="e.g. me@example.com"
+                      />
                     </Field>
 
                     <Field name="password" label="Password">
-                      <Input type="password" required minLength={12} />
+                      <Input
+                        type="password"
+                        required
+                        minLength={12}
+                        placeholder="e.g. super-secret-phrase"
+                      />
                     </Field>
                   </fieldset>
                 </Stack>
 
-                <footer>
+                <footer className="flex justify-end">
                   <Button type="submit" disabled={isPending}>
                     Sign in
+                    <LogIn />
                   </Button>
                 </footer>
               </form>

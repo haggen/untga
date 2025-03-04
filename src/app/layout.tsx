@@ -33,7 +33,7 @@ export default function Layout({ children }: Props) {
       className={`${fontSerif.variable} ${fontSans.variable} antialiased text-gray-800`}
     >
       <body>
-        <div style={{ filter: "url(#filmgrain)" }}>
+        <div style={{ filter: "url(#filmgrain)", mixBlendMode: "hard-light" }}>
           <QueryClientProvider>{children}</QueryClientProvider>
         </div>
 

@@ -3,6 +3,7 @@ import { PrismaClientOptions } from "@prisma/client/runtime/client";
 import type { Operation } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
+import "server-only";
 
 export { Prisma };
 
@@ -62,6 +63,12 @@ export type ItemSpecification<T = unknown> = Prisma.Result<
 
 export type Item<T = unknown> = Prisma.Result<
   typeof db.item,
+  T,
+  "findFirstOrThrow"
+>;
+
+export type Container<T = unknown> = Prisma.Result<
+  typeof db.container,
   T,
   "findFirstOrThrow"
 >;
@@ -165,13 +172,16 @@ const ext = Prisma.defineExtension((client) => {
   });
 });
 
+// Client is created inside a function so we can have the final type, via ReturnType<T> without instancing it.
+function createClient() {
+  return new PrismaClient(opts).$extends(ext);
+}
+
+// Update global interface with our client.
 declare global {
   // eslint-disable-next-line no-var
   var db: ReturnType<typeof createClient>;
 }
 
-function createClient() {
-  return new PrismaClient(opts).$extends(ext);
-}
-
+// Prisma client needs to be a singleton, otherwise it eventually exhausts the database connection pool.
 export const db = (global.db ??= createClient());

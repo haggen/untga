@@ -3,15 +3,16 @@ import { ComponentProps, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "inline-flex gap-2 items-center font-bold rounded-xs shadow",
+  base: "inline-flex gap-1 items-center font-bold rounded shadow inset-ring inset-ring-gray-800/25",
   variants: {
     size: {
-      default: "h-10 px-6",
-      large: "h-12 px-8 text-lg",
+      default: "h-10 px-4",
+      small: "h-5 px-2 text-xs",
     },
     variant: {
-      default: "bg-orange-700 text-orange-100",
-      secondary: "inset-ring-2 ring-orange-700 text-orange-700",
+      primary: "bg-orange-800 text-orange-100 hover:bg-orange-700",
+      secondary:
+        "text-orange-800 hover:text-orange-700 inset-ring-2 inset-ring-orange-800 hover:inset-ring-orange-700",
     },
     disabled: {
       true: "cursor-not-allowed filter-grayscale",
@@ -28,7 +29,7 @@ type Props = Omit<ComponentProps<"button">, "children"> & {
 
 export function Button({
   asChild,
-  variant = "default",
+  variant = "primary",
   size = "default",
   className,
   disabled,

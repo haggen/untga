@@ -27,10 +27,12 @@ model User {
 
 /// Sessions are used for authentication.
 model Session {
-  id        Int      @id @default(autoincrement())
-  secret    String   @unique @default(cuid())
-  createdAt DateTime @default(now())
-  expiresAt DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
+  id         Int      @id @default(autoincrement())
+  secret     String   @unique @default(cuid())
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
+  remoteAddr String
+  userAgent  String
 
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -138,6 +140,7 @@ model Item {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  amount    Int      @default(1)
 
   specificationId Int
   specification   ItemSpecification @relation(fields: [specificationId], references: [id], onDelete: Cascade)

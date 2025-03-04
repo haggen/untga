@@ -8,19 +8,31 @@ import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
 import { type Character } from "@/lib/prisma";
 import { useQuery } from "@tanstack/react-query";
+import { UserIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 
-function List({ characters }: { characters: Character[] }) {
+function List({
+  characters,
+}: {
+  characters: Character<{ include: { location: true } }>[];
+}) {
   return (
-    <Stack gap={4} asChild>
-      <ul>
-        {characters.map((character) => (
-          <li key={character.id}>
-            <Link href={`/characters/${character.id}`}>{character.name}</Link>
-          </li>
-        ))}
-      </ul>
-    </Stack>
+    <ul className="shadow ring ring-current/10">
+      {characters.map((character) => (
+        <li
+          key={character.id}
+          className="bg-orange-100/33 hover:bg-orange-200/50 not-first:border-t border-current/50"
+        >
+          <Link
+            href={`/characters/${character.id}`}
+            className="flex gap-1 p-3 font-bold"
+          >
+            <UserIcon />
+            {character.name}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -30,7 +42,7 @@ export default function Page() {
   const { data, isFetching } = useQuery({
     queryKey: ["characters"],
     queryFn: () =>
-      client.request<{ data: Character[] }>(
+      client.request<{ data: Character<{ include: { location: true } }>[] }>(
         `/api/users/${session.userId}/characters`
       ),
   });
@@ -49,7 +61,9 @@ export default function Page() {
         </Stack>
 
         {isFetching ? (
-          <p>Loading...</p>
+          <Alert type="neutral">
+            <p>Loading...</p>
+          </Alert>
         ) : data?.payload.data.length ? (
           <List characters={data.payload.data} />
         ) : (
@@ -58,9 +72,12 @@ export default function Page() {
           </Alert>
         )}
 
-        <footer>
+        <footer className="flex justify-end">
           <Button asChild>
-            <Link href="/characters/create">Create new character</Link>
+            <Link href="/characters/create">
+              New character
+              <UserPlusIcon />
+            </Link>
           </Button>
         </footer>
       </main>

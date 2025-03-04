@@ -14,7 +14,7 @@ export default async function Layout({ children }: Props) {
   return (
     <SessionProvider session={session}>
       <Stack gap={10} asChild>
-        <div className="p-12 max-w-[48rem] mx-auto">
+        <div className="p-6 md:p-12 max-w-[48rem] mx-auto">
           <nav className="flex items-center justify-between">
             <Anchor href="/">
               <h1 className="text-xl font-bold">Untga</h1>
@@ -22,12 +22,12 @@ export default async function Layout({ children }: Props) {
 
             <ul className="flex items-center gap-6">
               <li>
-                <Anchor href="/characters" activeClassName="text-orange-700">
+                <Anchor href="/characters" activeClassName="text-orange-900">
                   Characters
                 </Anchor>
               </li>
               <li>
-                <Anchor href="/user" activeClassName="text-orange-700">
+                <Anchor href="/profile" activeClassName="text-orange-900">
                   Profile
                 </Anchor>
               </li>

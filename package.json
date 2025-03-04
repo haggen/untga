@@ -6,7 +6,7 @@
   "scripts": {
     "prestart:development": "test -d node_modules || npm ci",
     "start": "npm run-script start:${NODE_ENV:-development}",
-    "start:development": "next dev",
+    "start:development": "next dev --turbo",
     "start:production": "next start",
     "prebuild": "prisma generate",
     "build": "next build",

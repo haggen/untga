@@ -6,7 +6,7 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
     <input
       {...props}
       className={twMerge(
-        "flex items-center h-10 px-2 bg-orange-100 shadow rounded-xs",
+        "flex items-center h-10 px-2 bg-stone-100/90 shadow rounded inset-ring inset-ring-current/55 placeholder:text-slate-500",
         className
       )}
     />

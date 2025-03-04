@@ -110,6 +110,7 @@ CREATE TABLE "Item" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "amount" INTEGER NOT NULL DEFAULT 1,
     "specificationId" INTEGER NOT NULL,
     "containerId" INTEGER NOT NULL,
 

@@ -5,14 +5,67 @@ import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
 import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
+import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
-import { useMutation } from "@tanstack/react-query";
+import type { Session } from "@/lib/prisma";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { CircleCheckBig } from "lucide-react";
 import { FormEvent } from "react";
+
+function Sessions() {
+  const session = useSession();
+
+  const query = useQuery({
+    queryKey: ["users", session.userId, "sessions"],
+    queryFn: () =>
+      client.request<{ data: Session[] }>(
+        `/api/users/${session.userId}/sessions`
+      ),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (sessionId: number) =>
+      client.request(`/api/sessions/${sessionId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      query.refetch();
+    },
+  });
+
+  return (
+    <Stack gap={6} asChild>
+      <section>
+        <Stack gap={2}>
+          <Heading variant="small" asChild>
+            <h2>Sessions</h2>
+          </Heading>
+          <p>
+            Check out your session history and invalidate your active sessions.
+          </p>
+        </Stack>
+
+        {mutation.error ? (
+          <Alert type="negative">{JSON.stringify(mutation.error)}</Alert>
+        ) : null}
+
+        {mutation.data ? (
+          <Alert type="positive">{JSON.stringify(mutation.data)}</Alert>
+        ) : null}
+
+        <ul>
+          {query.data?.payload.data.map((session) => (
+            <li key={session.id}>{String(session.createdAt)}</li>
+          ))}
+        </ul>
+      </section>
+    </Stack>
+  );
+}
 
 function EmailForm() {
   const { mutate, data, error, isPending } = useMutation({
-    mutationKey: ["users"],
     mutationFn: (payload: FormData) =>
       client.request("/api/users", {
         method: "PATCH",
@@ -45,14 +98,15 @@ function EmailForm() {
 
         {data ? <Alert type="positive">{JSON.stringify(data)}</Alert> : null}
 
-        <div className="flex gap-4">
-          <Field name="email" className="grow">
-            <Input type="email" required placeholder="e.g. me@example.com" />
-          </Field>
+        <Field name="email" className="grow">
+          <Input type="email" required placeholder="e.g. me@example.com" />
+        </Field>
+
+        <footer className="flex justify-end">
           <Button type="submit" size="default" disabled={isPending}>
-            Confirm
+            Confirm <CircleCheckBig />
           </Button>
-        </div>
+        </footer>
       </form>
     </Stack>
   );
@@ -90,23 +144,20 @@ function PasswordForm() {
 
         {data ? <Alert type="positive">{JSON.stringify(data)}</Alert> : null}
 
-        <div className="flex gap-4">
-          <Field
-            name="password"
-            hint="At least 12 characters."
-            className="grow"
-          >
-            <Input
-              type="password"
-              required
-              minLength={12}
-              placeholder="e.g. super-secret-phrase"
-            />
-          </Field>
+        <Field name="password" hint="At least 12 characters." className="grow">
+          <Input
+            type="password"
+            required
+            minLength={12}
+            placeholder="e.g. super-secret-phrase"
+          />
+        </Field>
+
+        <footer className="flex justify-end">
           <Button type="submit" size="default" disabled={isPending}>
-            Confirm
+            Confirm <CircleCheckBig />
           </Button>
-        </div>
+        </footer>
       </form>
     </Stack>
   );
@@ -123,6 +174,8 @@ export default function Page() {
             </Heading>
           </header>
         </Stack>
+
+        <Sessions />
 
         <EmailForm />
 
