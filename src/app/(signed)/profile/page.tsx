@@ -5,12 +5,13 @@ import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
 import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
+import { Menu } from "@/components/Menu";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
 import type { Session } from "@/lib/prisma";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CircleCheckBig } from "lucide-react";
+import { CircleCheckBig, TrashIcon } from "lucide-react";
 import { FormEvent } from "react";
 
 function Sessions() {
@@ -34,6 +35,8 @@ function Sessions() {
     },
   });
 
+  const sessions = query.data?.payload.data;
+
   return (
     <Stack gap={6} asChild>
       <section>
@@ -54,11 +57,37 @@ function Sessions() {
           <Alert type="positive">{JSON.stringify(mutation.data)}</Alert>
         ) : null}
 
-        <ul>
-          {query.data?.payload.data.map((session) => (
-            <li key={session.id}>{String(session.createdAt)}</li>
-          ))}
-        </ul>
+        {query.isLoading ? (
+          <Alert type="neutral">
+            <p>Loading...</p>
+          </Alert>
+        ) : (
+          <Menu>
+            {sessions?.map((session) => (
+              <Menu.Item key={session.id}>
+                <article className="flex justify-between items-center">
+                  <div>
+                    <h1 className="font-bold">
+                      Created on{" "}
+                      {new Date(session.createdAt).toLocaleDateString()} from{" "}
+                      {session.remoteAddr}
+                    </h1>
+                    <small>{session.userAgent}</small>
+                  </div>
+                  <div>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => mutation.mutate(session.id)}
+                    >
+                      <TrashIcon aria-label="Invalidate" />
+                    </Button>
+                  </div>
+                </article>
+              </Menu.Item>
+            ))}
+          </Menu>
+        )}
       </section>
     </Stack>
   );
