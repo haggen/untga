@@ -1,6 +1,6 @@
 "use client";
 
-import { Session } from "@/lib/prisma";
+import { Session } from "@/lib/db";
 import { createContext, ReactNode, useContext } from "react";
 
 type Value = Session<{ include: { user: { omit: { password: true } } } }>;

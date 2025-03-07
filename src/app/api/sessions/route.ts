@@ -1,5 +1,5 @@
 import { withErrorHandling } from "@/lib/api";
-import { db } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { getRemoteAddr, getUserAgent } from "@/lib/request";
 import { setActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";

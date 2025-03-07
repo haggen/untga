@@ -5,7 +5,7 @@ import { Heading } from "@/components/Heading";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
-import type { Character, Container } from "@/lib/prisma";
+import type { Character, Container } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 
@@ -41,26 +41,26 @@ function Sheet({
 
         <dl>
           <div className="flex items-center gap-1">
-            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/50">
+            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
               Name
             </dt>
             <dd>{character.name}</dd>
           </div>
           <div className="flex items-center gap-1">
-            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/50">
+            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
               Birth
             </dt>
             <dd>{new Date(character.createdAt).toLocaleDateString()}</dd>
           </div>
           <div className="flex items-center gap-1">
-            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/50">
+            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
               Location
             </dt>
             <dd>{character.location.name}</dd>
           </div>
           {character.attributes.map((attribute) => (
             <div className="flex items-center gap-1" key={attribute.id}>
-              <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/50">
+              <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
                 {attribute.specification.name}
               </dt>
               <dd>
@@ -88,7 +88,7 @@ function Inventory({ container }: { container: Container<WithItems> }) {
           <dl>
             {container.items.map((item) => (
               <div className="flex items-center gap-1" key={item.id}>
-                <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/50">
+                <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
                   {item.specification.name}
                 </dt>
                 <dd>&times;{item.amount}</dd>

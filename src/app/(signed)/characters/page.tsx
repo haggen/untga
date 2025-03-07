@@ -6,7 +6,7 @@ import { Heading } from "@/components/Heading";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
-import { type Character } from "@/lib/prisma";
+import { type Character } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
 import { UserIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
@@ -40,7 +40,7 @@ export default function Page() {
   const session = useSession();
 
   const { data, isFetching } = useQuery({
-    queryKey: ["characters"],
+    queryKey: ["users", session.userId, "characters"],
     queryFn: () =>
       client.request<{ data: Character<{ include: { location: true } }>[] }>(
         `/api/users/${session.userId}/characters`

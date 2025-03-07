@@ -1,5 +1,5 @@
 import { withErrorHandling } from "@/lib/api";
-import { db, Prisma } from "@/lib/prisma";
+import { db, Prisma } from "@/lib/db";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 

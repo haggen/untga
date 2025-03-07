@@ -1,5 +1,6 @@
 import { withErrorHandling } from "@/lib/api";
-import { db } from "@/lib/prisma";
+import { db } from "@/lib/db";
+import { NotFoundError, UnauthorizedError } from "@/lib/error";
 import { clearActiveSession, getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
@@ -31,17 +32,30 @@ export const DELETE = withErrorHandling(
       sessionId: schemas.id,
     });
 
-    const { userId } = await getActiveSessionOrThrow();
+    const { userId, id: activeSessionId } = await getActiveSessionOrThrow();
 
-    const session = await db.session.update({
-      where: { id: sessionId, userId },
-      data: { expiresAt: new Date() },
-      omit: {
-        secret: true,
-      },
+    let session = await db.session.findUnique({
+      omit: { secret: true },
+      where: { id: sessionId },
     });
 
-    await clearActiveSession();
+    if (!session) {
+      throw new NotFoundError();
+    }
+
+    if (session.userId !== userId) {
+      throw new UnauthorizedError();
+    }
+
+    session = await db.session.update({
+      omit: { secret: true },
+      where: { id: sessionId },
+      data: { expiresAt: new Date() },
+    });
+
+    if (activeSessionId === sessionId) {
+      await clearActiveSession();
+    }
 
     return NextResponse.json({ data: session });
   }

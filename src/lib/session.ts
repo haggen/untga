@@ -1,5 +1,5 @@
+import { db, Session } from "@/lib/db";
 import { UnauthorizedError } from "@/lib/error";
-import { db, Session } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import "server-only";

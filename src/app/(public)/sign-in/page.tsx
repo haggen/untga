@@ -9,7 +9,7 @@ import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
-import { Session } from "@/lib/prisma";
+import { Session } from "@/lib/db";
 import { useMutation } from "@tanstack/react-query";
 import { LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";

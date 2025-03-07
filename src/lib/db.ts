@@ -168,7 +168,16 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
     },
-    result: {},
+    result: {
+      session: {
+        expired: {
+          needs: { expiresAt: true },
+          compute(session) {
+            return session.expiresAt <= new Date();
+          },
+        },
+      },
+    },
   });
 });
 
@@ -184,4 +193,7 @@ declare global {
 }
 
 // Prisma client needs to be a singleton, otherwise it eventually exhausts the database connection pool.
-export const db = (global.db ??= createClient());
+export const db =
+  process.env.NODE_ENV === "production"
+    ? (global.db ??= createClient())
+    : createClient();

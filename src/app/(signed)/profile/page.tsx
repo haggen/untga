@@ -9,13 +9,20 @@ import { Menu } from "@/components/Menu";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
-import type { Session } from "@/lib/prisma";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import type { Session } from "@/lib/db";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CircleCheckBig, TrashIcon } from "lucide-react";
 import { FormEvent } from "react";
+import { UAParser } from "ua-parser-js";
+
+function getFormattedUserAgent(userAgent: string) {
+  const { browser, os } = UAParser(userAgent);
+  return `${browser.name} ${browser.major} on ${os.name}`;
+}
 
 function Sessions() {
   const session = useSession();
+  const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ["users", session.userId, "sessions"],
@@ -30,7 +37,8 @@ function Sessions() {
       client.request(`/api/sessions/${sessionId}`, {
         method: "DELETE",
       }),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
       query.refetch();
     },
   });
@@ -66,23 +74,37 @@ function Sessions() {
             {sessions?.map((session) => (
               <Menu.Item key={session.id}>
                 <article className="flex justify-between items-center">
-                  <div>
-                    <h1 className="font-bold">
-                      Created on{" "}
-                      {new Date(session.createdAt).toLocaleDateString()} from{" "}
-                      {session.remoteAddr}
-                    </h1>
-                    <small>{session.userAgent}</small>
-                  </div>
-                  <div>
-                    <Button
-                      variant="secondary"
-                      type="button"
-                      onClick={() => mutation.mutate(session.id)}
-                    >
-                      <TrashIcon aria-label="Invalidate" />
-                    </Button>
-                  </div>
+                  <header>
+                    <ul className="text-xs">
+                      <li>
+                        Created at:{" "}
+                        {new Date(session.createdAt).toLocaleString()}
+                      </li>
+                      <li>
+                        Expires at:{" "}
+                        {new Date(session.expiresAt).toLocaleString()}
+                      </li>
+                      <li>IP: {session.remoteAddr}</li>
+                      <li>
+                        Browser: {getFormattedUserAgent(session.userAgent)}
+                      </li>
+                    </ul>
+                  </header>
+                  <footer>
+                    {session.expired ? (
+                      <small className="px-2 italic text-gray-600">
+                        Expired
+                      </small>
+                    ) : (
+                      <Button
+                        variant="nested"
+                        type="button"
+                        onClick={() => mutation.mutate(session.id)}
+                      >
+                        <TrashIcon aria-label="Invalidate" />
+                      </Button>
+                    )}
+                  </footer>
                 </article>
               </Menu.Item>
             ))}
