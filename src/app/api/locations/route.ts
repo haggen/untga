@@ -4,15 +4,15 @@ import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
 export const GET = withErrorHandling(async (req) => {
-  const { entryId } = parse(req.nextUrl.searchParams, {
-    entryId: schemas.id.optional(),
+  const { exitId } = parse(req.nextUrl.searchParams, {
+    exitId: schemas.id.optional(),
   });
 
   const criteria: Prisma.LocationWhereInput = {};
 
-  // Filter by locations that can be entered from another location.
-  if (entryId) {
-    criteria.exits = { some: { entryId } };
+  // Get only locations that can be entered from a specified exit location.
+  if (exitId) {
+    criteria.entries = { some: { exitId } };
   }
 
   const locations = await db.location.findMany({

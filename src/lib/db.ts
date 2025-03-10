@@ -1,9 +1,9 @@
+import * as tags from "@/static/tags";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { PrismaClientOptions } from "@prisma/client/runtime/client";
 import type { Operation } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
-import "server-only";
 
 export { Prisma };
 
@@ -73,6 +73,12 @@ export type Container<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
+export type Slot<T = unknown> = Prisma.Result<
+  typeof db.slot,
+  T,
+  "findFirstOrThrow"
+>;
+
 /**
  * Isolate data from the query args and pass it to a handler.
  */
@@ -125,6 +131,107 @@ const ext = Prisma.defineExtension((client) => {
           }
 
           return user;
+        },
+      },
+      itemSpecification: {
+        findByTags(...tags: string[]) {
+          return db.itemSpecification.findFirstOrThrow({
+            where: { tags: { hasEvery: tags } },
+          });
+        },
+      },
+      character: {
+        withPublicData() {
+          return {
+            omit: { locationId: true },
+            include: {
+              attributes: { include: { spec: true } },
+              resources: { include: { spec: true } },
+              slots: { include: { item: { include: { spec: true } } } },
+            },
+          } satisfies Prisma.CharacterFindManyArgs;
+        },
+        /**
+         * Get character creation input data for starting slots.
+         */
+        async withSlots({
+          items,
+        }: {
+          items?: Prisma.ItemCreateNestedManyWithoutContainerInput;
+        }) {
+          return {
+            slots: {
+              create: [
+                { type: tags.Head },
+                { type: tags.Chest },
+                { type: tags.Weapon },
+                {
+                  type: tags.Storage,
+                  item: {
+                    create: {
+                      spec: {
+                        connect: {
+                          id: (
+                            await db.itemSpecification.findByTags(
+                              tags.Storage,
+                              tags.StartingEquipment
+                            )
+                          ).id,
+                        },
+                      },
+                      storage: {
+                        create: {
+                          items,
+                        },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          } satisfies Pick<Prisma.CharacterCreateInput, "slots">;
+        },
+
+        /**
+         * Get character creation input data for starting attributes.
+         */
+        async withAttributes() {
+          const attributes = await db.attributeSpecification.findMany();
+          return {
+            attributes: {
+              create: attributes.map(({ id }) => ({
+                specId: id,
+              })),
+            },
+          } satisfies Pick<Prisma.CharacterCreateInput, "attributes">;
+        },
+
+        /**
+         * Get character creation input data for starting resources.
+         */
+        async withResources() {
+          const resources = await db.resourceSpecification.findMany();
+
+          return {
+            resources: {
+              create: resources.map(({ id }) => ({
+                specId: id,
+              })),
+            },
+          } satisfies Pick<Prisma.CharacterCreateInput, "resources">;
+        },
+
+        /**
+         * Get character creation input data for starting location.
+         */
+        async withLocation() {
+          const location = await db.location.findFirstOrThrow({
+            where: { tags: { has: tags.StartingLocation } },
+          });
+
+          return {
+            location: { connect: { id: location.id } },
+          } satisfies Pick<Prisma.CharacterCreateInput, "location">;
         },
       },
     },

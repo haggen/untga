@@ -1,100 +1,134 @@
 "use client";
 
 import { Alert } from "@/components/Alert";
+import { Definition } from "@/components/Definition";
 import { Heading } from "@/components/Heading";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
-import { client } from "@/lib/client";
-import type { Character, Container } from "@/lib/db";
+import {
+  Character,
+  client,
+  Slot,
+  WithAttributes,
+  WithItem,
+  WithLocation,
+  WithResources,
+} from "@/lib/client";
+import { parse, schemas } from "@/lib/validation";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 
-type WithLocation = {
-  include: {
-    location: true;
-  };
-};
-
-type WithAttributes = {
-  include: { attributes: { include: { specification: true } } };
-};
-
-type WithContainer = {
-  include: { container: WithItems };
-};
-
-type WithItems = {
-  include: { items: { include: { specification: true } } };
-};
-
-function Sheet({
+function Summary({
   character,
 }: {
-  character: Character<WithLocation & WithAttributes>;
+  character: Character<WithLocation & WithResources>;
 }) {
   return (
     <Stack gap={4} asChild>
       <section>
         <Heading variant="small" asChild>
-          <h2>Sheet</h2>
+          <h2>Summary</h2>
         </Heading>
 
-        <dl>
-          <div className="flex items-center gap-1">
-            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
-              Name
-            </dt>
-            <dd>{character.name}</dd>
-          </div>
-          <div className="flex items-center gap-1">
-            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
-              Birth
-            </dt>
-            <dd>{new Date(character.createdAt).toLocaleDateString()}</dd>
-          </div>
-          <div className="flex items-center gap-1">
-            <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
-              Location
-            </dt>
-            <dd>{character.location.name}</dd>
-          </div>
-          {character.attributes.map((attribute) => (
-            <div className="flex items-center gap-1" key={attribute.id}>
-              <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
-                {attribute.specification.name}
-              </dt>
-              <dd>
-                {attribute.level} ({attribute.progress}%)
-              </dd>
-            </div>
+        <Definition.List>
+          <Definition label="Name">{character.name}</Definition>
+          <Definition label="Birth">
+            {new Date(character.createdAt).toLocaleDateString()}
+          </Definition>
+          <Definition label="Location">{character.location.name}</Definition>
+          <Definition label="Status">{character.status}</Definition>
+          {character.resources.map((resource) => (
+            <Definition label={resource.spec.name} key={resource.id}>
+              {resource.level}/{resource.cap}
+            </Definition>
           ))}
-        </dl>
+        </Definition.List>
       </section>
     </Stack>
   );
 }
 
-function Inventory({ container }: { container: Container<WithItems> }) {
-  console.log(container.items);
+function Attributes({ character }: { character: Character<WithAttributes> }) {
+  return (
+    <Stack gap={4} asChild>
+      <section>
+        <Heading variant="small" asChild>
+          <h2>Attributes</h2>
+        </Heading>
+
+        <Definition.List>
+          {character.attributes.map((attribute) => (
+            <Definition label={attribute.spec.name} key={attribute.id}>
+              {Math.floor(attribute.level * 100)}
+            </Definition>
+          ))}
+        </Definition.List>
+      </section>
+    </Stack>
+  );
+}
+
+function Equipment({ slots }: { slots: Slot<WithItem>[] }) {
+  return (
+    <Stack gap={4} asChild>
+      <section>
+        <Heading variant="small" asChild>
+          <h2>Equipment</h2>
+        </Heading>
+
+        {slots.length ? (
+          <Definition.List>
+            {slots.map((slot) => (
+              <Definition key={slot.id} label={slot.type}>
+                {slot.item ? slot.item.spec.name : "Empty"}
+              </Definition>
+            ))}
+          </Definition.List>
+        ) : (
+          <Alert type="neutral">Empty.</Alert>
+        )}
+      </section>
+    </Stack>
+  );
+}
+
+function Storage({
+  userId,
+  characterId,
+}: {
+  userId: number;
+  characterId: number;
+}) {
+  const { data } = useQuery({
+    queryKey: client.users.characters.storage.queryKey(userId, characterId),
+    queryFn: () => client.users.characters.storage.get(userId, characterId),
+  });
+
+  if (!data) {
+    return (
+      <Alert type="neutral">
+        <p>Loading...</p>
+      </Alert>
+    );
+  }
+
+  const container = data.payload.data;
 
   return (
     <Stack gap={4} asChild>
       <section>
         <Heading variant="small" asChild>
-          <h2>Inventory</h2>
+          <h2>{container.source.spec.name}</h2>
         </Heading>
 
         {container.items.length ? (
-          <dl>
+          <Definition.List>
             {container.items.map((item) => (
-              <div className="flex items-center gap-1" key={item.id}>
-                <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
-                  {item.specification.name}
-                </dt>
-                <dd>&times;{item.amount}</dd>
-              </div>
+              <Definition key={item.id} label={item.spec.name}>
+                &times;{item.amount}
+              </Definition>
             ))}
-          </dl>
+          </Definition.List>
         ) : (
           <Alert type="neutral">Empty.</Alert>
         )}
@@ -108,15 +142,15 @@ type Props = {
 };
 
 export default function Page({ params }: Props) {
-  useSession();
-  const { characterId } = use(params);
+  const { userId } = useSession();
+
+  const { characterId } = parse(use(params), {
+    characterId: schemas.id,
+  });
 
   const { data } = useQuery({
-    queryKey: ["characters", characterId],
-    queryFn: () =>
-      client.request<{
-        data: Character<WithLocation & WithAttributes & WithContainer>;
-      }>(`/api/characters/${characterId}`),
+    queryKey: client.users.characters.queryKey(userId, characterId),
+    queryFn: () => client.users.characters.get(userId, characterId),
   });
 
   if (!data) {
@@ -142,9 +176,13 @@ export default function Page({ params }: Props) {
           </header>
         </Stack>
 
-        <Sheet character={character} />
+        <Summary character={character} />
 
-        <Inventory container={character.container} />
+        <Attributes character={character} />
+
+        <Equipment slots={character.slots} />
+
+        <Storage userId={userId} characterId={characterId} />
       </main>
     </Stack>
   );

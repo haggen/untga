@@ -5,9 +5,9 @@ import { Alert } from "@/components/Alert";
 import { Anchor } from "@/components/Anchor";
 import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
+import { Group } from "@/components/Group";
 import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
-import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
 import { Session } from "@/lib/db";
 import { useMutation } from "@tanstack/react-query";
@@ -38,73 +38,71 @@ export default function Page() {
   };
 
   return (
-    <Stack gap={10} asChild>
-      <div>
-        <Header>
-          <ul className="flex items-center gap-6">
-            <li>
-              <Anchor href="/registration">Register</Anchor>
-            </li>
-          </ul>
-        </Header>
+    <Group depth={1}>
+      <Header>
+        <ul>
+          <li>
+            <Anchor href="/registration">Register</Anchor>
+          </li>
+        </ul>
+      </Header>
 
-        <Stack gap={10} asChild>
-          <main>
-            <Stack gap={4} asChild>
-              <header>
-                <Heading asChild>
-                  <h1>Sign in</h1>
-                </Heading>
+      <Group depth={2} asChild>
+        <main>
+          <Group depth={4} asChild>
+            <header>
+              <Heading asChild>
+                <h1>Sign in</h1>
+              </Heading>
 
-                <p>
-                  Welcome back, adventurer! Before you can resume your journey,
-                  first you need to start a new session.
-                </p>
-              </header>
-            </Stack>
+              <p>
+                Welcome back, adventurer! Before you can resume your journey,
+                first you need to start a new session.
+              </p>
+            </header>
+          </Group>
 
-            <Stack gap={10} asChild>
-              <form onSubmit={onSubmit} aria-busy={isPending}>
-                {error ? (
-                  <Alert type="negative">{JSON.stringify(error)}</Alert>
-                ) : null}
+          <Group depth={3} asChild>
+            <form onSubmit={onSubmit} aria-busy={isPending}>
+              {error ? (
+                <Alert type="negative">{JSON.stringify(error)}</Alert>
+              ) : null}
 
-                {data ? (
-                  <Alert type="positive">{JSON.stringify(data)}</Alert>
-                ) : null}
+              {data ? (
+                <Alert type="positive">{JSON.stringify(data)}</Alert>
+              ) : null}
 
-                <Stack gap={4} asChild>
-                  <fieldset>
-                    <Field name="email" label="E-mail">
-                      <Input
-                        type="email"
-                        required
-                        placeholder="e.g. me@example.com"
-                      />
-                    </Field>
+              <Group depth={4} asChild>
+                <fieldset>
+                  <Field name="email" label="E-mail">
+                    <Input
+                      type="email"
+                      required
+                      placeholder="e.g. me@example.com"
+                    />
+                  </Field>
 
-                    <Field name="password" label="Password">
-                      <Input
-                        type="password"
-                        required
-                        minLength={12}
-                        placeholder="e.g. super-secret-phrase"
-                      />
-                    </Field>
-                  </fieldset>
-                </Stack>
+                  <Field name="password" label="Password">
+                    <Input
+                      type="password"
+                      required
+                      minLength={12}
+                      placeholder="e.g. super-secret-phrase"
+                    />
+                  </Field>
+                </fieldset>
+              </Group>
 
-                <footer className="flex justify-end">
-                  <Button type="submit" disabled={isPending}>
-                    Sign in
-                    <LogIn />
-                  </Button>
-                </footer>
-              </form>
-            </Stack>
-          </main>
-        </Stack>
-      </div>
-    </Stack>
+              <footer className="flex justify-end">
+                <Button type="submit" disabled={isPending}>
+                  Sign in
+                  <LogIn />
+                </Button>
+              </footer>
+            </form>
+          </Group>
+        </main>
+      </Group>
+    </Group>
   );
 }

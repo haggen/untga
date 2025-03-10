@@ -1,3 +1,45 @@
+import type { Character, Container, Session, Slot, User } from "@/lib/db";
+
+export { Character, Container, Session, Slot, User };
+
+export type WithLocation = {
+  include: {
+    location: true;
+  };
+};
+
+export type WithSpec = {
+  include: { spec: true };
+};
+
+export type WithAttributes = {
+  include: { attributes: WithSpec };
+};
+
+export type WithResources = {
+  include: { resources: WithSpec };
+};
+
+export type WithSlots = {
+  include: { slots: WithItem };
+};
+
+export type WithItem = {
+  include: { item: WithSpec };
+};
+
+export type WithItems = {
+  include: { items: WithSpec };
+};
+
+export type WithSource = {
+  include: { source: WithSpec };
+};
+
+// --
+// --
+// --
+
 type ClientReq<T = unknown> = {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers: Record<string, string>;
@@ -59,4 +101,59 @@ async function request<T>(
   return clientResp;
 }
 
-export const client = { request };
+// --
+// --
+// --
+
+export const client = {
+  request,
+
+  users: {
+    queryKey: (userId: number) => ["users", userId],
+
+    characters: {
+      queryKey: (userId: number, characterId?: number) => [
+        ...client.users.queryKey(userId),
+        "characters",
+        characterId,
+      ],
+
+      get: async (userId: number, characterId: number) => {
+        return request<{
+          data: Character<
+            WithLocation & WithAttributes & WithResources & WithSlots
+          >;
+        }>(`/api/users/${userId}/characters/${characterId}`);
+      },
+
+      post: async ({
+        userId,
+        payload,
+      }: {
+        userId: number;
+        payload: FormData;
+      }) => {
+        return request<{
+          data: Character<
+            WithLocation & WithAttributes & WithResources & WithSlots
+          >;
+        }>(`/api/users/${userId}/characters`, {
+          payload,
+        });
+      },
+
+      storage: {
+        queryKey: (userId: number, characterId: number) => [
+          ...client.users.characters.queryKey(userId, characterId),
+          "storage",
+        ],
+
+        get: async (userId: number, characterId: number) => {
+          return request<{ data: Container<WithSource & WithItems> }>(
+            `/api/users/${userId}/characters/${characterId}/storage`
+          );
+        },
+      },
+    },
+  },
+};

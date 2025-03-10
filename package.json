@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "prisma": {
-    "seed": "node --experimental-strip-types prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
@@ -47,6 +47,7 @@
     "postcss": "^8",
     "prisma": "^6.4.1",
     "tailwindcss": "^4.0.9",
+    "tsx": "^4.19.3",
     "typescript": "^5"
   }
 }

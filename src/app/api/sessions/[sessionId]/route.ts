@@ -7,25 +7,6 @@ import { NextResponse } from "next/server";
 
 type Params = { sessionId: string };
 
-export const GET = withErrorHandling(
-  async (req, { params }: { params: Promise<Params> }) => {
-    const { sessionId } = parse(await params, {
-      sessionId: schemas.id,
-    });
-
-    const { userId } = await getActiveSessionOrThrow();
-
-    const session = await db.session.findUniqueOrThrow({
-      where: { id: sessionId, userId },
-      omit: {
-        secret: true,
-      },
-    });
-
-    return NextResponse.json({ data: session });
-  }
-);
-
 export const DELETE = withErrorHandling(
   async (req, { params }: { params: Promise<Params> }) => {
     const { sessionId } = parse(await params, {

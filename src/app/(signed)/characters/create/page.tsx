@@ -335,12 +335,13 @@ export default function Page() {
 
   const { mutate, data, error, isPending } = useMutation({
     mutationFn: (payload: FormData) =>
-      client.request(`/api/characters`, {
+      client.users.characters.post({
+        userId: session.userId,
         payload,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["users", session.userId, "characters"],
+        queryKey: client.users.queryKey(session.userId),
       });
       router.push("/characters");
     },
@@ -386,31 +387,37 @@ export default function Page() {
               <Alert type="positive">{JSON.stringify(data)}</Alert>
             ) : null}
 
-            <fieldset className="flex gap-2">
-              <Field name="name" className="grow">
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  required
-                  placeholder="e.g. Ragnar"
-                />
-              </Field>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={typeRandomName}
-              >
-                <Dices />
-              </Button>
-            </fieldset>
+            <Stack gap={4} asChild>
+              <fieldset>
+                <Field name="name" label="Name">
+                  <Input
+                    ref={inputRef}
+                    type="text"
+                    required
+                    placeholder="e.g. Ragnar"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={typeRandomName}
+                  >
+                    <Dices />
+                  </Button>
+                </Field>
 
-            <footer className="flex items-center justify-end gap-4">
-              {/* <Button variant="secondary" asChild>
-                <Link href="/characters">
-                  <ArrowLeft aria-label="Go back" />
-                </Link>
-              </Button> */}
+                <Field name="description" label="Bio">
+                  <Input
+                    area
+                    rows={3}
+                    required
+                    maxLength={256}
+                    placeholder="e.g. The son of a blacksmith..."
+                  />
+                </Field>
+              </fieldset>
+            </Stack>
 
+            <footer className="flex items-center justify-end gap-2">
               <Button type="submit" size="default" disabled={isPending}>
                 Create
                 <CircleCheckBigIcon />

@@ -1,71 +1,146 @@
-import { PrismaClient } from "@prisma/client";
-
-const db = new PrismaClient();
+import { db } from "@/lib/db";
+import * as tags from "@/static/tags";
 
 async function seed() {
-  const places = [
-    await db.location.create({
-      data: {
-        name: "Village",
-        description: "A small village.",
-        container: { create: {} },
-        tags: ["peaceful", "starting-location"],
-      },
-    }),
-    await db.location.create({
-      data: {
-        name: "Forest",
-        description: "A dense forest.",
-        container: { create: {} },
-        tags: ["hostile"],
-      },
-    }),
-  ];
-
-  await db.character.create({
+  const village = await db.location.create({
     data: {
-      name: "Jeremia, a concerned villager",
-      location: { connect: { id: places[0].id } },
-      container: { create: {} },
-      tags: ["npc"],
+      name: "Village",
+      description: "A small village.",
+      tags: [tags.Peaceful, tags.StartingLocation],
     },
   });
 
-  await db.character.create({
+  const forest = await db.location.create({
     data: {
-      name: "Brian, the hunter",
-      location: { connect: { id: places[1].id } },
-      container: { create: {} },
-      tags: ["npc"],
+      name: "Forest",
+      description: "A dense forest.",
+      tags: [tags.Hostile],
     },
   });
 
   await db.path.createMany({
     data: [
       {
-        exitId: places[0].id,
-        entryId: places[1].id,
+        exitId: village.id,
+        entryId: forest.id,
       },
       {
-        exitId: places[1].id,
-        entryId: places[0].id,
+        exitId: forest.id,
+        entryId: village.id,
       },
     ],
   });
 
-  await db.attributeSpecification.createMany({
-    data: [
-      {
-        name: "Health",
-        description: "If you have none, you're dead.",
-        tags: ["health", "player"],
-      },
-      {
-        name: "Stamina",
-        description: "Stamina is spent to perform actions.",
-        tags: ["stamina", "player"],
-      },
-    ],
+  await db.itemSpecification.createMany({
+    data: {
+      name: "Sword",
+      description: "A sharp sword.",
+      tags: [tags.Equipment, tags.Weapon],
+    },
+  });
+
+  await db.itemSpecification.createMany({
+    data: {
+      name: "Cap",
+      description: "A leather cap.",
+      tags: [tags.Equipment, tags.Head],
+    },
+  });
+
+  await db.itemSpecification.createMany({
+    data: {
+      name: "Apple",
+      description: "A juicy apple.",
+      tags: [tags.Food, tags.Consumable],
+    },
+  });
+
+  const gold = await db.itemSpecification.create({
+    data: {
+      name: "Gold coin",
+      description: "A gold coin.",
+      tags: [tags.Currency],
+    },
+  });
+
+  await db.itemSpecification.create({
+    data: {
+      name: "Backpack",
+      description: "A backpack.",
+      tags: [tags.Equipment, tags.Storage, tags.StartingEquipment],
+    },
+  });
+
+  await db.attributeSpecification.create({
+    data: {
+      name: "Negotiation",
+      description: "Skill to negotiate with others.",
+      tags: [tags.Negotiation, tags.Skill],
+    },
+  });
+
+  await db.attributeSpecification.create({
+    data: {
+      name: "Survivalship",
+      description: "General ability to survive in the wild.",
+      tags: [tags.Survivalship, tags.Skill],
+    },
+  });
+
+  await db.attributeSpecification.create({
+    data: {
+      name: "Combat",
+      description: "Ability to fight with hostiles.",
+      tags: [tags.Combat, tags.Skill],
+    },
+  });
+
+  await db.resourceSpecification.create({
+    data: {
+      name: "Health",
+      description: "Health points.",
+      tags: [tags.Health],
+    },
+  });
+
+  await db.resourceSpecification.create({
+    data: {
+      name: "Stamina",
+      description: "Stamina points.",
+      tags: [tags.Stamina],
+    },
+  });
+
+  await db.character.create({
+    data: {
+      name: "Jeremia, the villager",
+      location: { connect: { id: village.id } },
+      tags: [tags.NPC],
+
+      ...(await db.character.withSlots({
+        items: {
+          create: [{ spec: { connect: { id: gold.id } }, amount: 1000 }],
+        },
+      })),
+      ...(await db.character.withAttributes()),
+      ...(await db.character.withResources()),
+    },
+  });
+
+  await db.character.create({
+    data: {
+      name: "Brian, the hunter",
+      location: { connect: { id: forest.id } },
+      tags: [tags.NPC],
+
+      ...(await db.character.withSlots({
+        items: {
+          create: [{ spec: { connect: { id: gold.id } }, amount: 1000 }],
+        },
+      })),
+      ...(await db.character.withAttributes()),
+      ...(await db.character.withResources()),
+    },
   });
 }
 

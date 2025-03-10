@@ -30,35 +30,12 @@ CREATE TABLE "Character" (
     "deletedAt" TIMESTAMP(3),
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'idle',
     "tags" TEXT[],
     "userId" INTEGER,
     "locationId" INTEGER NOT NULL,
-    "containerId" INTEGER NOT NULL,
 
     CONSTRAINT "Character_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Act" (
-    "id" SERIAL NOT NULL,
-    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "completesAt" TIMESTAMP(3),
-    "data" JSONB NOT NULL DEFAULT '{}',
-    "characterId" INTEGER NOT NULL,
-
-    CONSTRAINT "Act_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Log" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "readAt" TIMESTAMP(3),
-    "message" TEXT NOT NULL,
-    "characterId" INTEGER NOT NULL,
-
-    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -78,12 +55,47 @@ CREATE TABLE "Attribute" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "level" INTEGER NOT NULL DEFAULT 1,
-    "progress" INTEGER NOT NULL DEFAULT 0,
-    "specificationId" INTEGER NOT NULL,
+    "level" DOUBLE PRECISION NOT NULL DEFAULT 1,
+    "specId" INTEGER NOT NULL,
     "characterId" INTEGER NOT NULL,
 
     CONSTRAINT "Attribute_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ResourceSpecification" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "tags" TEXT[],
+
+    CONSTRAINT "ResourceSpecification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Resource" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "level" INTEGER NOT NULL DEFAULT 100,
+    "cap" INTEGER NOT NULL DEFAULT 100,
+    "specId" INTEGER NOT NULL,
+    "characterId" INTEGER NOT NULL,
+
+    CONSTRAINT "Resource_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Log" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "readAt" TIMESTAMP(3),
+    "message" TEXT NOT NULL,
+    "characterId" INTEGER NOT NULL,
+
+    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -91,8 +103,21 @@ CREATE TABLE "Container" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "sourceId" INTEGER NOT NULL,
 
     CONSTRAINT "Container_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Slot" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "type" TEXT NOT NULL,
+    "itemId" INTEGER,
+    "characterId" INTEGER NOT NULL,
+
+    CONSTRAINT "Slot_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -113,10 +138,23 @@ CREATE TABLE "Item" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "amount" INTEGER NOT NULL DEFAULT 1,
-    "specificationId" INTEGER NOT NULL,
-    "containerId" INTEGER NOT NULL,
+    "specId" INTEGER NOT NULL,
+    "containerId" INTEGER,
 
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Effect" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP(3),
+    "description" TEXT,
+    "params" JSONB NOT NULL,
+    "tags" TEXT[],
+    "itemId" INTEGER NOT NULL,
+
+    CONSTRAINT "Effect_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -127,7 +165,6 @@ CREATE TABLE "Location" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "tags" TEXT[],
-    "containerId" INTEGER NOT NULL,
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
 );
@@ -150,16 +187,25 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Session_secret_key" ON "Session"("secret");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Character_containerId_key" ON "Character"("containerId");
+CREATE INDEX "AttributeSpecification_tags_idx" ON "AttributeSpecification"("tags");
 
 -- CreateIndex
-CREATE INDEX "AttributeSpecification_tags_idx" ON "AttributeSpecification"("tags");
+CREATE INDEX "ResourceSpecification_tags_idx" ON "ResourceSpecification"("tags");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Container_sourceId_key" ON "Container"("sourceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Slot_itemId_key" ON "Slot"("itemId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Slot_characterId_type_key" ON "Slot"("characterId", "type");
 
 -- CreateIndex
 CREATE INDEX "ItemSpecification_tags_idx" ON "ItemSpecification"("tags");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Location_containerId_key" ON "Location"("containerId");
+CREATE INDEX "Effect_tags_idx" ON "Effect"("tags");
 
 -- CreateIndex
 CREATE INDEX "Location_tags_idx" ON "Location"("tags");
@@ -174,28 +220,37 @@ ALTER TABLE "Character" ADD CONSTRAINT "Character_userId_fkey" FOREIGN KEY ("use
 ALTER TABLE "Character" ADD CONSTRAINT "Character_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Character" ADD CONSTRAINT "Character_containerId_fkey" FOREIGN KEY ("containerId") REFERENCES "Container"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Act" ADD CONSTRAINT "Act_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Log" ADD CONSTRAINT "Log_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_specificationId_fkey" FOREIGN KEY ("specificationId") REFERENCES "AttributeSpecification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_specId_fkey" FOREIGN KEY ("specId") REFERENCES "AttributeSpecification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Item" ADD CONSTRAINT "Item_specificationId_fkey" FOREIGN KEY ("specificationId") REFERENCES "ItemSpecification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Resource" ADD CONSTRAINT "Resource_specId_fkey" FOREIGN KEY ("specId") REFERENCES "ResourceSpecification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Resource" ADD CONSTRAINT "Resource_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Log" ADD CONSTRAINT "Log_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Container" ADD CONSTRAINT "Container_sourceId_fkey" FOREIGN KEY ("sourceId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Slot" ADD CONSTRAINT "Slot_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Slot" ADD CONSTRAINT "Slot_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Item" ADD CONSTRAINT "Item_specId_fkey" FOREIGN KEY ("specId") REFERENCES "ItemSpecification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Item" ADD CONSTRAINT "Item_containerId_fkey" FOREIGN KEY ("containerId") REFERENCES "Container"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Location" ADD CONSTRAINT "Location_containerId_fkey" FOREIGN KEY ("containerId") REFERENCES "Container"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Effect" ADD CONSTRAINT "Effect_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "ItemSpecification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Path" ADD CONSTRAINT "Path_entryId_fkey" FOREIGN KEY ("entryId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;

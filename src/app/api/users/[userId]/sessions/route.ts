@@ -3,13 +3,16 @@ import { db } from "@/lib/db";
 import { getActiveSessionOrThrow } from "@/lib/session";
 import { NextResponse } from "next/server";
 
+/**
+ * Get all the sessions of the authenticated user.
+ */
 export const GET = withErrorHandling(async () => {
   const { userId } = await getActiveSessionOrThrow();
 
   const where = { userId };
 
   const sessions = await db.session.findMany({
-    where: { userId },
+    where,
     omit: {
       secret: true,
     },

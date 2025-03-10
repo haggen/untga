@@ -1,9 +1,15 @@
-import { Children, cloneElement, ReactElement, useId } from "react";
+import { cloneElement, ReactElement, ReactNode, useId } from "react";
 import { twMerge } from "tailwind-merge";
+
+type ControlElement = ReactElement<{
+  id: string;
+  name?: string;
+  className?: string;
+}>;
 
 type Props = {
   label?: string;
-  children: ReactElement<{ id: string; name?: string }>;
+  children: ControlElement | [ControlElement, ...ReactNode[]];
   hint?: string;
   error?: string[];
   name?: string;
@@ -20,6 +26,8 @@ export function Field({
 }: Props) {
   const id = useId();
 
+  const [control, ...extra] = Array.isArray(children) ? children : [children];
+
   return (
     <div className={twMerge("flex flex-col gap-0.5", className)}>
       {label ? (
@@ -28,7 +36,10 @@ export function Field({
         </label>
       ) : null}
 
-      {cloneElement(Children.only(children), { id, name })}
+      <div className="flex items-center gap-2">
+        {cloneElement(control, { id, name, className: "grow" })}
+        {extra}
+      </div>
 
       {hint ? <small>{hint}</small> : null}
 

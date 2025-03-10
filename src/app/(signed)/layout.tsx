@@ -1,6 +1,6 @@
 import { Anchor } from "@/components/Anchor";
+import { Group } from "@/components/Group";
 import { SessionProvider } from "@/components/SessionProvider";
-import { Stack } from "@/components/Stack";
 import { getActiveSessionOrRedirect } from "@/lib/session";
 import { ReactNode } from "react";
 
@@ -12,8 +12,8 @@ export default async function Layout({ children }: Props) {
   const session = await getActiveSessionOrRedirect();
 
   return (
-    <SessionProvider session={session}>
-      <Stack gap={10} asChild>
+    <SessionProvider session={JSON.parse(JSON.stringify(session))}>
+      <Group depth={1} asChild>
         <div className="p-6 md:p-12 max-w-[48rem] mx-auto">
           <nav className="flex items-center justify-between">
             <Anchor href="/">
@@ -36,7 +36,7 @@ export default async function Layout({ children }: Props) {
 
           {children}
         </div>
-      </Stack>
+      </Group>
     </SessionProvider>
   );
 }

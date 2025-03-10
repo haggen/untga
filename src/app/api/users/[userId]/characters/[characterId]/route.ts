@@ -1,29 +1,26 @@
 import { withErrorHandling } from "@/lib/api";
 import { db } from "@/lib/db";
-import { UnauthorizedError } from "@/lib/error";
+import { NotFoundError, UnauthorizedError } from "@/lib/error";
 import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
-type Params = { userId: string };
+type Params = { userId: string; characterId: string };
 
 /**
- * Get all the characters of the authenticated player.
+ * Get a private detailed profile of a user's character.
  */
 export const GET = withErrorHandling(
   async (req, { params }: { params: Promise<Params> }) => {
-    const { userId } = parse(await params, {
+    const { userId, characterId } = parse(await params, {
       userId: schemas.id,
+      characterId: schemas.id,
     });
 
     const session = await getActiveSessionOrThrow();
 
-    if (session.userId !== userId) {
-      throw new UnauthorizedError();
-    }
-
-    const characters = await db.character.findMany({
-      where: { userId },
+    const character = await db.character.findUnique({
+      where: { id: characterId, userId },
       include: {
         location: true,
         attributes: { include: { spec: true } },
@@ -32,8 +29,16 @@ export const GET = withErrorHandling(
       },
     });
 
-    const total = await db.character.count({ where: { userId } });
+    if (!character) {
+      throw new NotFoundError();
+    }
 
-    return NextResponse.json({ data: characters, total });
+    if (userId !== session.userId) {
+      throw new UnauthorizedError(
+        "Character's detailed profile isn't accessible to you."
+      );
+    }
+
+    return NextResponse.json({ data: character });
   }
 );

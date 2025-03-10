@@ -3,6 +3,7 @@
 import { Alert } from "@/components/Alert";
 import { Button } from "@/components/Button";
 import { Heading } from "@/components/Heading";
+import { Menu } from "@/components/Menu";
 import { useSession } from "@/components/SessionProvider";
 import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
@@ -10,31 +11,6 @@ import { type Character } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
 import { UserIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
-
-function List({
-  characters,
-}: {
-  characters: Character<{ include: { location: true } }>[];
-}) {
-  return (
-    <ul className="shadow ring ring-current/10">
-      {characters.map((character) => (
-        <li
-          key={character.id}
-          className="bg-orange-100/33 hover:bg-orange-200/50 not-first:border-t border-current/50"
-        >
-          <Link
-            href={`/characters/${character.id}`}
-            className="flex gap-1 p-3 font-bold"
-          >
-            <UserIcon />
-            {character.name}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export default function Page() {
   const session = useSession();
@@ -46,6 +22,8 @@ export default function Page() {
         `/api/users/${session.userId}/characters`
       ),
   });
+
+  const characters = data?.payload.data;
 
   return (
     <Stack gap={10} asChild>
@@ -64,8 +42,19 @@ export default function Page() {
           <Alert type="neutral">
             <p>Loading...</p>
           </Alert>
-        ) : data?.payload.data.length ? (
-          <List characters={data.payload.data} />
+        ) : characters?.length ? (
+          <Menu>
+            {characters.map((character) => (
+              <li key={character.id}>
+                <Menu.Item asChild className="flex items-center gap-1">
+                  <Link href={`/characters/${character.id}`}>
+                    <UserIcon />
+                    {character.name}
+                  </Link>
+                </Menu.Item>
+              </li>
+            ))}
+          </Menu>
         ) : (
           <Alert type="neutral">
             <p>You don&apos;t have any characters.</p>

@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Learn more Prisma schema file at https://pris.ly/d/prisma-schema.
 
 generator client {
   provider = "prisma-client-js"
@@ -15,165 +11,335 @@ datasource db {
 
 /// User of the system.
 model User {
+  /// The primary key.
   id        Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt DateTime @default(now())
+  /// When it was last updated.
   updatedAt DateTime @updatedAt
+  /// User's email.
   email     String   @unique
+  /// Password hash
   password  String
 
+  /// User's sessions.
   sessions   Session[]
+  /// Characters created by the user.
   characters Character[]
 }
 
-/// Sessions are used for authentication.
+/// Authentication sessions.
 model Session {
+  /// The primary key.
   id         Int      @id @default(autoincrement())
+  /// The session's secret key.
   secret     String   @unique @default(cuid())
+  /// When it was created.
   createdAt  DateTime @default(now())
+  /// When it expires.
   expiresAt  DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
+  /// The remote address (IP) that created the session.
   remoteAddr String
+  /// The user agent that created the session.
   userAgent  String
 
+  /// User to whom the session belongs.
   userId Int
+  /// User to whom the session belongs.
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/// Characters in the world.
+/// Characters in the world, player controlled or otherwise.
 model Character {
+  /// The primary key.
   id          Int       @id @default(autoincrement())
+  /// When it was created.
   createdAt   DateTime  @default(now())
+  /// When it was last updated.
   updatedAt   DateTime  @updatedAt
+  /// When it was deleted.
   deletedAt   DateTime?
+  /// The name of the character.
   name        String
+  /// Character's bio.
   description String?
+  /// The current status of the character.
+  status      String    @default("idle")
+  /// Tags allow for attaching behavior.
   tags        String[]
 
-  userId      Int?
-  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  locationId  Int
-  location    Location    @relation(fields: [locationId], references: [id])
-  containerId Int         @unique
-  container   Container   @relation(fields: [containerId], references: [id], onDelete: Cascade)
-  attributes  Attribute[]
-  acts        Act[]
-  logs        Log[]
-}
-
-/// Acts can be performed by characters.
-model Act {
-  id          Int       @id @default(autoincrement())
-  startedAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  completesAt DateTime?
-  data        Json      @default("{}")
-
-  characterId Int
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-}
-
-/// Log events from a player character's perspective.
-model Log {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  readAt    DateTime?
-  message   String
-
-  characterId Int
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  /// The user to whom the character belongs.
+  userId     Int?
+  /// The user to whom the character belongs.
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// The current location of the character.
+  locationId Int
+  /// The current location of the character.
+  location   Location    @relation(fields: [locationId], references: [id])
+  /// Character's equipment slots.
+  slots      Slot[]
+  /// The character's attributes.
+  attributes Attribute[]
+  /// The character's log entries.
+  logs       Log[]
+  /// The character's resources.
+  resources  Resource[]
 }
 
 /// Static information of attributes.
 model AttributeSpecification {
+  /// The primary key.
   id          Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt   DateTime @default(now())
+  /// When it was last updated.
   updatedAt   DateTime @updatedAt
+  /// Attribute's name.
   name        String
+  /// Human-readable description.
   description String?
+  /// Tags allow for attaching behavior.
   tags        String[]
 
+  /// Attributes specified by this specification.
   attributes Attribute[]
 
   @@index([tags])
 }
 
-/// Attributes are checked against when deciding outcomes.
+/// Attributes are outcome modifiers.
 model Attribute {
+  /// The primary key.
   id        Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt DateTime @default(now())
+  /// When it was last updated.
   updatedAt DateTime @updatedAt
-  level     Int      @default(1)
-  progress  Int      @default(0)
+  /// Attribute's current level in a range of 0-1.
+  level     Float    @default(0)
 
-  specificationId Int
-  specification   AttributeSpecification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
-  characterId     Int
-  character       Character              @relation(fields: [characterId], references: [id])
+  /// Attribute's specification.
+  specId      Int
+  /// Attribute's specification.
+  spec        AttributeSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
+  /// The character this attribute belongs to.
+  characterId Int
+  /// The character this attribute belongs to.
+  character   Character              @relation(fields: [characterId], references: [id])
 }
 
-/// Container holds items.
-model Container {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  character Character?
-  location  Location?
-  items     Item[]
-}
-
-/// Static information of items.
-model ItemSpecification {
+/// Resource specification.
+model ResourceSpecification {
+  /// The primary key.
   id          Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt   DateTime @default(now())
+  /// When it was last updated.
   updatedAt   DateTime @updatedAt
+  /// Resource's name.
   name        String
+  /// Human-readable description.
   description String?
+  /// Tags allow for attaching behavior.
   tags        String[]
 
-  items Item[]
+  /// Resources specified by this specification.
+  resources Resource[]
+
+  @@index([tags])
+}
+
+/// Resources are spent by the characters to complete activities.
+model Resource {
+  /// The primary key.
+  id        Int      @id @default(autoincrement())
+  /// When it was created.
+  createdAt DateTime @default(now())
+  /// When it was last updated.
+  updatedAt DateTime @updatedAt
+  /// The current level of the resource.
+  level     Int      @default(100)
+  /// The maximum level of the resource.
+  cap       Int      @default(100)
+
+  /// Resource's specification.
+  specId      Int
+  /// Resource's specification.
+  spec        ResourceSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
+  /// The character this resource belongs to.
+  characterId Int
+  /// The character this resource belongs to.
+  character   Character             @relation(fields: [characterId], references: [id])
+}
+
+/// Log events from a player character's perspective.
+model Log {
+  /// The primary key.
+  id        Int       @id @default(autoincrement())
+  /// When it was created.
+  createdAt DateTime  @default(now())
+  /// When, if ever, it was read by the player.
+  readAt    DateTime?
+  /// The entry's message.
+  message   String
+
+  /// The character that created the log entry.
+  characterId Int
+  /// The character that created the log entry.
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+/// Containers hold multiple items, like bags.
+model Container {
+  /// The primary key.
+  id        Int      @id @default(autoincrement())
+  /// When it was created.
+  createdAt DateTime @default(now())
+  /// When it was last updated.
+  updatedAt DateTime @updatedAt
+
+  /// Item source of the container.
+  sourceId Int    @unique
+  /// Item source of the container.
+  source   Item   @relation("storage", fields: [sourceId], references: [id])
+  /// Contents of the container.
+  items    Item[]
+}
+
+/// Slots hold a single item and have a type.
+model Slot {
+  /// The primary key.
+  id        Int      @id @default(autoincrement())
+  /// When it was created.
+  createdAt DateTime @default(now())
+  /// When it was last updated.
+  updatedAt DateTime @updatedAt
+  /// The type of slot, e.g. head, weapon, storage, etc.
+  type      String
+
+  /// The item inserted in the slot.
+  itemId      Int?      @unique
+  /// The item inserted in the slot.
+  item        Item?     @relation(fields: [itemId], references: [id])
+  /// The character that owns the slot.
+  characterId Int
+  /// The character that owns the slot.
+  character   Character @relation(fields: [characterId], references: [id])
+
+  @@unique([characterId, type])
+}
+
+/// Specifies item's properties and behavior.
+model ItemSpecification {
+  /// The primary key.
+  id          Int      @id @default(autoincrement())
+  /// When it was created.
+  createdAt   DateTime @default(now())
+  /// When it was last updated.
+  updatedAt   DateTime @updatedAt
+  /// Name of the item.
+  name        String
+  /// Human-readable description.
+  description String?
+  /// Tags allow for attaching behavior.
+  tags        String[]
+
+  /// Items it specifies.
+  items   Item[]
+  /// Effects these items have.
+  effects Effect[]
 
   @@index([tags])
 }
 
 /// Items in the world.
 model Item {
+  /// The primary key.
   id        Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt DateTime @default(now())
+  /// When it was last updated.
   updatedAt DateTime @updatedAt
+  /// Current amount of the item.
   amount    Int      @default(1)
 
-  specificationId Int
-  specification   ItemSpecification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
-  containerId     Int
-  container       Container         @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  /// Item's specification.
+  specId      Int
+  /// Item's specification.
+  spec        ItemSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
+  /// The container holding the item.
+  containerId Int?
+  /// The container holding the item.
+  container   Container?        @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  /// The storage provided by the item.
+  storage     Container?        @relation("storage")
+  /// The slot holding the item.
+  slot        Slot?
+}
+
+/// Effects are attribute and outcome modifiers.
+model Effect {
+  /// Primary key.
+  id          Int       @id @default(autoincrement())
+  /// When it was created.
+  createdAt   DateTime  @default(now())
+  /// When it expires.
+  expiresAt   DateTime?
+  /// Human-readable description.
+  description String?
+  /// Effect parameters.
+  params      Json
+  /// Tags allow for attaching behavior.
+  tags        String[]
+
+  /// The source of the effect.
+  itemId Int
+  /// The source of the effect.
+  item   ItemSpecification @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([tags])
 }
 
 /// Locations in the world.
 model Location {
+  /// The primary key.
   id          Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt   DateTime @default(now())
+  /// When it was last updated.
   updatedAt   DateTime @updatedAt
+  /// Location's name.
   name        String
+  /// Human-readable description.
   description String?
+  /// Tags allow for attaching behavior.
   tags        String[]
 
-  containerId Int         @unique
-  container   Container   @relation(fields: [containerId], references: [id], onDelete: Cascade)
-  characters  Character[]
-  entries     Path[]      @relation("entry")
-  exits       Path[]      @relation("exit")
+  /// Characters currently in the location.
+  characters Character[]
+  /// Paths that lead to the location.
+  entries    Path[]      @relation("entry")
+  /// Paths that connect the location to somewhere else.
+  exits      Path[]      @relation("exit")
 
   @@index([tags])
 }
 
 /// Paths connect locations.
 model Path {
+  /// Primary key.
   id        Int      @id @default(autoincrement())
+  /// When it was created.
   createdAt DateTime @default(now())
+  /// When it was last updated.
   updatedAt DateTime @updatedAt
 
+  /// Location from where the path starts.
   entryId Int
+  /// Location from where the path starts.
   entry   Location @relation("entry", fields: [entryId], references: [id], onDelete: Cascade)
+  /// Location to where the path leads.
   exitId  Int
+  /// Location to where the path leads.
   exit    Location @relation("exit", fields: [exitId], references: [id], onDelete: Cascade)
 }

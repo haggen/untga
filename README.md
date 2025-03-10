@@ -25,11 +25,27 @@ docker compose up -w
 
 #### IDE integration
 
+The container will isolate its `node_modules` directory, therefore dependencies as well as Next.js and Prisma generated code won't be immediately locally available. To fix this, stop the container and run;
+
 ```shell
 npm install
-npx next build # To generate types.
+npx next build
 npx prisma generate
 ```
+
+#### Guidelines
+
+Below are some guidelines thought of during the development and in no particular order.
+
+##### Route handlers
+
+When working on route handlers, please make sure;
+
+1. You're using the error handler middleware.
+2. You have input validation near the top.
+3. You don't end up masking errors.
+4. You check the requester's access.
+5. Collection's response has a total count.
 
 ## Legal
 
