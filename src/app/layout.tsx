@@ -1,17 +1,27 @@
 import QueryClientProvider from "@/components/QueryClientProvider";
 import type { Metadata } from "next";
-import { Cabin, Labrada } from "next/font/google";
+import { Eczar, Rosario } from "next/font/google";
 import { ReactNode } from "react";
 
 import "./global.css";
 
-const fontSerif = Labrada({
+// Eczar
+// Grenze
+// Labrada
+const fontSerif = Eczar({
   variable: "--font-serif",
   weight: ["400", "700"],
   subsets: ["latin"],
 });
 
-const fontSans = Cabin({
+// Cabin
+// Rambla
+// Rosario
+// Signika
+// Alegreya_Sans
+// Anek_Latin
+// Livvic
+const fontSans = Rosario({
   variable: "--font-sans",
   weight: ["400", "700"],
   subsets: ["latin"],
@@ -30,10 +40,10 @@ export default function Layout({ children }: Props) {
   return (
     <html
       lang="en"
-      className={`${fontSerif.variable} ${fontSans.variable} antialiased text-gray-800`}
+      className={`${fontSerif.variable} ${fontSans.variable} antialiased text-neutral-900 inner-glow inner-glow-18 inner-glow-orange-900/50`}
     >
       <body>
-        <div style={{ filter: "url(#filmgrain)", mixBlendMode: "hard-light" }}>
+        <div className="filter-[url(#filmgrain)] mix-blend-hard-light">
           <QueryClientProvider>{children}</QueryClientProvider>
         </div>
 

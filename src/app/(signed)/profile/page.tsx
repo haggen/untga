@@ -2,7 +2,9 @@
 
 import { Alert } from "@/components/Alert";
 import { Button } from "@/components/Button";
+import { Definition } from "@/components/Definition";
 import { Field } from "@/components/Field";
+import { Geolocation } from "@/components/Geolocation";
 import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
 import { Menu } from "@/components/Menu";
@@ -11,7 +13,7 @@ import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
 import type { Session } from "@/lib/db";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CircleCheckBig, TrashIcon } from "lucide-react";
+import { CircleCheckBig } from "lucide-react";
 import { FormEvent } from "react";
 import { UAParser } from "ua-parser-js";
 
@@ -73,39 +75,22 @@ function Sessions() {
           <Menu>
             {sessions?.map((session) => (
               <Menu.Item key={session.id}>
-                <article className="flex justify-between items-center">
-                  <header>
-                    <ul className="text-xs">
-                      <li>
-                        Created at:{" "}
-                        {new Date(session.createdAt).toLocaleString()}
-                      </li>
-                      <li>
-                        Expires at:{" "}
-                        {new Date(session.expiresAt).toLocaleString()}
-                      </li>
-                      <li>IP: {session.remoteAddr}</li>
-                      <li>
-                        Browser: {getFormattedUserAgent(session.userAgent)}
-                      </li>
-                    </ul>
-                  </header>
-                  <footer>
-                    {session.expired ? (
-                      <small className="px-2 italic text-gray-600">
-                        Expired
-                      </small>
-                    ) : (
-                      <Button
-                        variant="nested"
-                        type="button"
-                        onClick={() => mutation.mutate(session.id)}
-                      >
-                        <TrashIcon aria-label="Invalidate" />
-                      </Button>
-                    )}
-                  </footer>
-                </article>
+                <Definition.List>
+                  <Definition label="Created at">
+                    {new Date(session.createdAt).toLocaleString()}
+                  </Definition>
+                  <Definition
+                    label={session.expired ? "Expired at" : "Expires at"}
+                  >
+                    {new Date(session.expiresAt).toLocaleString()}
+                  </Definition>
+                  <Definition label="Browser">
+                    {getFormattedUserAgent(session.userAgent)}
+                  </Definition>
+                  <Definition label="Location">
+                    <Geolocation ip={session.remoteAddr} />
+                  </Definition>
+                </Definition.List>
               </Menu.Item>
             ))}
           </Menu>
@@ -155,7 +140,7 @@ function EmailForm() {
 
         <footer className="flex justify-end">
           <Button type="submit" size="default" disabled={isPending}>
-            Confirm <CircleCheckBig />
+            Change e-mail <CircleCheckBig />
           </Button>
         </footer>
       </form>
@@ -206,7 +191,7 @@ function PasswordForm() {
 
         <footer className="flex justify-end">
           <Button type="submit" size="default" disabled={isPending}>
-            Confirm <CircleCheckBig />
+            Change password <CircleCheckBig />
           </Button>
         </footer>
       </form>

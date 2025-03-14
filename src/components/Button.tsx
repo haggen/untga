@@ -11,7 +11,7 @@ const variants = tv({
     },
     variant: {
       primary:
-        "shadow bg-orange-800 text-orange-100 hover:bg-orange-700 inset-ring inset-ring-gray-800/25",
+        "shadow bg-orange-800 text-orange-100 hover:bg-orange-700 inset-ring inset-ring-gray-800/30",
       secondary:
         "shadow text-orange-800 hover:text-orange-700 inset-ring-2 inset-ring-orange-800 hover:inset-ring-orange-700",
       nested: "text-orange-800 hover:text-orange-700",

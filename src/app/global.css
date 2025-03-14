@@ -2,16 +2,48 @@
 
 @layer base {
   html {
-    background-color: hsl(30, 90%, 85%);
+    background-color: var(--color-orange-100);
     background-image: url(/halftone.png), url(/paper.png);
     background-repeat: repeat;
     background-blend-mode: multiply;
-    box-shadow: inset 0 0 6rem hsla(30, 80%, 20%, 0.5);
-    min-height: 100dvh;
-    font-size: 18px;
   }
 
   button {
     cursor: pointer;
   }
+}
+
+@property --tw-inner-glow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inner-glow-size {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --tw-inner-glow-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: currentColor;
+}
+
+@utility inner-glow {
+  --tw-inner-glow: inset 0 0 var(--tw-inner-glow-size, 0)
+    var(--tw-inner-glow-color, currentColor);
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+    var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-inner-glow),
+    var(--tw-shadow);
+}
+
+@utility inner-glow-* {
+  --alpha: --modifier(integer)%;
+  
+  --tw-inner-glow-color: --alpha(--value(--color-*) / var(--alpha, 100%));
+  --tw-inner-glow-color: --value([color]);
+
+  --tw-inner-glow-size: --spacing(--value(integer));
+  --tw-inner-glow-size: --value([length]);
 }

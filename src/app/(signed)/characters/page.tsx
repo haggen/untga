@@ -1,11 +1,10 @@
 "use client";
 
 import { Alert } from "@/components/Alert";
-import { Button } from "@/components/Button";
+import { Group } from "@/components/Group";
 import { Heading } from "@/components/Heading";
 import { Menu } from "@/components/Menu";
 import { useSession } from "@/components/SessionProvider";
-import { Stack } from "@/components/Stack";
 import { client } from "@/lib/client";
 import { type Character } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
@@ -23,53 +22,51 @@ export default function Page() {
       ),
   });
 
-  const characters = data?.payload.data;
+  const characters = data?.payload.data ?? [];
 
   return (
-    <Stack gap={10} asChild>
+    <Group level={1} asChild>
       <main>
-        <Stack gap={4} asChild>
+        <Group level={4} asChild>
           <header>
             <Heading asChild>
               <h1>Characters</h1>
             </Heading>
 
-            <p>Select the character with which you&apos;d like to play.</p>
+            <p>Select the character with whom you&apos;d like to play.</p>
           </header>
-        </Stack>
+        </Group>
 
         {isFetching ? (
           <Alert type="neutral">
             <p>Loading...</p>
           </Alert>
-        ) : characters?.length ? (
-          <Menu>
-            {characters.map((character) => (
-              <li key={character.id}>
-                <Menu.Item asChild className="flex items-center gap-1">
-                  <Link href={`/characters/${character.id}`}>
-                    <UserIcon />
-                    {character.name}
-                  </Link>
-                </Menu.Item>
-              </li>
-            ))}
-          </Menu>
-        ) : (
-          <Alert type="neutral">
-            <p>You don&apos;t have any characters.</p>
-          </Alert>
-        )}
+        ) : null}
 
-        <footer className="flex justify-end">
-          <Button asChild>
+        <Menu>
+          {characters.map((character) => (
+            <Menu.Item
+              key={character.id}
+              asChild
+              className="flex items-center gap-1"
+            >
+              <Link href={`/characters/${character.id}`}>
+                <UserIcon />
+                {character.name}
+              </Link>
+            </Menu.Item>
+          ))}
+          <Menu.Item
+            asChild
+            className="flex items-center justify-center gap-1 font-bold "
+          >
             <Link href="/characters/create">
-              New character
+              Create new character
               <UserPlusIcon />
             </Link>
-          </Button>
-        </footer>
+          </Menu.Item>
+        </Menu>
       </main>
-    </Stack>
+    </Group>
   );
 }

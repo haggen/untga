@@ -3,10 +3,11 @@
 import { Alert } from "@/components/Alert";
 import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
+import { Group } from "@/components/Group";
 import { Heading } from "@/components/Heading";
 import { Input } from "@/components/Input";
 import { useSession } from "@/components/SessionProvider";
-import { Stack } from "@/components/Stack";
+import { Textarea } from "@/components/Textarea";
 import { client } from "@/lib/client";
 import { draw } from "@/lib/random";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -362,22 +363,22 @@ export default function Page() {
   };
 
   return (
-    <Stack gap={10} asChild>
+    <Group level={1} asChild>
       <main>
-        <Stack gap={4} asChild>
+        <Group level={4} asChild>
           <header>
             <Heading asChild>
               <h1>Create new character</h1>
             </Heading>
 
             <p>
-              Choose your character&apos;s name below. This is how you&apos;ll
+              Enter your character&apos;s details below. This is how you&apos;ll
               be known in this world.
             </p>
           </header>
-        </Stack>
+        </Group>
 
-        <Stack gap={10} asChild>
+        <Group level={2} asChild>
           <form onSubmit={onSubmit} aria-busy={isPending}>
             {error ? (
               <Alert type="negative">{JSON.stringify(error)}</Alert>
@@ -387,7 +388,7 @@ export default function Page() {
               <Alert type="positive">{JSON.stringify(data)}</Alert>
             ) : null}
 
-            <Stack gap={4} asChild>
+            <Group level={3} asChild>
               <fieldset>
                 <Field name="name" label="Name">
                   <Input
@@ -395,6 +396,7 @@ export default function Page() {
                     type="text"
                     required
                     placeholder="e.g. Ragnar"
+                    pattern="[a-zA-Z0-9\s]+"
                   />
                   <Button
                     type="button"
@@ -406,8 +408,7 @@ export default function Page() {
                 </Field>
 
                 <Field name="description" label="Bio">
-                  <Input
-                    area
+                  <Textarea
                     rows={3}
                     required
                     maxLength={256}
@@ -415,7 +416,7 @@ export default function Page() {
                   />
                 </Field>
               </fieldset>
-            </Stack>
+            </Group>
 
             <footer className="flex items-center justify-end gap-2">
               <Button type="submit" size="default" disabled={isPending}>
@@ -424,8 +425,8 @@ export default function Page() {
               </Button>
             </footer>
           </form>
-        </Stack>
+        </Group>
       </main>
-    </Stack>
+    </Group>
   );
 }

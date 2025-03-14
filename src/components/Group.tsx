@@ -13,11 +13,11 @@ const variants = tv({
       true: "justify-between",
       false: "",
     },
-    depth: {
+    level: {
       1: "gap-12",
-      2: "gap-10",
+      2: "gap-9",
       3: "gap-6",
-      4: "gap-4",
+      4: "gap-3",
       5: "gap-2",
       6: "gap-1",
     },
@@ -28,7 +28,7 @@ type Props = ComponentProps<"div"> & {
   asChild?: boolean;
   inline?: boolean;
   justify?: boolean;
-  depth?: keyof typeof variants.variants.depth;
+  level?: keyof typeof variants.variants.level;
   children: ReactNode;
 };
 
@@ -36,14 +36,14 @@ export function Group({
   asChild,
   className,
   inline = false,
-  depth = 6,
+  level,
   justify,
   ...props
 }: Props) {
   const Component = asChild ? Slot : "div";
   return (
     <Component
-      className={variants({ inline, depth, justify, className })}
+      className={variants({ inline, level, justify, className })}
       {...props}
     />
   );

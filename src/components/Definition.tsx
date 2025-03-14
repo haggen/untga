@@ -12,8 +12,8 @@ export function Definition({
   ...props
 }: DefinitionProps) {
   return (
-    <div className={twMerge("flex items-center gap-1", className)} {...props}>
-      <dt className="flex items-center gap-1 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
+    <div className={twMerge("flex items-center gap-2", className)} {...props}>
+      <dt className="flex items-center gap-2 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
         {label}
       </dt>
       <dd>{children}</dd>
@@ -24,9 +24,7 @@ export function Definition({
 type ListProps = ComponentProps<"dl">;
 
 export function List({ className, ...props }: ListProps) {
-  return (
-    <dl className={twMerge("flex flex-col gap-1", className)} {...props} />
-  );
+  return <dl className={twMerge("flex flex-col", className)} {...props} />;
 }
 
 Definition.List = List;

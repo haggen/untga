@@ -10,12 +10,12 @@ type Props = {
 };
 
 const variants = tv({
-  base: "p-3 ring ring-current/10 shadow",
+  base: "p-4 shadow",
   variants: {
     type: {
-      neutral: "bg-sky-300/33 text-sky-900",
-      positive: "bg-green-300/33 text-green-900",
-      negative: "bg-rose-300/50 text-rose-900",
+      neutral: "bg-orange-100/30",
+      positive: "bg-lime-200/30 text-lime-900",
+      negative: "bg-red-200/30 text-red-900",
     },
   },
 });

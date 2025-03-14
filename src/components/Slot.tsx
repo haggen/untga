@@ -24,7 +24,7 @@ function merge(
   return merged;
 }
 
-type Props = HTMLAttributes<HTMLElement> & { children: ReactNode };
+type Props = HTMLAttributes<HTMLElement> & { children?: ReactNode };
 
 export function Slot({ children, ...props }: Props) {
   const child = Children.only(children);

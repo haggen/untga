@@ -108,6 +108,16 @@ async function request<T>(
 export const client = {
   request,
 
+  characters: {
+    queryKey: (characterId?: number) => ["characters", characterId],
+
+    get: async (characterId: number) => {
+      return request<{
+        data: Character<WithAttributes & WithResources & WithSlots>;
+      }>(`/api/characters/${characterId}`);
+    },
+  },
+
   users: {
     queryKey: (userId: number) => ["users", userId],
 
