@@ -1,5 +1,5 @@
+import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db, Prisma } from "@/lib/db";
-import { withErrorHandling, withMiddleware } from "@/lib/middleware";
 import { NextResponse } from "next/server";
 
 export const GET = withMiddleware(withErrorHandling(), async () => {

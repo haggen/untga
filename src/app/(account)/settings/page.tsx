@@ -2,7 +2,6 @@
 
 import { Alert } from "@/components/Alert";
 import { Button } from "@/components/Button";
-import { Definition } from "@/components/Definition";
 import { Field } from "@/components/Field";
 import { Geolocation } from "@/components/Geolocation";
 import { Heading } from "@/components/Heading";
@@ -10,14 +9,20 @@ import { Input } from "@/components/Input";
 import { Menu } from "@/components/Menu";
 import { useSession } from "@/components/SessionProvider";
 import { client } from "@/lib/client";
+import { format } from "@/lib/format";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CircleCheckBig } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 import { UAParser } from "ua-parser-js";
 
 function getFormattedUserAgent(userAgent: string) {
   const { browser, os } = UAParser(userAgent);
-  return `${browser.name} ${browser.major} on ${os.name}`;
+
+  if (!browser.name) {
+    return "unknown browser";
+  }
+
+  return `${browser.name} ${browser.major} (${os.name})`;
 }
 
 function Sessions() {
@@ -64,22 +69,20 @@ function Sessions() {
         <Menu>
           {sessions?.map((session) => (
             <Menu.Item key={session.id}>
-              <Definition.List>
-                <Definition label="Created at">
-                  {new Date(session.createdAt).toLocaleString()}
-                </Definition>
-                <Definition
-                  label={session.expired ? "Expired at" : "Expires at"}
-                >
-                  {new Date(session.expiresAt).toLocaleString()}
-                </Definition>
-                <Definition label="Browser">
-                  {getFormattedUserAgent(session.userAgent)}
-                </Definition>
-                <Definition label="Location">
-                  <Geolocation ip={session.ip} />
-                </Definition>
-              </Definition.List>
+              <p className="p-3">
+                Created at {format.datetime(session.createdAt)}, from{" "}
+                <Geolocation ip={session.ip} />, on{" "}
+                {getFormattedUserAgent(session.userAgent)}.{" "}
+                {session.expired
+                  ? "Expired"
+                  : `Expires on ${format.datetime(session.expiresAt)}`}
+                {". "}
+                {session.expired ? null : (
+                  <Button size="small" variant="secondary">
+                    Invalidate
+                  </Button>
+                )}
+              </p>
             </Menu.Item>
           ))}
         </Menu>
@@ -89,12 +92,11 @@ function Sessions() {
 }
 
 function ChangeEmail() {
+  const session = useSession();
+
   const { mutate, data, error, isPending } = useMutation({
     mutationFn: (payload: FormData) =>
-      client.request("/api/users", {
-        method: "PATCH",
-        payload,
-      }),
+      client.users.patch(session.userId, payload),
   });
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -121,17 +123,17 @@ function ChangeEmail() {
         </p>
       </header>
 
-      {error ? <Alert type="negative" dump={error} /> : null}
+      <Alert type="negative" dump={error} />
 
-      {data ? <Alert type="positive" dump={data} /> : null}
+      <Alert type="positive" dump={data} />
 
-      <Field name="email" className="grow">
-        <Input type="email" required placeholder="e.g. me@example.com" />
+      <Field name="email">
+        <Input type="email" required placeholder="e.g. player@example.com" />
       </Field>
 
       <footer className="flex justify-end">
         <Button type="submit" size="default" disabled={isPending}>
-          Change e-mail <CircleCheckBig />
+          Change my e-mail
         </Button>
       </footer>
     </form>
@@ -139,13 +141,11 @@ function ChangeEmail() {
 }
 
 function ChangePassword() {
+  const session = useSession();
+
   const { mutate, data, error, isPending } = useMutation({
-    mutationKey: ["users"],
     mutationFn: (payload: FormData) =>
-      client.request("/api/users", {
-        method: "PATCH",
-        payload,
-      }),
+      client.users.patch(session.userId, payload),
   });
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -169,11 +169,11 @@ function ChangePassword() {
         <p>Type your new password in the input below and confirm.</p>
       </header>
 
-      {error ? <Alert type="negative" dump={error} /> : null}
+      <Alert type="negative" dump={error} />
 
-      {data ? <Alert type="positive" dump={data} /> : null}
+      <Alert type="positive" dump={data} />
 
-      <Field name="password" hint="At least 12 characters." className="grow">
+      <Field name="password" hint="At least 12 characters.">
         <Input
           type="password"
           required
@@ -184,7 +184,56 @@ function ChangePassword() {
 
       <footer className="flex justify-end">
         <Button type="submit" size="default" disabled={isPending}>
-          Change password <CircleCheckBig />
+          Change my password
+        </Button>
+      </footer>
+    </form>
+  );
+}
+
+function DeleteAccount() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const session = useSession();
+
+  const { mutate, data, error, isPending } = useMutation({
+    mutationFn: () => client.users.delete(session.userId),
+    onSuccess: () => {
+      queryClient.clear();
+      router.push("/register");
+    },
+  });
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    mutate();
+  };
+
+  return (
+    <form
+      className="flex flex-col gap-6"
+      onSubmit={onSubmit}
+      aria-busy={isPending}
+    >
+      <header className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Delete your account</h2>
+        </Heading>
+        <p>
+          By clicking on the button below you agree to have all your data,
+          including your characters progression, be purged from our system. Some
+          information, like IP addresses, may take a little longer to be
+          completely removed from our logs.
+        </p>
+      </header>
+
+      <Alert type="negative" dump={error} />
+
+      <Alert type="positive" dump={data} />
+
+      <footer className="flex justify-end">
+        <Button type="submit" size="default" disabled={isPending}>
+          Delete my account
         </Button>
       </footer>
     </form>
@@ -205,6 +254,8 @@ export default function Page() {
       <ChangeEmail />
 
       <ChangePassword />
+
+      <DeleteAccount />
     </main>
   );
 }

@@ -7,14 +7,14 @@ const variants = tv({
   variants: {
     size: {
       default: "h-10 px-6",
-      small: "h-5 px-3 text-xs",
+      small: "h-6 px-3 text-xs",
     },
     variant: {
       primary:
-        "bg-orange-800 text-stone-100 hover:bg-orange-700 inset-ring inset-ring-stone-800/30",
+        "bg-orange-700 text-stone-100 hover:bg-orange-600 border border-orange-800",
       secondary:
-        "shadow text-orange-800 bg-orange-800/10 hover:text-orange-700 border-2 border-current",
-      nested: "text-orange-800 hover:text-orange-700",
+        "text-orange-700 bg-orange-700/10 hover:text-orange-600 border-2 border-current",
+      nested: "text-orange-700 hover:text-orange-600",
     },
     disabled: {
       true: "cursor-not-allowed filter-grayscale",

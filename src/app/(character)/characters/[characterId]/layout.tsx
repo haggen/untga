@@ -4,8 +4,7 @@ import { serializable } from "@/lib/serializable";
 import { getActiveSessionOrRedirect } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import {
-  BookOpenIcon,
-  LogOutIcon,
+  BookOpenTextIcon,
   PackageOpenIcon,
   SignpostIcon,
   UserCircleIcon,
@@ -27,7 +26,7 @@ export default async function Layout({ params, children }: Props) {
   return (
     <SessionProvider session={serializable(session)}>
       <div className="grow flex flex-col gap-12">
-        {children}
+        <div className="grow">{children}</div>
 
         <Tab.Bar>
           <Tab href={`/characters/${characterId}/summary`}>
@@ -40,10 +39,7 @@ export default async function Layout({ params, children }: Props) {
             <SignpostIcon /> Location
           </Tab>
           <Tab href={`/characters/${characterId}/journal`}>
-            <BookOpenIcon /> Journal
-          </Tab>
-          <Tab href="/characters">
-            <LogOutIcon /> Log out
+            <BookOpenTextIcon /> Journal
           </Tab>
         </Tab.Bar>
       </div>

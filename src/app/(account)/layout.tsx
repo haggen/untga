@@ -15,7 +15,7 @@ export default async function Layout({ children }: Props) {
   return (
     <SessionProvider session={serializable(session)}>
       <div className="grow flex flex-col gap-12">
-        {children}
+        <div className="grow">{children}</div>
 
         <Tab.Bar>
           <Tab href="/characters">

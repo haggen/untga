@@ -1,6 +1,6 @@
+import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
 import { NotFoundError, UnauthorizedError } from "@/lib/error";
-import { withErrorHandling, withMiddleware } from "@/lib/middleware";
 import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";

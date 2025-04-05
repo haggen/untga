@@ -1,5 +1,5 @@
+import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
-import { withErrorHandling, withMiddleware } from "@/lib/middleware";
 import { getRemoteAddr, getUserAgent } from "@/lib/request";
 import { setActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";

@@ -18,7 +18,12 @@ function plural(
   }`;
 }
 
+function datetime(date: Date | string, opts?: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat("en-US", opts).format(new Date(date));
+}
+
 export const format = {
   number,
   plural,
+  datetime,
 };

@@ -8,21 +8,46 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-/**
- * Route handler.
- */
-export type Handler<T> = (
-  req: NextRequest,
-  extra: { params: Promise<T> }
-) => Promise<NextResponse>;
+export type Context<S = unknown> = {
+  request: NextRequest;
+  params: unknown;
+  state: S;
+  next: () => Promise<NextResponse>;
+};
 
-/**
- * Wraps a route handler with error handling.
- */
-export function withErrorHandling<T>(handler: Handler<T>): Handler<T> {
-  return async (req, extra) => {
+export type Handler<S> = (context: Context<S>) => Promise<NextResponse>;
+
+export type Middleware<S> = (...arg: unknown[]) => Handler<S>;
+
+export function withMiddleware<S>(...handlers: Handler<S>[]) {
+  const initial = async () => {
+    throw new Error("Handler chain ended without producing a response.");
+  };
+
+  return async (req: NextRequest, extra: { params: Promise<unknown> }) => {
+    const params = await extra.params;
+
+    const context: Context<S> = {
+      request: req,
+      params,
+      state: {} as S,
+      next: initial,
+    };
+
+    const chain = handlers.reduceRight((next, handler: Handler<S>) => {
+      return async (context: Context<S>) => {
+        return await handler({ ...context, next: () => next(context) });
+      };
+    }, initial);
+
+    return await chain(context);
+  };
+}
+
+export function withErrorHandling() {
+  return async ({ next }: Context) => {
     try {
-      return await handler(req, extra);
+      return await next();
     } catch (error) {
       if (isRedirectError(error)) {
         throw error;

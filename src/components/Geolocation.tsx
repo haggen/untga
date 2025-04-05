@@ -22,12 +22,8 @@ export function Geolocation({ ip }: Props) {
     return "Loading...";
   }
 
-  if (error) {
-    return "Unknown";
-  }
-
-  if (data.error) {
-    return "Unknown";
+  if (error || data.error) {
+    return "unknown country";
   }
 
   return `${data.city}, ${data.region}, ${data.country_code}`;

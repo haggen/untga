@@ -1,8 +1,9 @@
-import { withMiddleware } from "@/lib/middleware";
+import { withErrorHandling, withMiddleware } from "@/lib/api";
+import { db } from "@/lib/db";
 import { getActiveSessionOrThrow } from "@/lib/session";
 import { NextResponse } from "next/server";
 
-export const GET = withMiddleware(async () => {
+export const GET = withMiddleware(withErrorHandling(), async () => {
   const { userId } = await getActiveSessionOrThrow();
 
   const where = { userId };

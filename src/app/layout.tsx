@@ -52,7 +52,7 @@ export default function Layout({ children }: Props) {
               </p>
             </header>
 
-            <div className="grow flex flex-col px-3 py-12 text-stone-800 rounded bg-stone-200 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply">
+            <div className="grow flex flex-col px-3 pt-12 pb-3  text-stone-800 rounded bg-slate-200 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply">
               {children}
             </div>
           </div>

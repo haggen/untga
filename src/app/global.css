@@ -11,6 +11,7 @@
   inherits: false;
   initial-value: 0 0 #0000;
 }
+
 @property --tw-inner-glow-size {
   syntax: "<length>";
   inherits: false;

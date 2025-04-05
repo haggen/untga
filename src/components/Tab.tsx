@@ -12,7 +12,7 @@ export function Tab({ href, children, ...props }: TabProps) {
       <Link
         href={href}
         className="flex flex-col items-center gap-1 px-3 text-sm text-center truncate"
-        variant={{ className: "text-orange-800 " }}
+        variant={{ className: "text-orange-700 " }}
       >
         {children}
       </Link>
@@ -25,7 +25,10 @@ type BarProps = ComponentProps<"ul">;
 export function Bar({ className, ...props }: BarProps) {
   return (
     <ul
-      className={twMerge("grid auto-cols-fr grid-flow-col", className)}
+      className={twMerge(
+        "grid auto-cols-fr grid-flow-col sticky bottom-5",
+        className
+      )}
       {...props}
     />
   );

@@ -127,14 +127,29 @@ export const client = {
       });
     },
 
-    characters: {
-      queryKey: (userId: number, characterId?: number) =>
-        [...client.users.queryKey(userId), "characters", characterId] as const,
+    patch: async (userId: number, payload: FormData) => {
+      return request<{
+        data: User;
+      }>(`/api/v1/users/${userId}`, {
+        method: "PATCH",
+        payload,
+      });
+    },
 
-      get: async (userId: number, characterId: number) => {
+    delete: async (userId: number) => {
+      return request(`/api/v1/users/${userId}`, {
+        method: "DELETE",
+      });
+    },
+
+    characters: {
+      queryKey: (userId: number) =>
+        [...client.users.queryKey(userId), "characters"] as const,
+
+      get: async (userId: number) => {
         return request<{
-          data: Character;
-        }>(`/api/v1/users/${userId}/characters/${characterId}`);
+          data: Character[];
+        }>(`/api/v1/users/${userId}/characters`);
       },
 
       post: async ({
