@@ -2,171 +2,212 @@ import { db } from "@/lib/db";
 import * as tags from "@/static/tags";
 
 async function seed() {
-  const village = await db.location.create({
-    data: {
-      name: "Village",
-      description: "A small village.",
-      tags: [tags.Peaceful, tags.StartingLocation],
-    },
-  });
+  const locations = {
+    village: await db.location.create({
+      data: {
+        name: "Village",
+        description: "A small village.",
+        tags: [tags.Peaceful, tags.StartingLocation],
+      },
+    }),
 
-  const forest = await db.location.create({
-    data: {
-      name: "Forest",
-      description: "A dense forest.",
-      tags: [tags.Contested],
-    },
-  });
+    forest: await db.location.create({
+      data: {
+        name: "Forest",
+        description: "A dense forest.",
+        tags: [tags.Contested],
+      },
+    }),
+  };
 
   await db.route.createMany({
     data: [
       {
-        exitId: village.id,
-        entryId: forest.id,
+        exitId: locations.village.id,
+        entryId: locations.forest.id,
       },
       {
-        exitId: forest.id,
-        entryId: village.id,
+        exitId: locations.forest.id,
+        entryId: locations.village.id,
       },
     ],
   });
 
-  await db.itemSpecification.createMany({
-    data: {
-      name: "Crude knife",
-      description: "A crude knife.",
-      tags: [tags.Weapon],
-    },
-  });
+  const items = {
+    crudeKnife: await db.itemSpecification.createMany({
+      data: {
+        name: "Crude knife",
+        description: "A crude knife.",
+        tags: [tags.Weapon],
+      },
+    }),
 
-  await db.itemSpecification.createMany({
-    data: {
-      name: "Straw hat",
-      description: "A simple hat made of straw.",
-      tags: [tags.Equipment, tags.Head],
-    },
-  });
+    strawHat: await db.itemSpecification.createMany({
+      data: {
+        name: "Straw hat",
+        description: "A simple hat made of straw.",
+        tags: [tags.Equipment, tags.Head],
+      },
+    }),
 
-  await db.itemSpecification.createMany({
-    data: {
-      name: "Plain shirt",
-      description: "A simple and plain shirt.",
-      tags: [tags.Equipment, tags.Chest],
-    },
-  });
+    plainShirt: await db.itemSpecification.createMany({
+      data: {
+        name: "Plain shirt",
+        description: "A simple and plain shirt.",
+        tags: [tags.Equipment, tags.Chest],
+      },
+    }),
 
-  await db.itemSpecification.createMany({
-    data: {
-      name: "Linen sash",
-      description: "A sash made of linen.",
-      tags: [tags.Equipment, tags.Waist, tags.Storage],
-    },
-  });
+    linenSash: await db.itemSpecification.createMany({
+      data: {
+        name: "Linen sash",
+        description: "A sash made of linen.",
+        tags: [tags.Equipment, tags.Waist, tags.Storage],
+      },
+    }),
 
-  await db.itemSpecification.createMany({
-    data: {
-      name: "Linen pants",
-      description: "A pair of pants made of linen.",
-      tags: [tags.Equipment, tags.Legs],
-    },
-  });
+    linenPants: await db.itemSpecification.createMany({
+      data: {
+        name: "Linen pants",
+        description: "A pair of pants made of linen.",
+        tags: [tags.Equipment, tags.Legs],
+      },
+    }),
 
-  await db.itemSpecification.createMany({
-    data: {
-      name: "Apple",
-      description: "A juicy apple.",
-      tags: [tags.Food, tags.Consumable],
-    },
-  });
+    leatherShoes: await db.itemSpecification.createMany({
+      data: {
+        name: "Leather shoes",
+        description: "A pair of shoes made of leather.",
+        tags: [tags.Equipment, tags.Feet],
+      },
+    }),
 
-  const gold = await db.itemSpecification.create({
-    data: {
-      name: "Gold coin",
-      description: "A gold coin.",
-      tags: [tags.Currency],
-    },
-  });
+    apple: await db.itemSpecification.createMany({
+      data: {
+        name: "Apple",
+        description: "A juicy apple.",
+        tags: [tags.Food, tags.Consumable],
+      },
+    }),
 
-  await db.itemSpecification.create({
-    data: {
-      name: "Leather backpack",
-      description: "A leather backpack.",
-      tags: [
-        tags.Equipment,
-        tags.Backpack,
-        tags.Storage,
-        tags.StartingEquipment,
-      ],
-    },
-  });
+    gold: await db.itemSpecification.create({
+      data: {
+        name: "Gold coin",
+        description: "A gold coin.",
+        tags: [tags.Currency],
+      },
+    }),
 
-  await db.attributeSpecification.create({
-    data: {
-      name: "Negotiation",
-      description: "The ability to negotiate with others.",
-      tags: [tags.Skill, tags.Negotiation],
-    },
-  });
+    backpack: await db.itemSpecification.create({
+      data: {
+        name: "Leather backpack",
+        description: "A leather backpack.",
+        tags: [
+          tags.Equipment,
+          tags.Backpack,
+          tags.Storage,
+          tags.StartingEquipment,
+        ],
+      },
+    }),
+  };
 
-  await db.attributeSpecification.create({
-    data: {
-      name: "Survivalship",
-      description: "The ability to survive in the wild.",
-      tags: [tags.Skill, tags.Survivalship],
-    },
-  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const skills = {
+    negotiation: await db.attributeSpecification.create({
+      data: {
+        name: "Negotiation",
+        description: "The ability to negotiate with others.",
+        tags: [tags.Player, tags.NPC, tags.Skill, tags.Negotiation],
+      },
+    }),
 
-  await db.attributeSpecification.create({
-    data: {
-      name: "Combat",
-      description: "The ability to fight with hostiles.",
-      tags: [tags.Skill, tags.Combat],
-    },
-  });
+    survivalship: await db.attributeSpecification.create({
+      data: {
+        name: "Survivalship",
+        description: "The ability to survive in the wild.",
+        tags: [tags.Player, tags.NPC, tags.Skill, tags.Survivalship],
+      },
+    }),
 
-  await db.attributeSpecification.create({
-    data: {
-      name: "Health",
-      description: "Health points.",
-      tags: [tags.Resource, tags.Health],
-    },
-  });
+    combat: await db.attributeSpecification.create({
+      data: {
+        name: "Combat",
+        description: "Combat know-how and technique.",
+        tags: [tags.Player, tags.NPC, tags.Skill, tags.Combat],
+      },
+    }),
 
-  await db.attributeSpecification.create({
-    data: {
-      name: "Stamina",
-      description: "Stamina points.",
-      tags: [tags.Resource, tags.Stamina],
-    },
-  });
+    crafting: await db.attributeSpecification.create({
+      data: {
+        name: "Crafting",
+        description: "The ability to craft items.",
+        tags: [tags.Player, tags.NPC, tags.Skill, tags.Crafting],
+      },
+    }),
 
-  await db.character.create({
-    data: {
-      name: "Jeremia, the villager",
-      location: { connect: { id: village.id } },
-      tags: [tags.NPC],
-      ...(await db.character.startingSlots({
-        items: {
-          create: [{ spec: { connect: { id: gold.id } }, amount: 1000 }],
-        },
-      })),
-      ...(await db.character.startingAttributes()),
-    },
-  });
+    foraging: await db.attributeSpecification.create({
+      data: {
+        name: "Foraging",
+        description: "The ability to forage for resources.",
+        tags: [tags.Player, tags.NPC, tags.Skill, tags.Foraging],
+      },
+    }),
+  };
 
-  await db.character.create({
-    data: {
-      name: "Brian, the hunter",
-      location: { connect: { id: forest.id } },
-      tags: [tags.NPC],
-      ...(await db.character.startingSlots({
-        items: {
-          create: [{ spec: { connect: { id: gold.id } }, amount: 1000 }],
-        },
-      })),
-      ...(await db.character.startingAttributes()),
-    },
-  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const attributes = {
+    health: await db.attributeSpecification.create({
+      data: {
+        name: "Health",
+        description: "Health points.",
+        tags: [tags.Player, tags.NPC, tags.Resource, tags.Health],
+      },
+    }),
+
+    stamina: await db.attributeSpecification.create({
+      data: {
+        name: "Stamina",
+        description: "Stamina points.",
+        tags: [tags.Player, tags.NPC, tags.Resource, tags.Stamina],
+      },
+    }),
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const npc = {
+    jeremia: await db.character.create({
+      data: {
+        name: "Jeremia, the villager",
+        location: { connect: { id: locations.village.id } },
+        tags: [tags.NPC],
+        ...(await db.character.startingSlots({
+          items: {
+            create: [
+              { spec: { connect: { id: items.gold.id } }, amount: 1000 },
+            ],
+          },
+        })),
+        ...(await db.character.startingAttributes()),
+      },
+    }),
+
+    brian: await db.character.create({
+      data: {
+        name: "Brian, the hunter",
+        location: { connect: { id: locations.forest.id } },
+        tags: [tags.NPC],
+        ...(await db.character.startingSlots({
+          items: {
+            create: [
+              { spec: { connect: { id: items.gold.id } }, amount: 1000 },
+            ],
+          },
+        })),
+        ...(await db.character.startingAttributes()),
+      },
+    }),
+  };
 }
 
 seed()

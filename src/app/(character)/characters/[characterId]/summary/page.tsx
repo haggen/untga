@@ -1,11 +1,13 @@
 "use client";
 
 import { Alert } from "@/components/Alert";
+import { Button } from "@/components/Button";
 import { Definition } from "@/components/Definition";
 import { Heading } from "@/components/Heading";
 import { client } from "@/lib/client";
 import { parse, schemas } from "@/lib/validation";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { use } from "react";
 
 function Summary({ characterId }: { characterId: number }) {
@@ -61,11 +63,21 @@ function Header({ characterId }: { characterId: number }) {
 
   return (
     <header className="flex flex-col gap-1.5">
-      <Heading asChild>
-        <h1>{isLoading ? "Loading..." : character?.name}</h1>
-      </Heading>
+      <div className="flex items-center justify-between">
+        <Heading asChild>
+          <h1>{isLoading ? "Loading..." : character?.name}</h1>
+        </Heading>
 
-      <p>{isLoading ? "Loading..." : character?.description}</p>
+        <Button asChild variant="secondary" size="small">
+          <Link href="/characters">Exit</Link>
+        </Button>
+      </div>
+
+      <p>
+        {isLoading
+          ? "Loading..."
+          : character?.description ?? "No description available."}
+      </p>
     </header>
   );
 }

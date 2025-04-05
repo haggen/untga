@@ -151,20 +151,6 @@ export const client = {
           data: Character[];
         }>(`/api/v1/users/${userId}/characters`);
       },
-
-      post: async ({
-        userId,
-        payload,
-      }: {
-        userId: number;
-        payload: FormData;
-      }) => {
-        return request<{
-          data: Character;
-        }>(`/api/v1/users/${userId}/characters`, {
-          payload,
-        });
-      },
     },
 
     sessions: {
@@ -211,6 +197,14 @@ export const client = {
 
   characters: {
     queryKey: (characterId?: number) => ["characters", characterId] as const,
+
+    post: async (payload: FormData) => {
+      return request<{
+        data: Character;
+      }>(`/api/v1/characters`, {
+        payload,
+      });
+    },
 
     get: async (characterId: number) => {
       return request<{

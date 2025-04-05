@@ -27,3 +27,5 @@ export const Legs = "legs";
 export const Feet = "feet";
 export const Slot = "slot";
 export const Resource = "resource";
+export const Foraging = "foraging";
+export const Crafting = "crafting";

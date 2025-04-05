@@ -1,6 +1,7 @@
 import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db, Prisma } from "@/lib/db";
 import { parse, schemas } from "@/lib/validation";
+import * as tags from "@/static/tags";
 import { NextResponse } from "next/server";
 
 export const GET = withMiddleware(withErrorHandling(), async (context) => {
@@ -11,6 +12,7 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
 
   const where: Prisma.AttributeWhereInput = {
     character: { id: characterId },
+    spec: { tags: { has: tags.Resource } },
   };
 
   const attributes = await db.attribute.findMany({

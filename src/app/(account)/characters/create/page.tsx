@@ -22,14 +22,10 @@ export default function Page() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { mutate, data, error, isPending } = useMutation({
-    mutationFn: (payload: FormData) =>
-      client.users.characters.post({
-        userId: session.userId,
-        payload,
-      }),
+    mutationFn: (payload: FormData) => client.characters.post(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: client.users.queryKey(session.userId),
+        queryKey: client.users.characters.queryKey(session.userId),
       });
       router.push("/characters");
     },
@@ -39,6 +35,7 @@ export default function Page() {
     event.preventDefault();
     const form = event.currentTarget;
     const payload = new FormData(form);
+    payload.set("userId", String(session.userId));
 
     mutate(payload);
   };
@@ -91,13 +88,13 @@ export default function Page() {
           <Field
             name="description"
             label="Bio"
-            hint="Other players can see your bio. You won't be able to change this later."
+            hint="Your bio is public you can change it later."
           >
             <Textarea
               rows={3}
               required
               maxLength={256}
-              placeholder="e.g. The son of a blacksmith..."
+              placeholder="e.g. The child of a blacksmith..."
             />
           </Field>
         </fieldset>

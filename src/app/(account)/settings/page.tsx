@@ -69,20 +69,30 @@ function Sessions() {
         <Menu>
           {sessions?.map((session) => (
             <Menu.Item key={session.id}>
-              <p className="p-3">
-                Created at {format.datetime(session.createdAt)}, from{" "}
-                <Geolocation ip={session.ip} />, on{" "}
-                {getFormattedUserAgent(session.userAgent)}.{" "}
-                {session.expired
-                  ? "Expired"
-                  : `Expires on ${format.datetime(session.expiresAt)}`}
-                {". "}
-                {session.expired ? null : (
-                  <Button size="small" variant="secondary">
-                    Invalidate
-                  </Button>
-                )}
-              </p>
+              <div className="flex items-center justify-between gap-6 p-3">
+                <p>
+                  Created at{" "}
+                  {format.datetime(session.createdAt, {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                  , from <Geolocation ip={session.ip} />, on{" "}
+                  {getFormattedUserAgent(session.userAgent)}.{" "}
+                  {session.expired ? "Expired" : "Expires"} on{" "}
+                  {format.datetime(session.expiresAt, {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                  .
+                </p>
+                <aside>
+                  {session.expired ? null : (
+                    <Button size="small" variant="secondary">
+                      Invalidate
+                    </Button>
+                  )}
+                </aside>
+              </div>
             </Menu.Item>
           ))}
         </Menu>
