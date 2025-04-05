@@ -1,29 +1,28 @@
 import { Slot } from "@/components/Slot";
-import { ComponentProps, ReactNode } from "react";
+import { HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "font-serif",
+  base: "font-serif font-medium",
   variants: {
     variant: {
-      default: "font-bold text-4xl",
-      small: "font-bold text-2xl",
+      default: "text-5xl",
+      small: "text-3xl",
     },
   },
 });
 
-type Props = Omit<ComponentProps<"span">, "children"> & {
+type Props = HTMLAttributes<HTMLHeadingElement> & {
   asChild?: boolean;
   variant?: keyof typeof variants.variants.variant;
-  children: ReactNode;
 };
 
-export function Heading({
-  asChild,
-  variant = "default",
-  className,
-  ...props
-}: Props) {
-  const Component = asChild ? Slot : "span";
-  return <Component {...props} className={variants({ variant, className })} />;
+export function Heading({ asChild, variant = "default", ...props }: Props) {
+  const Component = asChild ? Slot : "h1";
+  return (
+    <Component
+      {...props}
+      className={variants({ variant, className: props.className })}
+    />
+  );
 }

@@ -14,11 +14,11 @@ async function seed() {
     data: {
       name: "Forest",
       description: "A dense forest.",
-      tags: [tags.Hostile],
+      tags: [tags.Contested],
     },
   });
 
-  await db.path.createMany({
+  await db.route.createMany({
     data: [
       {
         exitId: village.id,
@@ -33,17 +33,41 @@ async function seed() {
 
   await db.itemSpecification.createMany({
     data: {
-      name: "Sword",
-      description: "A sharp sword.",
-      tags: [tags.Equipment, tags.Weapon],
+      name: "Crude knife",
+      description: "A crude knife.",
+      tags: [tags.Weapon],
     },
   });
 
   await db.itemSpecification.createMany({
     data: {
-      name: "Cap",
-      description: "A leather cap.",
+      name: "Straw hat",
+      description: "A simple hat made of straw.",
       tags: [tags.Equipment, tags.Head],
+    },
+  });
+
+  await db.itemSpecification.createMany({
+    data: {
+      name: "Plain shirt",
+      description: "A simple and plain shirt.",
+      tags: [tags.Equipment, tags.Chest],
+    },
+  });
+
+  await db.itemSpecification.createMany({
+    data: {
+      name: "Linen sash",
+      description: "A sash made of linen.",
+      tags: [tags.Equipment, tags.Waist, tags.Storage],
+    },
+  });
+
+  await db.itemSpecification.createMany({
+    data: {
+      name: "Linen pants",
+      description: "A pair of pants made of linen.",
+      tags: [tags.Equipment, tags.Legs],
     },
   });
 
@@ -65,49 +89,54 @@ async function seed() {
 
   await db.itemSpecification.create({
     data: {
-      name: "Backpack",
-      description: "A backpack.",
-      tags: [tags.Equipment, tags.Storage, tags.StartingEquipment],
+      name: "Leather backpack",
+      description: "A leather backpack.",
+      tags: [
+        tags.Equipment,
+        tags.Backpack,
+        tags.Storage,
+        tags.StartingEquipment,
+      ],
     },
   });
 
   await db.attributeSpecification.create({
     data: {
       name: "Negotiation",
-      description: "Skill to negotiate with others.",
-      tags: [tags.Negotiation, tags.Skill],
+      description: "The ability to negotiate with others.",
+      tags: [tags.Skill, tags.Negotiation],
     },
   });
 
   await db.attributeSpecification.create({
     data: {
       name: "Survivalship",
-      description: "General ability to survive in the wild.",
-      tags: [tags.Survivalship, tags.Skill],
+      description: "The ability to survive in the wild.",
+      tags: [tags.Skill, tags.Survivalship],
     },
   });
 
   await db.attributeSpecification.create({
     data: {
       name: "Combat",
-      description: "Ability to fight with hostiles.",
-      tags: [tags.Combat, tags.Skill],
+      description: "The ability to fight with hostiles.",
+      tags: [tags.Skill, tags.Combat],
     },
   });
 
-  await db.resourceSpecification.create({
+  await db.attributeSpecification.create({
     data: {
       name: "Health",
       description: "Health points.",
-      tags: [tags.Health],
+      tags: [tags.Resource, tags.Health],
     },
   });
 
-  await db.resourceSpecification.create({
+  await db.attributeSpecification.create({
     data: {
       name: "Stamina",
       description: "Stamina points.",
-      tags: [tags.Stamina],
+      tags: [tags.Resource, tags.Stamina],
     },
   });
 
@@ -116,14 +145,12 @@ async function seed() {
       name: "Jeremia, the villager",
       location: { connect: { id: village.id } },
       tags: [tags.NPC],
-
-      ...(await db.character.withSlots({
+      ...(await db.character.startingSlots({
         items: {
           create: [{ spec: { connect: { id: gold.id } }, amount: 1000 }],
         },
       })),
-      ...(await db.character.withAttributes()),
-      ...(await db.character.withResources()),
+      ...(await db.character.startingAttributes()),
     },
   });
 
@@ -132,14 +159,12 @@ async function seed() {
       name: "Brian, the hunter",
       location: { connect: { id: forest.id } },
       tags: [tags.NPC],
-
-      ...(await db.character.withSlots({
+      ...(await db.character.startingSlots({
         items: {
           create: [{ spec: { connect: { id: gold.id } }, amount: 1000 }],
         },
       })),
-      ...(await db.character.withAttributes()),
-      ...(await db.character.withResources()),
+      ...(await db.character.startingAttributes()),
     },
   });
 }

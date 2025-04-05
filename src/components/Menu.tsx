@@ -1,8 +1,8 @@
 import { Slot } from "@/components/Slot";
-import { ComponentProps, Fragment, ReactNode } from "react";
+import { Fragment, HTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
-type MenuProps = ComponentProps<"ul"> & {
+type MenuProps = HTMLAttributes<HTMLElement> & {
   asChild?: boolean;
   children: ReactNode;
 };
@@ -11,13 +11,13 @@ export function Menu({ asChild, ...props }: MenuProps) {
   const Component = asChild ? Slot : "ul";
   return (
     <Component
-      className="flex flex-col gap-px shadow bg-orange-200/30 inner-glow inner-glow-6 inner-glow-orange-900/50"
+      className="flex flex-col gap-px border rounded border-stone-800/30"
       {...props}
     />
   );
 }
 
-type ItemProps = ComponentProps<"li"> & {
+type ItemProps = HTMLAttributes<HTMLElement> & {
   asChild?: boolean;
   children: ReactNode;
 };
@@ -32,7 +32,7 @@ export function Item({ asChild, className, ...props }: ItemProps) {
     <Wrap>
       <Component
         className={twMerge(
-          "block p-4 bg-orange-200/30 hover:bg-orange-100/30",
+          "p-4 bg-orange-200/30 hover:bg-orange-100/30",
           className
         )}
         {...props}

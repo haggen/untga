@@ -1,13 +1,6 @@
 @import "tailwindcss";
 
 @layer base {
-  html {
-    background-color: var(--color-orange-100);
-    background-image: url(/halftone.png), url(/paper.png);
-    background-repeat: repeat;
-    background-blend-mode: multiply;
-  }
-
   button {
     cursor: pointer;
   }
@@ -40,10 +33,14 @@
 
 @utility inner-glow-* {
   --alpha: --modifier(integer)%;
-  
+
   --tw-inner-glow-color: --alpha(--value(--color-*) / var(--alpha, 100%));
   --tw-inner-glow-color: --value([color]);
 
   --tw-inner-glow-size: --spacing(--value(integer));
   --tw-inner-glow-size: --value([length]);
+}
+
+@utility scrollbar-hidden {
+  scrollbar-width: none;
 }

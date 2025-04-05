@@ -6,14 +6,14 @@ const variants = tv({
   base: "inline-flex gap-1 items-center font-bold rounded",
   variants: {
     size: {
-      default: "h-10 px-4",
-      small: "h-5 px-2 text-xs",
+      default: "h-10 px-6",
+      small: "h-5 px-3 text-xs",
     },
     variant: {
       primary:
-        "shadow bg-orange-800 text-orange-100 hover:bg-orange-700 inset-ring inset-ring-gray-800/30",
+        "bg-orange-800 text-stone-100 hover:bg-orange-700 inset-ring inset-ring-stone-800/30",
       secondary:
-        "shadow text-orange-800 hover:text-orange-700 inset-ring-2 inset-ring-orange-800 hover:inset-ring-orange-700",
+        "shadow text-orange-800 bg-orange-800/10 hover:text-orange-700 border-2 border-current",
       nested: "text-orange-800 hover:text-orange-700",
     },
     disabled: {

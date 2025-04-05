@@ -1,0 +1,27 @@
+import { db } from "@/lib/db";
+import { NotFoundError } from "@/lib/error";
+import { withErrorHandling, withMiddleware } from "@/lib/middleware";
+import { parse, schemas } from "@/lib/validation";
+import { NextResponse } from "next/server";
+
+export const GET = withMiddleware(withErrorHandling(), async (context) => {
+  const { params } = context;
+  const { locationId } = parse(params, {
+    locationId: schemas.id,
+  });
+
+  const location = await db.location.findUnique({
+    where: { id: locationId },
+    include: { exits: { include: { exit: true } } },
+  });
+
+  if (!location) {
+    throw new NotFoundError("Location not found.");
+  }
+
+  const total = await db.route.count({
+    where: { entry: { id: locationId } },
+  });
+
+  return NextResponse.json({ data: location.exits, total });
+});

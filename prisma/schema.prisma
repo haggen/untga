@@ -31,22 +31,24 @@ model User {
 /// Authentication sessions.
 model Session {
   /// The primary key.
-  id         Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   /// The session's secret key.
-  secret     String   @unique @default(cuid())
+  secret    String   @unique @default(cuid())
   /// When it was created.
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
   /// When it expires.
-  expiresAt  DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the data optional.
-  /// The remote address (IP) that created the session.
-  remoteAddr String
+  expiresAt DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the input optional.
+  /// The remote address of the client that created the session.
+  ip        String
   /// The user agent that created the session.
-  userAgent  String
+  userAgent String
 
   /// User to whom the session belongs.
   userId Int
   /// User to whom the session belongs.
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
 }
 
 /// Characters in the world, player controlled or otherwise.
@@ -71,19 +73,22 @@ model Character {
   /// The user to whom the character belongs.
   userId     Int?
   /// The user to whom the character belongs.
-  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
   /// The current location of the character.
   locationId Int
   /// The current location of the character.
-  location   Location    @relation(fields: [locationId], references: [id])
-  /// Character's equipment slots.
-  slots      Slot[]
+  location   Location    @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  /// The character's equipment slots.
+  slots      Container[]
   /// The character's attributes.
   attributes Attribute[]
   /// The character's log entries.
   logs       Log[]
-  /// The character's resources.
-  resources  Resource[]
+  /// The character's active effects.
+  effects    Effect[]
+
+  @@index([tags])
+  @@index([deletedAt])
 }
 
 /// Static information of attributes.
@@ -117,62 +122,20 @@ model Attribute {
   updatedAt DateTime @updatedAt
   /// Attribute's current level in a range of 0-1.
   level     Float    @default(0)
+  /// Attribute's maximum level.
+  cap       Float    @default(100)
 
   /// Attribute's specification.
   specId      Int
   /// Attribute's specification.
-  spec        AttributeSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
+  spec        AttributeSpecification @relation(fields: [specId], references: [id], onDelete: Restrict)
   /// The character this attribute belongs to.
   characterId Int
   /// The character this attribute belongs to.
-  character   Character              @relation(fields: [characterId], references: [id])
+  character   Character              @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
-/// Resource specification.
-model ResourceSpecification {
-  /// The primary key.
-  id          Int      @id @default(autoincrement())
-  /// When it was created.
-  createdAt   DateTime @default(now())
-  /// When it was last updated.
-  updatedAt   DateTime @updatedAt
-  /// Resource's name.
-  name        String
-  /// Human-readable description.
-  description String?
-  /// Tags allow for attaching behavior.
-  tags        String[]
-
-  /// Resources specified by this specification.
-  resources Resource[]
-
-  @@index([tags])
-}
-
-/// Resources are spent by the characters to complete activities.
-model Resource {
-  /// The primary key.
-  id        Int      @id @default(autoincrement())
-  /// When it was created.
-  createdAt DateTime @default(now())
-  /// When it was last updated.
-  updatedAt DateTime @updatedAt
-  /// The current level of the resource.
-  level     Int      @default(100)
-  /// The maximum level of the resource.
-  cap       Int      @default(100)
-
-  /// Resource's specification.
-  specId      Int
-  /// Resource's specification.
-  spec        ResourceSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
-  /// The character this resource belongs to.
-  characterId Int
-  /// The character this resource belongs to.
-  character   Character             @relation(fields: [characterId], references: [id])
-}
-
-/// Log events from a player character's perspective.
+/// Log are events involving a character.
 model Log {
   /// The primary key.
   id        Int       @id @default(autoincrement())
@@ -186,7 +149,7 @@ model Log {
   /// The character that created the log entry.
   characterId Int
   /// The character that created the log entry.
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
 /// Containers hold multiple items, like bags.
@@ -197,36 +160,21 @@ model Container {
   createdAt DateTime @default(now())
   /// When it was last updated.
   updatedAt DateTime @updatedAt
+  /// Tags allow for attaching behavior.
+  tags      String[]
 
+  /// If the container is provided by an item, Item source of the container.
+  sourceId    Int?       @unique
   /// Item source of the container.
-  sourceId Int    @unique
-  /// Item source of the container.
-  source   Item   @relation("storage", fields: [sourceId], references: [id])
+  source      Item?      @relation("storage", fields: [sourceId], references: [id], onDelete: Restrict)
+  /// 
+  character   Character? @relation(fields: [characterId], references: [id], onDelete: Restrict)
+  /// Container as character slots.
+  characterId Int?
   /// Contents of the container.
-  items    Item[]
-}
+  items       Item[]
 
-/// Slots hold a single item and have a type.
-model Slot {
-  /// The primary key.
-  id        Int      @id @default(autoincrement())
-  /// When it was created.
-  createdAt DateTime @default(now())
-  /// When it was last updated.
-  updatedAt DateTime @updatedAt
-  /// The type of slot, e.g. head, weapon, storage, etc.
-  type      String
-
-  /// The item inserted in the slot.
-  itemId      Int?      @unique
-  /// The item inserted in the slot.
-  item        Item?     @relation(fields: [itemId], references: [id])
-  /// The character that owns the slot.
-  characterId Int
-  /// The character that owns the slot.
-  character   Character @relation(fields: [characterId], references: [id])
-
-  @@unique([characterId, type])
+  @@index([tags])
 }
 
 /// Specifies item's properties and behavior.
@@ -241,13 +189,13 @@ model ItemSpecification {
   name        String
   /// Human-readable description.
   description String?
+  /// The item's base price.
+  price       Int      @default(0)
   /// Tags allow for attaching behavior.
   tags        String[]
 
   /// Items it specifies.
-  items   Item[]
-  /// Effects these items have.
-  effects Effect[]
+  items Item[]
 
   @@index([tags])
 }
@@ -255,49 +203,69 @@ model ItemSpecification {
 /// Items in the world.
 model Item {
   /// The primary key.
-  id        Int      @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   /// When it was created.
-  createdAt DateTime @default(now())
+  createdAt  DateTime @default(now())
   /// When it was last updated.
-  updatedAt DateTime @updatedAt
-  /// Current amount of the item.
-  amount    Int      @default(1)
+  updatedAt  DateTime @updatedAt
+  /// The item's current amount.
+  amount     Int      @default(1)
+  /// The item's current durability.
+  durability Int      @default(100)
 
   /// Item's specification.
   specId      Int
   /// Item's specification.
-  spec        ItemSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
+  spec        ItemSpecification @relation(fields: [specId], references: [id], onDelete: Restrict)
   /// The container holding the item.
   containerId Int?
   /// The container holding the item.
-  container   Container?        @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  container   Container?        @relation(fields: [containerId], references: [id], onDelete: Restrict)
   /// The storage provided by the item.
   storage     Container?        @relation("storage")
-  /// The slot holding the item.
-  slot        Slot?
 }
 
-/// Effects are attribute and outcome modifiers.
-model Effect {
-  /// Primary key.
-  id          Int       @id @default(autoincrement())
+/// Effect's specification.
+model EffectSpecification {
+  /// The primary key.
+  id          Int      @id @default(autoincrement())
   /// When it was created.
-  createdAt   DateTime  @default(now())
-  /// When it expires.
-  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  /// When it was last updated.
+  updatedAt   DateTime @updatedAt
+  /// Name of the effect.
+  name        String
   /// Human-readable description.
   description String?
-  /// Effect parameters.
-  params      Json
   /// Tags allow for attaching behavior.
   tags        String[]
 
-  /// The source of the effect.
-  itemId Int
-  /// The source of the effect.
-  item   ItemSpecification @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  /// Effects 
+  effects Effect[]
 
   @@index([tags])
+}
+
+/// Effects are modifiers for character outcomes.
+model Effect {
+  /// Primary key.
+  id        Int       @id @default(autoincrement())
+  /// When it was created.
+  startedAt DateTime  @default(now())
+  /// When it expires.
+  expiresAt DateTime?
+
+  /// Effect's specification.
+  specId      Int
+  /// Effect's specification.
+  spec        EffectSpecification @relation(fields: [specId], references: [id], onDelete: Restrict)
+  /// The character being affected.
+  characterId Int
+  /// The character being affected.
+  character   Character           @relation(fields: [characterId], references: [id], onDelete: Restrict)
+
+  @@index([startedAt])
+  @@index([expiresAt])
 }
 
 /// Locations in the world.
@@ -317,29 +285,31 @@ model Location {
 
   /// Characters currently in the location.
   characters Character[]
-  /// Paths that lead to the location.
-  entries    Path[]      @relation("entry")
-  /// Paths that connect the location to somewhere else.
-  exits      Path[]      @relation("exit")
+  /// Routes that lead away from the location. Please note that the exit of a location is the entry of a route.
+  exits      Route[]     @relation("exit")
+  /// Routes that lead into the location. Please note that the entry of a location is the exit of a route.
+  entries    Route[]     @relation("entry")
 
   @@index([tags])
 }
 
-/// Paths connect locations.
-model Path {
+/// Routes allow travel between locations.
+model Route {
   /// Primary key.
   id        Int      @id @default(autoincrement())
   /// When it was created.
   createdAt DateTime @default(now())
   /// When it was last updated.
   updatedAt DateTime @updatedAt
+  /// The route's length.
+  length    Int      @default(1)
 
-  /// Location from where the path starts.
+  /// Location from where the route starts. Please note that the entry of a route is the exit of a location.
   entryId Int
-  /// Location from where the path starts.
-  entry   Location @relation("entry", fields: [entryId], references: [id], onDelete: Cascade)
-  /// Location to where the path leads.
+  /// Location from where the route starts. Please note that the entry of a route is the exit of a location.
+  entry   Location @relation("exit", fields: [entryId], references: [id], onDelete: Restrict)
+  /// Location to where the route leads. Please note that the exit of a route is the entry of a location.
   exitId  Int
-  /// Location to where the path leads.
-  exit    Location @relation("exit", fields: [exitId], references: [id], onDelete: Cascade)
+  /// Location to where the route leads. Please note that the exit of a route is the entry of a location.
+  exit    Location @relation("entry", fields: [exitId], references: [id], onDelete: Restrict)
 }

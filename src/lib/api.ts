@@ -28,10 +28,6 @@ export function withErrorHandling<T>(handler: Handler<T>): Handler<T> {
         throw error;
       }
 
-      if (error instanceof ZodError) {
-        return NextResponse.json({ error }, { status: 422 });
-      }
-
       if (error instanceof UnauthorizedError) {
         return NextResponse.json({ error: error.message }, { status: 401 });
       }
@@ -42,6 +38,10 @@ export function withErrorHandling<T>(handler: Handler<T>): Handler<T> {
 
       if (error instanceof NotFoundError) {
         return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+
+      if (error instanceof ZodError) {
+        return NextResponse.json({ error }, { status: 422 });
       }
 
       if (error instanceof GameStateError) {

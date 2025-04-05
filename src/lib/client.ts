@@ -1,6 +1,15 @@
-import type { Character, Container, Session, Slot, User } from "@/lib/db";
+import type {
+  Attribute,
+  Character,
+  Container,
+  Effect,
+  Item,
+  Route,
+  Session,
+  User,
+} from "@/lib/db";
 
-export { Character, Container, Session, Slot, User };
+export { Attribute, Character, Container, Effect, Route, Session, User };
 
 export type WithLocation = {
   include: {
@@ -16,16 +25,12 @@ export type WithAttributes = {
   include: { attributes: WithSpec };
 };
 
-export type WithResources = {
-  include: { resources: WithSpec };
+export type WithEffects = {
+  include: { effects: WithSpec };
 };
 
 export type WithSlots = {
-  include: { slots: WithItem };
-};
-
-export type WithItem = {
-  include: { item: WithSpec };
+  include: { slots: WithItems };
 };
 
 export type WithItems = {
@@ -72,7 +77,10 @@ async function request<T>(
   clientReq.headers ??= {};
   clientReq.headers["Content-Type"] ??= "application/json; charset=utf-8";
 
-  const url = new URL(baseUrl, window.location.origin);
+  const url = new URL(
+    baseUrl,
+    typeof window !== "undefined" ? window.location.origin : undefined
+  );
 
   if (clientReq.query) {
     for (const [key, value] of Object.entries(clientReq.query)) {
@@ -108,32 +116,25 @@ async function request<T>(
 export const client = {
   request,
 
-  characters: {
-    queryKey: (characterId?: number) => ["characters", characterId],
-
-    get: async (characterId: number) => {
-      return request<{
-        data: Character<WithAttributes & WithResources & WithSlots>;
-      }>(`/api/characters/${characterId}`);
-    },
-  },
-
   users: {
-    queryKey: (userId: number) => ["users", userId],
+    queryKey: (userId?: number) => ["users", userId] as const,
+
+    post: async (payload: FormData) => {
+      return request<{
+        data: User;
+      }>(`/api/v1/users`, {
+        payload,
+      });
+    },
 
     characters: {
-      queryKey: (userId: number, characterId?: number) => [
-        ...client.users.queryKey(userId),
-        "characters",
-        characterId,
-      ],
+      queryKey: (userId: number, characterId?: number) =>
+        [...client.users.queryKey(userId), "characters", characterId] as const,
 
       get: async (userId: number, characterId: number) => {
         return request<{
-          data: Character<
-            WithLocation & WithAttributes & WithResources & WithSlots
-          >;
-        }>(`/api/users/${userId}/characters/${characterId}`);
+          data: Character;
+        }>(`/api/v1/users/${userId}/characters/${characterId}`);
       },
 
       post: async ({
@@ -144,25 +145,154 @@ export const client = {
         payload: FormData;
       }) => {
         return request<{
-          data: Character<
-            WithLocation & WithAttributes & WithResources & WithSlots
-          >;
-        }>(`/api/users/${userId}/characters`, {
+          data: Character;
+        }>(`/api/v1/users/${userId}/characters`, {
           payload,
         });
       },
+    },
 
-      storage: {
-        queryKey: (userId: number, characterId: number) => [
-          ...client.users.characters.queryKey(userId, characterId),
-          "storage",
-        ],
+    sessions: {
+      queryKey: (userId: number) =>
+        [...client.users.queryKey(userId), "sessions"] as const,
 
-        get: async (userId: number, characterId: number) => {
-          return request<{ data: Container<WithSource & WithItems> }>(
-            `/api/users/${userId}/characters/${characterId}/storage`
-          );
-        },
+      get: async (userId: number) => {
+        return request<{ data: Session[] }>(`/api/v1/users/${userId}/sessions`);
+      },
+    },
+  },
+
+  sessions: {
+    queryKey: (sessionId?: number) => ["sessions", sessionId] as const,
+
+    post: async (payload: FormData) => {
+      return request<{
+        data: Session;
+      }>(`/api/v1/sessions`, {
+        payload,
+      });
+    },
+
+    get: async (userId: number) => {
+      return request<{ data: Session[] }>(`/api/v1/users/${userId}/sessions`);
+    },
+
+    delete: async (sessionId: number) => {
+      return request(`/api/v1/sessions/${sessionId}`, {
+        method: "DELETE",
+      });
+    },
+  },
+
+  containers: {
+    queryKey: (containerId: number) => ["containers", containerId] as const,
+
+    get: async (containerId: number) => {
+      return request<Container<WithSource & WithItems>>(
+        `/api/v1/containers/${containerId}`
+      );
+    },
+  },
+
+  characters: {
+    queryKey: (characterId?: number) => ["characters", characterId] as const,
+
+    get: async (characterId: number) => {
+      return request<{
+        data: Character;
+      }>(`/api/v1/characters/${characterId}`);
+    },
+
+    slots: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "slots"] as const,
+
+      get: async (characterId: number) => {
+        return request<{ data: Container<WithItems>[]; total: number }>(
+          `/api/v1/characters/${characterId}/slots`
+        );
+      },
+    },
+
+    effects: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "effects"] as const,
+
+      get: async (characterId: number) => {
+        return request<{ data: Effect<WithSpec>[]; total: number }>(
+          `/api/v1/characters/${characterId}/effects`
+        );
+      },
+    },
+
+    resources: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "resources"] as const,
+
+      get: async (characterId: number) => {
+        return request<{ data: Attribute<WithSpec>[]; total: number }>(
+          `/api/v1/characters/${characterId}/resources`
+        );
+      },
+    },
+
+    skills: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "skills"] as const,
+
+      get: async (characterId: number) => {
+        return request<{ data: Attribute<WithSpec>[]; total: number }>(
+          `/api/v1/characters/${characterId}/skills`
+        );
+      },
+    },
+  },
+
+  items: {
+    queryKey: (itemId: number) => ["items", itemId] as const,
+
+    get: async (itemId: number) => {
+      return request<{ data: Item<WithSpec> }>(`/api/v1/items/${itemId}`);
+    },
+
+    storage: {
+      queryKey: (itemId: number) =>
+        [...client.items.queryKey(itemId), "storage"] as const,
+
+      get: async (itemId: number) => {
+        return request<{ data: Container<WithItems> }>(
+          `/api/v1/items/${itemId}/storage`
+        );
+      },
+    },
+  },
+
+  locations: {
+    queryKey: () => ["locations"] as const,
+
+    get: async () => {
+      return request<{ data: Location[] }>(`/api/v1/locations`);
+    },
+
+    characters: {
+      queryKey: (locationId: number) =>
+        [...client.locations.queryKey(), locationId, "characters"] as const,
+
+      get: async (locationId: number) => {
+        return request<{ data: Character[] }>(
+          `/api/v1/locations/${locationId}/characters`
+        );
+      },
+    },
+
+    exits: {
+      queryKey: (locationId: number) =>
+        [...client.locations.queryKey(), locationId, "exits"] as const,
+
+      get: async (locationId: number) => {
+        return request<{ data: Route[] }>(
+          `/api/v1/locations/${locationId}/exits`
+        );
       },
     },
   },

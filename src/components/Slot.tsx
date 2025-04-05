@@ -1,40 +1,68 @@
 import {
   Children,
   cloneElement,
+  CSSProperties,
   HTMLAttributes,
   isValidElement,
-  ReactNode,
 } from "react";
 import { twMerge } from "tailwind-merge";
 
-function merge(
-  parent: HTMLAttributes<HTMLElement>,
-  child: HTMLAttributes<HTMLElement>
-) {
-  const merged = Object.assign({}, parent, child);
+type Prop<T> = T extends "style"
+  ? CSSProperties
+  : T extends "className"
+  ? string
+  : unknown;
 
-  if (parent.style && child.style) {
-    merged.style = { ...child.style, ...parent.style };
+function has<T extends string>(
+  props: unknown,
+  prop: T
+): props is { [prop in T]: Prop<T> } {
+  if (typeof props !== "object" || props === null) {
+    return false;
   }
 
-  if (parent.className && child.className) {
-    merged.className = twMerge(child.className, parent.className);
+  switch (prop) {
+    case "style":
+      return (
+        "style" in props &&
+        typeof props.style === "object" &&
+        props.style !== null
+      );
+    case "className":
+      return "className" in props && typeof props.className === "string";
+    default:
+      return prop in props && props[prop as keyof typeof props] !== undefined;
+  }
+}
+
+function merge<T, U>(parent: T, child: U) {
+  let merged = { ...parent, ...child };
+
+  if (has(parent, "style") && has(child, "style")) {
+    merged = {
+      ...merged,
+      style: { ...child.style, ...parent.style },
+    };
+  }
+
+  if (has(parent, "className") && has(child, "className")) {
+    merged = {
+      ...merged,
+      className: twMerge(child.className, parent.className),
+    };
   }
 
   return merged;
 }
 
-type Props = HTMLAttributes<HTMLElement> & { children?: ReactNode };
+type Props = HTMLAttributes<HTMLElement>;
 
 export function Slot({ children, ...props }: Props) {
-  const child = Children.only(children);
+  const element = Children.only(children);
 
-  if (!isValidElement(child)) {
+  if (!isValidElement(element)) {
     throw new Error("Not a valid element");
   }
 
-  return cloneElement(
-    child,
-    merge(props, child.props as HTMLAttributes<HTMLElement>)
-  );
+  return cloneElement(element, merge(props, element.props));
 }

@@ -7,6 +7,24 @@ import { DateTime } from "luxon";
 
 export { Prisma };
 
+export type User<T = unknown> = Prisma.Result<
+  typeof db.user,
+  T,
+  "findFirstOrThrow"
+>;
+
+export type Session<T = unknown> = Prisma.Result<
+  typeof db.session,
+  T,
+  "findFirstOrThrow"
+>;
+
+export type Character<T = unknown> = Prisma.Result<
+  typeof db.character,
+  T,
+  "findFirstOrThrow"
+>;
+
 export type AttributeSpecification<T = unknown> = Prisma.Result<
   typeof db.attributeSpecification,
   T,
@@ -19,26 +37,14 @@ export type Attribute<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
-export type Character<T = unknown> = Prisma.Result<
-  typeof db.character,
+export type EffectSpecification<T = unknown> = Prisma.Result<
+  typeof db.effectSpecification,
   T,
   "findFirstOrThrow"
 >;
 
-export type Session<T = unknown> = Prisma.Result<
-  typeof db.session,
-  T,
-  "findFirstOrThrow"
->;
-
-export type Location<T = unknown> = Prisma.Result<
-  typeof db.location,
-  T,
-  "findFirstOrThrow"
->;
-
-export type Path<T = unknown> = Prisma.Result<
-  typeof db.path,
+export type Effect<T = unknown> = Prisma.Result<
+  typeof db.effect,
   T,
   "findFirstOrThrow"
 >;
@@ -49,8 +55,8 @@ export type Log<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
-export type User<T = unknown> = Prisma.Result<
-  typeof db.user,
+export type Container<T = unknown> = Prisma.Result<
+  typeof db.container,
   T,
   "findFirstOrThrow"
 >;
@@ -67,14 +73,14 @@ export type Item<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
-export type Container<T = unknown> = Prisma.Result<
-  typeof db.container,
+export type Location<T = unknown> = Prisma.Result<
+  typeof db.location,
   T,
   "findFirstOrThrow"
 >;
 
-export type Slot<T = unknown> = Prisma.Result<
-  typeof db.slot,
+export type Route<T = unknown> = Prisma.Result<
+  typeof db.route,
   T,
   "findFirstOrThrow"
 >;
@@ -82,25 +88,25 @@ export type Slot<T = unknown> = Prisma.Result<
 /**
  * Isolate data from the query args and pass it to a handler.
  */
-async function handle<T, O extends Operation>(
+async function applyDataMod<T, O extends Operation>(
   args: Prisma.Args<T, O>,
-  handler: (data: T) => Promise<void>
+  modify: (data: T) => Promise<void>
 ) {
   if ("create" in args) {
-    await handler(args.create);
+    await modify(args.create);
   }
 
   if ("update" in args) {
-    await handler(args.update);
+    await modify(args.update);
   }
 
   if ("data" in args) {
     if (Array.isArray(args.data)) {
       for (const data of args.data) {
-        await handler(data);
+        await modify(data);
       }
     } else {
-      await handler(args.data);
+      await modify(args.data);
     }
   }
 }
@@ -141,20 +147,10 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
       character: {
-        withPublicData() {
-          return {
-            omit: { locationId: true },
-            include: {
-              attributes: { include: { spec: true } },
-              resources: { include: { spec: true } },
-              slots: { include: { item: { include: { spec: true } } } },
-            },
-          } satisfies Prisma.CharacterFindManyArgs;
-        },
         /**
          * Get character creation input data for starting slots.
          */
-        async withSlots({
+        async startingSlots({
           items,
         }: {
           items?: Prisma.ItemCreateNestedManyWithoutContainerInput;
@@ -162,18 +158,22 @@ const ext = Prisma.defineExtension((client) => {
           return {
             slots: {
               create: [
-                { type: tags.Head },
-                { type: tags.Chest },
-                { type: tags.Weapon },
+                { tags: [tags.Slot, tags.Head] },
+                { tags: [tags.Slot, tags.Chest] },
+                { tags: [tags.Slot, tags.Waist] },
+                { tags: [tags.Slot, tags.Hands] },
+                { tags: [tags.Slot, tags.Legs] },
+                { tags: [tags.Slot, tags.Feet] },
                 {
-                  type: tags.Storage,
-                  item: {
+                  tags: [tags.Slot, tags.Backpack],
+                  items: {
                     create: {
                       spec: {
                         connect: {
                           id: (
                             await db.itemSpecification.findByTags(
-                              tags.Storage,
+                              tags.Equipment,
+                              tags.Backpack,
                               tags.StartingEquipment
                             )
                           ).id,
@@ -195,8 +195,11 @@ const ext = Prisma.defineExtension((client) => {
         /**
          * Get character creation input data for starting attributes.
          */
-        async withAttributes() {
-          const attributes = await db.attributeSpecification.findMany();
+        async startingAttributes() {
+          const attributes = await db.attributeSpecification.findMany({
+            where: { tags: { has: tags.Player } },
+          });
+
           return {
             attributes: {
               create: attributes.map(({ id }) => ({
@@ -207,24 +210,9 @@ const ext = Prisma.defineExtension((client) => {
         },
 
         /**
-         * Get character creation input data for starting resources.
-         */
-        async withResources() {
-          const resources = await db.resourceSpecification.findMany();
-
-          return {
-            resources: {
-              create: resources.map(({ id }) => ({
-                specId: id,
-              })),
-            },
-          } satisfies Pick<Prisma.CharacterCreateInput, "resources">;
-        },
-
-        /**
          * Get character creation input data for starting location.
          */
-        async withLocation() {
+        async startingLocation() {
           const location = await db.location.findFirstOrThrow({
             where: { tags: { has: tags.StartingLocation } },
           });
@@ -246,7 +234,7 @@ const ext = Prisma.defineExtension((client) => {
             case "updateMany":
             case "updateManyAndReturn":
             case "upsert":
-              await handle(args, async (data: Prisma.UserUpdateInput) => {
+              await applyDataMod(args, async (data: Prisma.UserUpdateInput) => {
                 if (typeof data.password === "string") {
                   data.password = await bcrypt.hash(data.password, 10);
                 }
@@ -266,9 +254,12 @@ const ext = Prisma.defineExtension((client) => {
             case "updateMany":
             case "updateManyAndReturn":
             case "upsert":
-              await handle(args, async (data: Prisma.SessionUpdateInput) => {
-                data.expiresAt ??= DateTime.now().plus({ day: 1 }).toJSDate();
-              });
+              await applyDataMod(
+                args,
+                async (data: Prisma.SessionUpdateInput) => {
+                  data.expiresAt ??= DateTime.now().plus({ day: 1 }).toJSDate();
+                }
+              );
               break;
           }
           return await query(args);

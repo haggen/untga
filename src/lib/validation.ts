@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Common validation schema.
+ * Common validation schemas.
  */
 export const schemas = {
   id: z.coerce.number().positive(),
@@ -14,7 +14,7 @@ export const schemas = {
  * Parse payload using a schema.
  */
 export function parse<Shape extends z.ZodRawShape>(
-  payload: FormData | URLSearchParams | Record<string, unknown>,
+  payload: unknown,
   shape: Shape
 ) {
   return z
@@ -27,7 +27,9 @@ export function parse<Shape extends z.ZodRawShape>(
             ? payload.get(key) ?? undefined
             : payload instanceof URLSearchParams
             ? payload.get(key) ?? undefined
-            : payload[key],
+            : typeof payload === "object" && payload !== null
+            ? (payload as Record<string, unknown>)[key]
+            : undefined,
         ])
       )
     );

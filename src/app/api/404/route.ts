@@ -1,6 +1,6 @@
-import { withErrorHandling } from "@/lib/api";
 import { NotFoundError } from "@/lib/error";
+import { withErrorHandling, withMiddleware } from "@/lib/middleware";
 
-export const GET = withErrorHandling(async () => {
+export const GET = withMiddleware(withErrorHandling(), async () => {
   throw new NotFoundError("Not found.");
 });
