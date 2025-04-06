@@ -88,10 +88,10 @@ export default function Page() {
           <Field
             name="description"
             label="Bio"
-            hint="Your bio is public you can change it later."
+            hint="This information is public and you can change it later. Limit of 256 characters."
           >
             <Textarea
-              rows={3}
+              rows={4}
               required
               maxLength={256}
               placeholder="e.g. The child of a blacksmith..."

@@ -7,6 +7,7 @@ import { client } from "@/lib/client";
 import { parse, schemas } from "@/lib/validation";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { Header } from "../header";
 
 function Summary({ characterId }: { characterId: number }) {
   const characterQuery = useQuery({
@@ -48,25 +49,6 @@ function Summary({ characterId }: { characterId: number }) {
         </Alert>
       )}
     </section>
-  );
-}
-
-function Header({ characterId }: { characterId: number }) {
-  const { data, isLoading } = useQuery({
-    queryKey: client.characters.queryKey(characterId),
-    queryFn: () => client.characters.get(characterId),
-  });
-
-  const character = data?.payload.data;
-
-  return (
-    <header className="flex flex-col gap-1.5">
-      <Heading asChild>
-        <h1>{isLoading ? "Loading..." : character?.name}</h1>
-      </Heading>
-
-      <p>{isLoading ? "Loading..." : character?.description}</p>
-    </header>
   );
 }
 

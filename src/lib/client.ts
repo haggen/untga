@@ -4,12 +4,24 @@ import type {
   Container,
   Effect,
   Item,
+  Location,
+  Log,
   Route,
   Session,
   User,
 } from "@/lib/db";
 
-export { Attribute, Character, Container, Effect, Route, Session, User };
+export {
+  Attribute,
+  Character,
+  Container,
+  Effect,
+  Location,
+  Log,
+  Route,
+  Session,
+  User,
+};
 
 export type WithLocation = {
   include: {
@@ -39,6 +51,14 @@ export type WithItems = {
 
 export type WithSource = {
   include: { source: WithSpec };
+};
+
+export type WithEntry = {
+  include: { entry: true };
+};
+
+export type WithExit = {
+  include: { exit: true };
 };
 
 // --
@@ -212,6 +232,21 @@ export const client = {
       }>(`/api/v1/characters/${characterId}`);
     },
 
+    patch: async (characterId: number, payload: FormData) => {
+      return request<{
+        data: Character;
+      }>(`/api/v1/characters/${characterId}`, {
+        method: "PATCH",
+        payload,
+      });
+    },
+
+    delete: async (characterId: number) => {
+      return request(`/api/v1/characters/${characterId}`, {
+        method: "DELETE",
+      });
+    },
+
     slots: {
       queryKey: (characterId: number) =>
         [...client.characters.queryKey(characterId), "slots"] as const,
@@ -219,6 +254,28 @@ export const client = {
       get: async (characterId: number) => {
         return request<{ data: Container<WithItems>[]; total: number }>(
           `/api/v1/characters/${characterId}/slots`
+        );
+      },
+    },
+
+    logs: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "logs"] as const,
+
+      get: async (characterId: number) => {
+        return request<{ data: Log[]; total: number }>(
+          `/api/v1/characters/${characterId}/logs`
+        );
+      },
+    },
+
+    location: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "location"] as const,
+
+      get: async (characterId: number) => {
+        return request<{ data: Location }>(
+          `/api/v1/characters/${characterId}/location`
         );
       },
     },
@@ -277,10 +334,16 @@ export const client = {
   },
 
   locations: {
-    queryKey: () => ["locations"] as const,
+    queryKey: (locationId?: number) => ["locations", locationId] as const,
 
-    get: async () => {
+    get: (async (locationId?: number) => {
+      if (locationId) {
+        return request<{ data: Location }>(`/api/v1/locations/${locationId}`);
+      }
       return request<{ data: Location[] }>(`/api/v1/locations`);
+    }) as {
+      (locationId: number): Promise<ClientResp<{ data: Location }>>;
+      (): Promise<ClientResp<{ data: Location[] }>>;
     },
 
     characters: {
@@ -299,7 +362,7 @@ export const client = {
         [...client.locations.queryKey(), locationId, "exits"] as const,
 
       get: async (locationId: number) => {
-        return request<{ data: Route[] }>(
+        return request<{ data: Route<WithEntry & WithExit>[] }>(
           `/api/v1/locations/${locationId}/exits`
         );
       },

@@ -1,16 +1,11 @@
+import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { parse, schemas } from "@/lib/validation";
 import { permanentRedirect } from "next/navigation";
 
-type Props = {
-  params: Promise<{
-    characterId: string;
-  }>;
-};
-
-export default async function Page({ params }: Props) {
-  const { characterId } = parse(await params, {
+export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
+  const { characterId } = parse(params, {
     characterId: schemas.id,
   });
 
   permanentRedirect(`/characters/${characterId}/summary`);
-}
+});

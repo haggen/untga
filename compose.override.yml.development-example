@@ -9,8 +9,6 @@ services:
             - node_modules
     environment:
       NODE_ENV: development
-    volumes:
-      - /app/node_modules
     networks:
       - default
       - traefik
@@ -19,7 +17,7 @@ services:
       - "traefik.http.routers.untga.rule=Host(`untga.local.crz.li`)"
   db:
     ports: 
-      - 5432:5432
+      - 5432:5432 # Allow local Prisma to connect to the database.
 
 networks:
   traefik:

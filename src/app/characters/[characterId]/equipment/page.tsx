@@ -3,31 +3,12 @@
 import { Alert } from "@/components/Alert";
 import { Definition } from "@/components/Definition";
 import { Heading } from "@/components/Heading";
-import { useSession } from "@/components/SessionProvider";
 import { client } from "@/lib/client";
 import { parse, schemas } from "@/lib/validation";
 import * as tags from "@/static/tags";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-
-function Header({ characterId }: { characterId: number }) {
-  const { data } = useQuery({
-    queryKey: client.characters.queryKey(characterId),
-    queryFn: () => client.characters.get(characterId),
-  });
-
-  const character = data?.payload.data;
-
-  return (
-    <header className="flex flex-col gap-1.5">
-      <Heading asChild>
-        <h1>{character?.name ?? "Loading..."}</h1>
-      </Heading>
-
-      <p>{character?.description ?? "No description given."}</p>
-    </header>
-  );
-}
+import { Header } from "../header";
 
 function Equipment({ characterId }: { characterId: number }) {
   const { data } = useQuery({
@@ -103,8 +84,6 @@ type Props = {
 };
 
 export default function Page({ params }: Props) {
-  useSession();
-
   const { characterId } = parse(use(params), {
     characterId: schemas.id,
   });
