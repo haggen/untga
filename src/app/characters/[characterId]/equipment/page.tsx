@@ -45,7 +45,7 @@ function Storage({ characterId }: { characterId: number }) {
     queryFn: () => client.characters.slots.get(characterId),
   });
 
-  const slot = slots?.find((slot) => slot.tags.includes(tags.Backpack));
+  const slot = slots?.find((slot) => slot.tags.includes(tags.Back));
   const backpack = slot?.items[0];
   const backpackId = backpack?.id ?? 0;
 

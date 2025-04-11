@@ -1,19 +1,41 @@
 # Untga (working title)
 
-> A text-based browser RPG.
+> A text-based browser multiplayer RPG.
 
-⚠️ This is a work in progress.
+Untga is a text-based multiplayer RPG that borrows ideas from incremental games and MMORPGs.
 
-Untga is a text-based RPG that you can play on your browser.
+## Roadmap
+
+The project is still early in development and things can change fast.
+
+### Current milestone
+
+- [x] Registration.
+- [x] Login.
+- [ ] Recovery (forgot password).
+- [ ] E-mail verification.
+- [ ] Session invalidation.
+- [x] Character creation.
+- [x] Character editing.
+- [x] Basic data structures for game mechanics.
+- [ ] Character deletion.
+- [ ] Change your e-mail.
+- [ ] Change your password.
+- [ ] Account deletion.
+- [ ] Instantaneous travel between locations.
+- [ ] Change equipment (equip and unequip).
+- [ ] Player journal.
+
+### Future milestones
+
+- [ ] Combat simulation during travels to hostile places.
+- [ ] Foraging and gathering resources.
+- [ ] Crafting.
+- [ ] Travel length based on location distance.
+- [ ] NPC dialogue and quests.
+- [ ] Social interactions (mail, friendship, trade, etc).
 
 ## Development
-
-The stack is;
-
-1. TypeScript
-2. Next.js
-3. Tailwind CSS
-4. Prisma (PostgreSQL)
 
 ### Getting started
 
@@ -23,30 +45,30 @@ Copy `compose.override.yml.development-example` as `compose.override.yml` and ru
 docker compose up -w
 ```
 
-#### IDE integration
+### IDE integration
 
-The container will isolate its `node_modules` directory, therefore dependencies as well as Next.js and Prisma generated code won't be immediately locally available. To fix this, stop the container and run;
+The container will isolate the `node_modules` directory, therefore dependencies and generated code, such as Next.js' types and Prisma's client, won't be locally available unless you fix it:
 
 ```shell
-npm install
-npx next build
+npm ci
 npx prisma generate
+npx next build
 ```
 
-#### Guidelines
+### Guidelines
 
-Below are some guidelines thought of during the development and in no particular order.
+These are some of the guidelines thought of during the development and in no particular order.
 
-##### Route handlers
+#### Route handlers
 
-When working on route handlers, please make sure;
+When working on route handlers, please make sure:
 
-1. You're using the error handler middleware.
-2. You have input validation near the top.
-3. You don't end up masking errors.
-4. You check the requester's access.
-5. Collection's response has a total count.
+1. Middlewares, like error handling, are being used.
+2. Inputs like querystring and payload are being validated.
+3. Thrown errors are meaningful and are not masking the underlying issue.
+4. Read and write access are being properly checked.
+5. Collection's response returns a total amount.
 
 ## Legal
 
-Apache-2.0 ©️ 2024 Arthur Corenzan.
+Apache-2.0 ©️ 2024 Arthur Corenzan, and Untga contributors.

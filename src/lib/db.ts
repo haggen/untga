@@ -165,7 +165,7 @@ const ext = Prisma.defineExtension((client) => {
                 { tags: [tags.Slot, tags.Legs] },
                 { tags: [tags.Slot, tags.Feet] },
                 {
-                  tags: [tags.Slot, tags.Backpack],
+                  tags: [tags.Slot, tags.Back],
                   items: {
                     create: {
                       spec: {
@@ -173,8 +173,8 @@ const ext = Prisma.defineExtension((client) => {
                           id: (
                             await db.itemSpecification.findByTags(
                               tags.Equipment,
-                              tags.Backpack,
-                              tags.StartingEquipment
+                              tags.Back,
+                              tags.Storage
                             )
                           ).id,
                         },
@@ -197,7 +197,7 @@ const ext = Prisma.defineExtension((client) => {
          */
         async startingAttributes() {
           const attributes = await db.attributeSpecification.findMany({
-            where: { tags: { has: tags.Player } },
+            where: { tags: { hasSome: [tags.Skill, tags.Resource] } },
           });
 
           return {

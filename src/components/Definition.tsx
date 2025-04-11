@@ -12,7 +12,10 @@ export function Definition({
   ...props
 }: DefinitionProps) {
   return (
-    <div className={twMerge("flex items-center gap-2", className)} {...props}>
+    <div
+      className={twMerge("flex items-center gap-2 py-0.5", className)}
+      {...props}
+    >
       <dt className="flex items-center gap-2 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
         {label}
       </dt>

@@ -1,213 +1,348 @@
-import { db } from "@/lib/db";
+import { db, Prisma } from "@/lib/db";
 import * as tags from "@/static/tags";
 
-async function seed() {
-  const locations = {
-    village: await db.location.create({
-      data: {
-        name: "Village",
-        description: "A small village.",
-        tags: [tags.Peaceful, tags.StartingLocation],
-      },
-    }),
-
-    forest: await db.location.create({
-      data: {
-        name: "Forest",
-        description: "A dense forest.",
-        tags: [tags.Contested],
-      },
-    }),
-  };
-
-  await db.route.createMany({
-    data: [
-      {
-        exitId: locations.village.id,
-        entryId: locations.forest.id,
-      },
-      {
-        exitId: locations.forest.id,
-        entryId: locations.village.id,
-      },
-    ],
+async function createLocations(
+  data: { name: string; description: string; tags: string[]; exits: string[] }[]
+) {
+  const locations = await db.location.createManyAndReturn({
+    data: data.map((location) => ({
+      name: location.name,
+      description: location.description,
+      tags: location.tags,
+    })),
   });
 
-  const items = {
-    crudeKnife: await db.itemSpecification.createMany({
-      data: {
-        name: "Crude knife",
-        description: "A crude knife.",
-        tags: [tags.Weapon],
-      },
-    }),
+  const routes: Prisma.RouteUncheckedCreateInput[] = [];
 
-    strawHat: await db.itemSpecification.createMany({
-      data: {
-        name: "Straw hat",
-        description: "A simple hat made of straw.",
-        tags: [tags.Equipment, tags.Head],
-      },
-    }),
+  data.forEach((data) => {
+    const location = locations.find((location) => location.name === data.name);
 
-    plainShirt: await db.itemSpecification.createMany({
-      data: {
-        name: "Plain shirt",
-        description: "A simple and plain shirt.",
-        tags: [tags.Equipment, tags.Chest],
-      },
-    }),
+    if (!location) {
+      throw new Error(`Can't find location ${data.name}.`);
+    }
 
-    linenSash: await db.itemSpecification.createMany({
-      data: {
-        name: "Linen sash",
-        description: "A sash made of linen.",
-        tags: [tags.Equipment, tags.Waist, tags.Storage],
-      },
-    }),
+    data.exits.forEach((name) => {
+      const exit = locations.find((location) => location.name === name);
 
-    linenPants: await db.itemSpecification.createMany({
-      data: {
-        name: "Linen pants",
-        description: "A pair of pants made of linen.",
-        tags: [tags.Equipment, tags.Legs],
-      },
-    }),
+      if (!exit) {
+        throw new Error(`Can't find location ${name}.`);
+      }
 
-    leatherShoes: await db.itemSpecification.createMany({
-      data: {
-        name: "Leather shoes",
-        description: "A pair of shoes made of leather.",
-        tags: [tags.Equipment, tags.Feet],
-      },
-    }),
+      routes.push({
+        entryId: location.id,
+        exitId: exit.id,
+      });
+    });
+  });
 
-    apple: await db.itemSpecification.createMany({
-      data: {
-        name: "Apple",
-        description: "A juicy apple.",
-        tags: [tags.Food, tags.Consumable],
-      },
-    }),
+  await db.route.createManyAndReturn({
+    data: routes,
+  });
+}
 
-    gold: await db.itemSpecification.create({
-      data: {
-        name: "Gold coin",
-        description: "A gold coin.",
-        tags: [tags.Currency],
-      },
-    }),
+async function seed() {
+  const locations = [
+    {
+      name: "Hearthmere Village",
+      description:
+        "A quiet farming village nestled in a wooded hollow. Known for its warm hearths and honest folk.",
+      tags: [tags.Peaceful, tags.StartingLocation],
+      exits: ["Stonefield Market", "Dunhollow Crossroads"],
+    },
+    {
+      name: "Stonefield Market",
+      description:
+        "A bustling roadside town with open-air stalls, smiths, and stables. Trade thrives under the watchful eye of the reeve.",
+      tags: [tags.Peaceful],
+      exits: ["Hearthmere Village", "Dunhollow Crossroads"],
+    },
+    {
+      name: "Dunhollow Crossroads",
+      description:
+        "A central meeting point for travelers and merchants. Inns, gossip, and coin change hands swiftly here.",
+      tags: [tags.Peaceful],
+      exits: [
+        "Hearthmere Village",
+        "Stonefield Market",
+        "Redbarrow Ruins",
+        "Black Fen Marshes",
+      ],
+    },
+    {
+      name: "Black Fen Marshes",
+      description:
+        "Treacherous wetlands cloaked in fog. Travelers speak of unseen things moving beneath the water.",
+      tags: [tags.Hostile],
+      exits: ["Dunhollow Crossroads", "Wyrm's Hollow"],
+    },
+    {
+      name: "Wyrm's Hollow",
+      description:
+        "A deep forest ravine where wolves and worse hunt. Few who enter without cause return.",
+      tags: [tags.Hostile],
+      exits: ["Black Fen Marshes", "Redbarrow Ruins"],
+    },
+    {
+      name: "Redbarrow Ruins",
+      description:
+        "Crumbled remains of an ancient fort. Bandits and grave robbers haunt the shadows.",
+      tags: [tags.Hostile],
+      exits: ["Dunhollow Crossroads", "Wyrm's Hollow", "Ashgrove"],
+    },
+    {
+      name: "Gallows Peak",
+      description:
+        "A wind-blasted mountain pass with old gallows. Cursed winds howl through the rocks.",
+      tags: [tags.Hostile],
+      exits: ["Ashgrove"],
+    },
+    {
+      name: "Ashgrove",
+      description:
+        "Once a thriving hamlet, now a scorched ruin. The scent of burnt wood never fades.",
+      tags: [tags.Hostile],
+      exits: ["Redbarrow Ruins", "Gallows Peak", "Hollowdeep Caverns"],
+    },
+    {
+      name: "Hollowdeep Caverns",
+      description:
+        "A dark series of tunnels stretching beneath the hills. Claustrophobic and home to unseen creatures.",
+      tags: [tags.Hostile],
+      exits: ["Ashgrove", "Bleakstrand Coast"],
+    },
+    {
+      name: "Bleakstrand Coast",
+      description:
+        "Rocky shores where wrecks lie half-sunken. Sailors claim ghostly lights dance over the waves.",
+      tags: [tags.Hostile],
+      exits: ["Hollowdeep Caverns"],
+    },
+  ];
 
-    backpack: await db.itemSpecification.create({
-      data: {
-        name: "Leather backpack",
-        description: "A leather backpack.",
-        tags: [
-          tags.Equipment,
-          tags.Backpack,
-          tags.Storage,
-          tags.StartingEquipment,
-        ],
-      },
-    }),
-  };
+  createLocations(locations);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const skills = {
-    negotiation: await db.attributeSpecification.create({
-      data: {
-        name: "Negotiation",
-        description: "The ability to negotiate with others.",
-        tags: [tags.Player, tags.NPC, tags.Skill, tags.Negotiation],
-      },
-    }),
+  const items = [
+    {
+      name: "Peasant's Hood",
+      description: "A simple cloth hood worn by villagers and field hands.",
+      tags: [tags.Equipment, tags.Head],
+    },
+    {
+      name: "Peasant's Tunic",
+      description: "A coarse linen tunic offering minimal protection.",
+      tags: [tags.Equipment, tags.Chest],
+    },
+    {
+      name: "Peasant's Belt",
+      description: "A rope belt holding tools and small pouches.",
+      tags: [tags.Equipment, tags.Waist],
+    },
+    {
+      name: "Peasant's Gloves",
+      description: "Worn cloth gloves with patched fingertips.",
+      tags: [tags.Equipment, tags.Hands],
+    },
+    {
+      name: "Peasant's Trousers",
+      description: "Basic wool trousers with mud-stained hems.",
+      tags: [tags.Equipment, tags.Legs],
+    },
+    {
+      name: "Peasant's Shoes",
+      description: "Simple leather shoes with thin soles.",
+      tags: [tags.Equipment, tags.Feet],
+    },
+    {
+      name: "Scout's Hood",
+      description: "A dark hood worn by woodsmen and rangers.",
+      tags: [tags.Equipment, tags.Head],
+    },
+    {
+      name: "Leather Jerkin",
+      description: "A reinforced leather chestpiece suited for mobility.",
+      tags: [tags.Equipment, tags.Chest],
+    },
+    {
+      name: "Utility Belt",
+      description: "A tough belt fitted with loops and satchels.",
+      tags: [tags.Equipment, tags.Waist],
+    },
+    {
+      name: "Leather Gloves",
+      description: "Sturdy gloves offering grip and protection.",
+      tags: [tags.Equipment, tags.Hands],
+    },
+    {
+      name: "Padded Trousers",
+      description: "Lightly padded pants to protect against briars and blows.",
+      tags: [tags.Equipment, tags.Legs],
+    },
+    {
+      name: "Ranger's Boots",
+      description: "Thick leather boots with soft soles for silent movement.",
+      tags: [tags.Equipment, tags.Feet],
+    },
+    {
+      name: "Mail Coif",
+      description: "A steel-linked hood worn under a helm.",
+      tags: [tags.Equipment, tags.Head],
+    },
+    {
+      name: "Chainmail Hauberk",
+      description: "A knee-length coat of interlinked metal rings.",
+      tags: [tags.Equipment, tags.Chest],
+    },
+    {
+      name: "Warrior's Girdle",
+      description: "A reinforced belt supporting the mail and weaponry.",
+      tags: [tags.Equipment, tags.Waist],
+    },
+    {
+      name: "Steel Gauntlets",
+      description: "Metal-plated gloves worn by infantry and knights.",
+      tags: [tags.Equipment, tags.Hands],
+    },
+    {
+      name: "Chain Leggings",
+      description: "Flexible chainmail trousers offering solid protection.",
+      tags: [tags.Equipment, tags.Legs],
+    },
+    {
+      name: "Iron Sabatons",
+      description: "Armored boots with overlapping metal plates.",
+      tags: [tags.Equipment, tags.Feet],
+    },
+    {
+      name: "Canvas Satchel",
+      description:
+        "A worn canvas bag slung over one shoulder. Light and roomy.",
+      tags: [tags.Equipment, tags.Back, tags.Storage],
+    },
+    {
+      name: "Leather Backpack",
+      description:
+        "A rugged backpack with buckles and straps. Useful for carrying gear.",
+      tags: [tags.Equipment, tags.Back, tags.Storage],
+    },
+    {
+      name: "Merchant's Sash",
+      description:
+        "A long cloth sash with hidden pouches sewn into the lining.",
+      tags: [tags.Equipment, tags.Waist, tags.Storage],
+    },
+    {
+      name: "Iron Shortsword",
+      description: "Reliable, if unremarkable, sidearm for trained fighters.",
+      tags: [tags.Weapon],
+    },
+    {
+      name: "Rusty Dagger",
+      description:
+        "A pitted blade ideal for desperate defense or backalley fights.",
+      tags: [tags.Weapon],
+    },
+    {
+      name: "Woodsman's Axe",
+      description: "A stout axe used for felling trees—and sometimes foes.",
+      tags: [tags.Weapon],
+    },
+    {
+      name: "Claymore",
+      description:
+        "A massive blade wielded with both hands. Fearsome in open combat.",
+      tags: [tags.Weapon],
+    },
+    {
+      name: "Hunter's Bow",
+      description: "A longbow of yew, balanced and deadly at range.",
+      tags: [tags.Weapon],
+    },
+    {
+      name: "Loaf of Hard Bread",
+      description: "Dense, long-lasting bread. Chewing it's half the battle.",
+      tags: [tags.Consumable],
+    },
+    {
+      name: "Flask of Red Wine",
+      description: "Cheap village wine. Sour but warming.",
+      tags: [tags.Consumable],
+    },
+    {
+      name: "Dried Apples",
+      description: "Slices of apple, dried over the hearth. Sweet and chewy.",
+      tags: [tags.Consumable],
+    },
+    {
+      name: "Bandage Roll",
+      description: "Clean cloth strips used to dress wounds. Slows bleeding.",
+      tags: [tags.Consumable],
+    },
+    {
+      name: "Tarnished Locket",
+      description: "An old silver locket containing a faded portrait.",
+      tags: [tags.Trinket],
+    },
+    {
+      name: "Carved Wooden Charm",
+      description:
+        "A token whittled into the shape of a stag. Thought to bring luck.",
+      tags: [tags.Trinket],
+    },
+    {
+      name: "Gold Coin",
+      description: "A gold coin. Used as currency.",
+      tags: [tags.Currency],
+    },
+  ];
 
-    survivalship: await db.attributeSpecification.create({
-      data: {
-        name: "Survivalship",
-        description: "The ability to survive in the wild.",
-        tags: [tags.Player, tags.NPC, tags.Skill, tags.Survivalship],
-      },
-    }),
+  await db.itemSpecification.createManyAndReturn({
+    data: items.map((item) => ({
+      name: item.name,
+      description: item.description,
+      tags: item.tags,
+    })),
+  });
 
-    combat: await db.attributeSpecification.create({
-      data: {
-        name: "Combat",
-        description: "Combat know-how and technique.",
-        tags: [tags.Player, tags.NPC, tags.Skill, tags.Combat],
-      },
-    }),
+  const attributes = [
+    {
+      name: "Survivalship",
+      description: "The ability to survive in the wild.",
+      tags: [tags.Skill, tags.Survivalship],
+    },
+    {
+      name: "Combat",
+      description: "Combat know-how and technique.",
+      tags: [tags.Skill, tags.Combat],
+    },
+    {
+      name: "Crafting",
+      description: "The ability to craft items.",
+      tags: [tags.Skill, tags.Crafting],
+    },
+    {
+      name: "Foraging",
+      description: "The ability to forage for resources.",
+      tags: [tags.Skill, tags.Foraging],
+    },
+    {
+      name: "Health",
+      description: "Health points.",
+      tags: [tags.Resource, tags.Health],
+    },
+    {
+      name: "Stamina",
+      description: "Stamina points.",
+      tags: [tags.Resource, tags.Stamina],
+    },
+  ];
 
-    crafting: await db.attributeSpecification.create({
-      data: {
-        name: "Crafting",
-        description: "The ability to craft items.",
-        tags: [tags.Player, tags.NPC, tags.Skill, tags.Crafting],
-      },
-    }),
-
-    foraging: await db.attributeSpecification.create({
-      data: {
-        name: "Foraging",
-        description: "The ability to forage for resources.",
-        tags: [tags.Player, tags.NPC, tags.Skill, tags.Foraging],
-      },
-    }),
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const attributes = {
-    health: await db.attributeSpecification.create({
-      data: {
-        name: "Health",
-        description: "Health points.",
-        tags: [tags.Player, tags.NPC, tags.Resource, tags.Health],
-      },
-    }),
-
-    stamina: await db.attributeSpecification.create({
-      data: {
-        name: "Stamina",
-        description: "Stamina points.",
-        tags: [tags.Player, tags.NPC, tags.Resource, tags.Stamina],
-      },
-    }),
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const npc = {
-    jeremia: await db.character.create({
-      data: {
-        name: "Jeremia, the villager",
-        location: { connect: { id: locations.village.id } },
-        tags: [tags.NPC],
-        ...(await db.character.startingSlots({
-          items: {
-            create: [
-              { spec: { connect: { id: items.gold.id } }, amount: 1000 },
-            ],
-          },
-        })),
-        ...(await db.character.startingAttributes()),
-      },
-    }),
-
-    brian: await db.character.create({
-      data: {
-        name: "Brian, the hunter",
-        location: { connect: { id: locations.forest.id } },
-        tags: [tags.NPC],
-        ...(await db.character.startingSlots({
-          items: {
-            create: [
-              { spec: { connect: { id: items.gold.id } }, amount: 1000 },
-            ],
-          },
-        })),
-        ...(await db.character.startingAttributes()),
-      },
-    }),
-  };
+  await db.attributeSpecification.createManyAndReturn({
+    data: attributes.map((attribute) => ({
+      name: attribute.name,
+      description: attribute.description,
+      tags: attribute.tags,
+    })),
+  });
 }
 
 seed()

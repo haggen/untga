@@ -37,7 +37,7 @@ export async function getActiveSessionOrRedirect() {
   const session = await getActiveSession();
 
   if (!session) {
-    redirect("/sign-in");
+    redirect("/login");
   }
 
   return session;
