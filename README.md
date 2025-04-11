@@ -2,7 +2,7 @@
 
 > A text-based browser multiplayer RPG.
 
-Untga is a text-based multiplayer RPG that borrows ideas from incremental games and MMORPGs.
+Untga is a text-based multiplayer RPG that borrows ideas from [incremental games](https://en.wikipedia.org/wiki/Incremental_game) and [MMORPGs](https://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game).
 
 ## Roadmap
 
