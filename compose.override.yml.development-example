@@ -18,7 +18,9 @@ services:
       - "traefik.http.routers.untga.rule=Host(`untga.local.crz.li`)"
   db:
     ports: 
-      - 5432:5432 # Allow local Prisma to connect to the database.
+      # Support local connections to the database.
+      # Local Prisma reads the port from .env.
+      - 5432:5432
 
 networks:
   traefik:
