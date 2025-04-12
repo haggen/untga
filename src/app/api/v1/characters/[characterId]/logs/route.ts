@@ -18,5 +18,7 @@ export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
 
   const total = await db.log.count({ where });
 
-  return NextResponse.json({ data: logs, total });
+  return NextResponse.json(logs, {
+    headers: { "X-Total": total.toString() },
+  });
 });

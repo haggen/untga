@@ -33,6 +33,6 @@ export const POST = withMiddleware(
 
     await setActiveSession(session);
 
-    return NextResponse.json({ data: user }, { status: 201 });
+    return NextResponse.json(user, { status: 201 });
   }
 );

@@ -5,8 +5,7 @@ import { NextResponse } from "next/server";
 
 export const GET = withMiddleware(
   withErrorHandling(),
-  async (context: Context) => {
-    const { params } = context;
+  async ({ params }: Context) => {
     const { characterId } = parse(params, {
       characterId: schemas.id,
     });
@@ -28,6 +27,8 @@ export const GET = withMiddleware(
 
     const total = await db.container.count({ where });
 
-    return NextResponse.json({ data: containers, total });
+    return NextResponse.json(containers, {
+      headers: { "X-Total": total.toString() },
+    });
   }
 );

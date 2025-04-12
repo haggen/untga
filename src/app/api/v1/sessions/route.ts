@@ -34,7 +34,7 @@ export const POST = withMiddleware(
 
     // But we still have to omit session's secret from the response.
     return NextResponse.json(
-      { data: { ...session, secret: undefined } },
+      { ...session, secret: undefined },
       { status: 201 }
     );
   }

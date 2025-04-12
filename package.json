@@ -1,16 +1,16 @@
 {
   "name": "untga",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "prestart:development": "test -d node_modules || npm ci",
-    "start": "npm run-script start:${NODE_ENV:-development}",
+    "start": "npm run start:${NODE_ENV:-development}",
     "start:development": "next dev --turbo",
     "start:production": "next start",
     "prebuild": "prisma generate",
     "build": "next build",
-    "fix": "next lint --fix",
+    "fix": "next lint --fix && tsc --noEmit",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },

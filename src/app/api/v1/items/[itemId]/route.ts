@@ -23,6 +23,6 @@ export const GET = withMiddleware(
       throw new NotFoundError("Item not found.");
     }
 
-    return NextResponse.json({ data: item });
+    return NextResponse.json(item);
   }
 );

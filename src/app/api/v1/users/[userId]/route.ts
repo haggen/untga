@@ -5,8 +5,7 @@ import { getActiveSessionOrThrow } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
-export const GET = withMiddleware(withErrorHandling(), async (context) => {
-  const { params } = context;
+export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
   const { userId } = parse(params, {
     userId: schemas.id,
   });
@@ -28,36 +27,60 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
     throw new NotFoundError();
   }
 
-  return NextResponse.json({ data: user });
+  return NextResponse.json(user);
 });
 
-export const PATCH = withMiddleware(withErrorHandling(), async (context) => {
-  const { params, request: req } = context;
-  const { userId } = parse(params, {
-    userId: schemas.id,
-  });
+export const PATCH = withMiddleware(
+  withErrorHandling(),
+  async ({ params, request }) => {
+    const { userId } = parse(params, {
+      userId: schemas.id,
+    });
 
-  const payload = parse(await req.json(), {
-    email: schemas.email.optional(),
-    password: schemas.password.optional(),
-  });
+    const payload = parse(await request.json(), {
+      email: schemas.email.optional(),
+      password: schemas.password.optional(),
+    });
 
-  const session = await getActiveSessionOrThrow();
+    const session = await getActiveSessionOrThrow();
 
-  if (userId !== session.userId) {
-    throw new UnauthorizedError();
+    if (userId !== session.userId) {
+      throw new UnauthorizedError();
+    }
+
+    const user = await db.user.update({
+      where: { id: userId },
+      omit: {
+        password: true,
+      },
+      data: {
+        email: payload.email,
+        password: payload.password,
+      },
+    });
+
+    return NextResponse.json(user);
   }
+);
 
-  const user = await db.user.update({
-    where: { id: userId },
-    omit: {
-      password: true,
-    },
-    data: {
-      email: payload.email,
-      password: payload.password,
-    },
-  });
+export const DELETE = withMiddleware(
+  withErrorHandling(),
+  async ({ params }) => {
+    const { userId } = parse(params, {
+      userId: schemas.id,
+    });
 
-  return NextResponse.json({ data: user });
-});
+    const session = await getActiveSessionOrThrow();
+
+    if (userId !== session.userId) {
+      throw new UnauthorizedError();
+    }
+
+    const user = await db.user.update({
+      where: { id: userId },
+      data: { deletedAt: new Date() },
+    });
+
+    return NextResponse.json(user);
+  }
+);

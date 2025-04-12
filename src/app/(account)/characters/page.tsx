@@ -14,7 +14,7 @@ export default function Page() {
     queryFn: () => client.users.characters.get(session.userId),
   });
 
-  const characters = data?.payload.data ?? [];
+  const characters = data?.payload ?? [];
 
   return (
     <main className="flex flex-col gap-12">

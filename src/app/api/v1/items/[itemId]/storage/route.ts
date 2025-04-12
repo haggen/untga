@@ -23,6 +23,6 @@ export const GET = withMiddleware(
       throw new NotFoundError();
     }
 
-    return NextResponse.json({ data: container });
+    return NextResponse.json(container);
   }
 );

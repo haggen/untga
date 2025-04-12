@@ -11,5 +11,7 @@ export const GET = withMiddleware(withErrorHandling(), async () => {
 
   const total = await db.location.count({ where });
 
-  return NextResponse.json({ data: locations, total });
+  const response = NextResponse.json(locations);
+  response.headers.set("X-Total", total.toString());
+  return response;
 });

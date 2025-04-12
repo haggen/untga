@@ -28,5 +28,7 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
     where,
   });
 
-  return NextResponse.json({ data: characters, total });
+  return NextResponse.json(characters, {
+    headers: { "X-Total": total.toString() },
+  });
 });

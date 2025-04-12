@@ -12,13 +12,15 @@ datasource db {
 /// User of the system.
 model User {
   /// The primary key.
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   /// When it was created.
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   /// When it was last updated.
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime  @updatedAt
+  /// When it was deleted.
+  deletedAt DateTime?
   /// User's email.
-  email     String   @unique
+  email     String    @unique
   /// Password hash
   password  String
 

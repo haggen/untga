@@ -140,17 +140,13 @@ export const client = {
     queryKey: (userId?: number) => ["users", userId] as const,
 
     post: async (payload: FormData) => {
-      return request<{
-        data: User;
-      }>(`/api/v1/users`, {
+      return request<User>(`/api/v1/users`, {
         payload,
       });
     },
 
     patch: async (userId: number, payload: FormData) => {
-      return request<{
-        data: User;
-      }>(`/api/v1/users/${userId}`, {
+      return request<User>(`/api/v1/users/${userId}`, {
         method: "PATCH",
         payload,
       });
@@ -167,9 +163,7 @@ export const client = {
         [...client.users.queryKey(userId), "characters"] as const,
 
       get: async (userId: number) => {
-        return request<{
-          data: Character[];
-        }>(`/api/v1/users/${userId}/characters`);
+        return request<Character[]>(`/api/v1/users/${userId}/characters`);
       },
     },
 
@@ -178,7 +172,7 @@ export const client = {
         [...client.users.queryKey(userId), "sessions"] as const,
 
       get: async (userId: number) => {
-        return request<{ data: Session[] }>(`/api/v1/users/${userId}/sessions`);
+        return request<Session[]>(`/api/v1/users/${userId}/sessions`);
       },
     },
   },
@@ -187,15 +181,13 @@ export const client = {
     queryKey: (sessionId?: number) => ["sessions", sessionId] as const,
 
     post: async (payload: FormData) => {
-      return request<{
-        data: Session;
-      }>(`/api/v1/sessions`, {
+      return request<Session>(`/api/v1/sessions`, {
         payload,
       });
     },
 
     get: async (userId: number) => {
-      return request<{ data: Session[] }>(`/api/v1/users/${userId}/sessions`);
+      return request<Session[]>(`/api/v1/users/${userId}/sessions`);
     },
 
     delete: async (sessionId: number) => {
@@ -219,23 +211,17 @@ export const client = {
     queryKey: (characterId?: number) => ["characters", characterId] as const,
 
     post: async (payload: FormData) => {
-      return request<{
-        data: Character;
-      }>(`/api/v1/characters`, {
+      return request<Character>(`/api/v1/characters`, {
         payload,
       });
     },
 
     get: async (characterId: number) => {
-      return request<{
-        data: Character;
-      }>(`/api/v1/characters/${characterId}`);
+      return request<Character>(`/api/v1/characters/${characterId}`);
     },
 
     patch: async (characterId: number, payload: FormData) => {
-      return request<{
-        data: Character;
-      }>(`/api/v1/characters/${characterId}`, {
+      return request<Character>(`/api/v1/characters/${characterId}`, {
         method: "PATCH",
         payload,
       });
@@ -252,7 +238,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "slots"] as const,
 
       get: async (characterId: number) => {
-        return request<{ data: Container<WithItems>[]; total: number }>(
+        return request<Container<WithItems>[]>(
           `/api/v1/characters/${characterId}/slots`
         );
       },
@@ -263,9 +249,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "logs"] as const,
 
       get: async (characterId: number) => {
-        return request<{ data: Log[]; total: number }>(
-          `/api/v1/characters/${characterId}/logs`
-        );
+        return request<Log[]>(`/api/v1/characters/${characterId}/logs`);
       },
     },
 
@@ -274,9 +258,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "location"] as const,
 
       get: async (characterId: number) => {
-        return request<{ data: Location }>(
-          `/api/v1/characters/${characterId}/location`
-        );
+        return request<Location>(`/api/v1/characters/${characterId}/location`);
       },
     },
 
@@ -285,7 +267,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "effects"] as const,
 
       get: async (characterId: number) => {
-        return request<{ data: Effect<WithSpec>[]; total: number }>(
+        return request<Effect<WithSpec>[]>(
           `/api/v1/characters/${characterId}/effects`
         );
       },
@@ -296,7 +278,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "resources"] as const,
 
       get: async (characterId: number) => {
-        return request<{ data: Attribute<WithSpec>[]; total: number }>(
+        return request<Attribute<WithSpec>[]>(
           `/api/v1/characters/${characterId}/resources`
         );
       },
@@ -307,7 +289,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "skills"] as const,
 
       get: async (characterId: number) => {
-        return request<{ data: Attribute<WithSpec>[]; total: number }>(
+        return request<Attribute<WithSpec>[]>(
           `/api/v1/characters/${characterId}/skills`
         );
       },
@@ -318,7 +300,7 @@ export const client = {
     queryKey: (itemId: number) => ["items", itemId] as const,
 
     get: async (itemId: number) => {
-      return request<{ data: Item<WithSpec> }>(`/api/v1/items/${itemId}`);
+      return request<Item<WithSpec>>(`/api/v1/items/${itemId}`);
     },
 
     storage: {
@@ -326,9 +308,7 @@ export const client = {
         [...client.items.queryKey(itemId), "storage"] as const,
 
       get: async (itemId: number) => {
-        return request<{ data: Container<WithItems> }>(
-          `/api/v1/items/${itemId}/storage`
-        );
+        return request<Container<WithItems>>(`/api/v1/items/${itemId}/storage`);
       },
     },
   },
@@ -338,12 +318,12 @@ export const client = {
 
     get: (async (locationId?: number) => {
       if (locationId) {
-        return request<{ data: Location }>(`/api/v1/locations/${locationId}`);
+        return request<Location>(`/api/v1/locations/${locationId}`);
       }
-      return request<{ data: Location[] }>(`/api/v1/locations`);
+      return request<Location[]>(`/api/v1/locations`);
     }) as {
-      (locationId: number): Promise<ClientResp<{ data: Location }>>;
-      (): Promise<ClientResp<{ data: Location[] }>>;
+      (locationId: number): Promise<ClientResp<Location>>;
+      (): Promise<ClientResp<Location[]>>;
     },
 
     characters: {
@@ -351,7 +331,7 @@ export const client = {
         [...client.locations.queryKey(), locationId, "characters"] as const,
 
       get: async (locationId: number) => {
-        return request<{ data: Character[] }>(
+        return request<Character[]>(
           `/api/v1/locations/${locationId}/characters`
         );
       },
@@ -362,7 +342,7 @@ export const client = {
         [...client.locations.queryKey(), locationId, "exits"] as const,
 
       get: async (locationId: number) => {
-        return request<{ data: Route<WithEntry & WithExit>[] }>(
+        return request<Route<WithEntry & WithExit>[]>(
           `/api/v1/locations/${locationId}/exits`
         );
       },

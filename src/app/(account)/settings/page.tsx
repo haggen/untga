@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 import { UAParser } from "ua-parser-js";
 
+// @todo: Move this to ./src/lib/something.
 function getFormattedUserAgent(userAgent: string) {
   const { browser, os } = UAParser(userAgent);
 
@@ -28,6 +29,7 @@ function getFormattedUserAgent(userAgent: string) {
 function Sessions() {
   const queryClient = useQueryClient();
   const session = useSession();
+  const router = useRouter();
 
   const query = useQuery({
     queryKey: client.users.sessions.queryKey(session.userId),
@@ -36,15 +38,20 @@ function Sessions() {
 
   const mutation = useMutation({
     mutationFn: (sessionId: number) => client.sessions.delete(sessionId),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: client.users.sessions.queryKey(session.userId),
-      });
-      query.refetch();
+    onSuccess: async (_, sessionId) => {
+      if (session.id === sessionId) {
+        queryClient.clear();
+        router.push("/register");
+      } else {
+        await queryClient.invalidateQueries({
+          queryKey: client.users.sessions.queryKey(session.userId),
+        });
+        await query.refetch();
+      }
     },
   });
 
-  const sessions = query.data?.payload.data;
+  const sessions = query.data?.payload;
 
   return (
     <section className="flex flex-col gap-6">
@@ -87,7 +94,11 @@ function Sessions() {
                 </p>
                 <aside>
                   {session.expired ? null : (
-                    <Button size="small" variant="secondary">
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      onClick={() => mutation.mutate(session.id)}
+                    >
                       Invalidate
                     </Button>
                   )}
@@ -260,11 +271,8 @@ export default function Page() {
       </header>
 
       <Sessions />
-
       <ChangeEmail />
-
       <ChangePassword />
-
       <DeleteAccount />
     </main>
   );

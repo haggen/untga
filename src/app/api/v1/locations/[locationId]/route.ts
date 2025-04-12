@@ -18,5 +18,5 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
     throw new NotFoundError("Location not found.");
   }
 
-  return NextResponse.json({ data: location });
+  return NextResponse.json(location);
 });

@@ -30,7 +30,7 @@ export default function Page({ params }: Props) {
     queryFn: () => client.characters.get(characterId),
   });
 
-  const character = query.data?.payload.data;
+  const character = query.data?.payload;
 
   const mutation = useMutation({
     mutationFn: (payload: FormData) =>
@@ -84,7 +84,6 @@ export default function Page({ params }: Props) {
           >
             <Textarea
               rows={4}
-              required
               maxLength={256}
               placeholder="e.g. The child of a blacksmith..."
               defaultValue={character?.description ?? ""}

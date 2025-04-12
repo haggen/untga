@@ -1,47 +1,8 @@
-import { db, Prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 import * as tags from "@/static/tags";
 
-async function createLocations(
-  data: { name: string; description: string; tags: string[]; exits: string[] }[]
-) {
-  const locations = await db.location.createManyAndReturn({
-    data: data.map((location) => ({
-      name: location.name,
-      description: location.description,
-      tags: location.tags,
-    })),
-  });
-
-  const routes: Prisma.RouteUncheckedCreateInput[] = [];
-
-  data.forEach((data) => {
-    const location = locations.find((location) => location.name === data.name);
-
-    if (!location) {
-      throw new Error(`Can't find location ${data.name}.`);
-    }
-
-    data.exits.forEach((name) => {
-      const exit = locations.find((location) => location.name === name);
-
-      if (!exit) {
-        throw new Error(`Can't find location ${name}.`);
-      }
-
-      routes.push({
-        entryId: location.id,
-        exitId: exit.id,
-      });
-    });
-  });
-
-  await db.route.createManyAndReturn({
-    data: routes,
-  });
-}
-
-async function seed() {
-  const locations = [
+const data = {
+  locations: [
     {
       name: "Hearthmere Village",
       description:
@@ -117,11 +78,9 @@ async function seed() {
       tags: [tags.Hostile],
       exits: ["Hollowdeep Caverns"],
     },
-  ];
+  ],
 
-  createLocations(locations);
-
-  const items = [
+  items: [
     {
       name: "Peasant's Hood",
       description: "A simple cloth hood worn by villagers and field hands.",
@@ -293,36 +252,25 @@ async function seed() {
       description: "A gold coin. Used as currency.",
       tags: [tags.Currency],
     },
-  ];
-
-  await db.itemSpecification.createManyAndReturn({
-    data: items.map((item) => ({
-      name: item.name,
-      description: item.description,
-      tags: item.tags,
-    })),
-  });
-
-  const attributes = [
+  ],
+  attributes: [
     {
-      name: "Survivalship",
-      description: "The ability to survive in the wild.",
-      tags: [tags.Skill, tags.Survivalship],
+      name: "Navigation",
+      description:
+        "By star, map, or uncanny instinct, you discern the swiftest routes. Worn paths and forgotten shortcuts yield passage, hastening your journeys across the realm and ensuring you don't stray needlessly from the path.",
+      tags: [tags.Skill, tags.Navigation],
     },
     {
-      name: "Combat",
-      description: "Combat know-how and technique.",
-      tags: [tags.Skill, tags.Combat],
+      name: "Perception",
+      description:
+        "Few details escape your keen senses. Spot the glint of lost trinkets, the tremor of unsafe ground, or the silent threat of ambush ahead. Heightened awareness keeps you safer from hazards and may reveal unexpected opportunities.",
+      tags: [tags.Skill, tags.Perception],
     },
     {
-      name: "Crafting",
-      description: "The ability to craft items.",
-      tags: [tags.Skill, tags.Crafting],
-    },
-    {
-      name: "Foraging",
-      description: "The ability to forage for resources.",
-      tags: [tags.Skill, tags.Foraging],
+      name: "Endurance",
+      description:
+        "Miles melt away beneath tireless feet. A hardy constitution shrugs off the road's exhaustion, conserving your vital energy and letting you journey farther before rest is needed. You push onward where lesser folk would falter.",
+      tags: [tags.Skill, tags.Endurance],
     },
     {
       name: "Health",
@@ -334,14 +282,61 @@ async function seed() {
       description: "Stamina points.",
       tags: [tags.Resource, tags.Stamina],
     },
-  ];
+  ],
+};
 
-  await db.attributeSpecification.createManyAndReturn({
-    data: attributes.map((attribute) => ({
-      name: attribute.name,
-      description: attribute.description,
-      tags: attribute.tags,
-    })),
+async function seed() {
+  await db.$transaction(async (tx) => {
+    const locations = await tx.location.createManyAndReturn({
+      data: data.locations.map((location) => ({
+        name: location.name,
+        description: location.description,
+        tags: location.tags,
+      })),
+    });
+
+    await tx.route.createManyAndReturn({
+      data: data.locations
+        .map((data) => {
+          const location = locations.find(
+            (location) => location.name === data.name
+          );
+
+          if (!location) {
+            throw new Error(`Can't find location ${data.name}.`);
+          }
+
+          return data.exits.map((name) => {
+            const exit = locations.find((location) => location.name === name);
+
+            if (!exit) {
+              throw new Error(`Can't find location ${name}.`);
+            }
+
+            return {
+              entryId: location.id,
+              exitId: exit.id,
+            };
+          });
+        })
+        .flat(),
+    });
+
+    await tx.itemSpecification.createManyAndReturn({
+      data: data.items.map((item) => ({
+        name: item.name,
+        description: item.description,
+        tags: item.tags,
+      })),
+    });
+
+    await tx.attributeSpecification.createManyAndReturn({
+      data: data.attributes.map((attribute) => ({
+        name: attribute.name,
+        description: attribute.description,
+        tags: attribute.tags,
+      })),
+    });
   });
 }
 

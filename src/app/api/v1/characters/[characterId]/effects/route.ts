@@ -3,8 +3,7 @@ import { db, Prisma } from "@/lib/db";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
-export const GET = withMiddleware(withErrorHandling(), async (context) => {
-  const { params } = context;
+export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
   const { characterId } = parse(params, {
     characterId: schemas.id,
   });
@@ -22,5 +21,7 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
 
   const total = await db.effect.count({ where });
 
-  return NextResponse.json({ data: effects, total });
+  return NextResponse.json(effects, {
+    headers: { "X-Total": total.toString() },
+  });
 });

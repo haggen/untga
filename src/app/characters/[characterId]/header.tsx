@@ -10,7 +10,7 @@ export function Header({ characterId }: { characterId: number }) {
     queryFn: () => client.characters.get(characterId),
   });
 
-  const character = data?.payload.data;
+  const character = data?.payload;
 
   return (
     <header className="flex flex-col gap-1.5">
@@ -36,7 +36,7 @@ export function Header({ characterId }: { characterId: number }) {
       <p>
         {isLoading
           ? "Loading..."
-          : character?.description ?? "No description available."}
+          : character?.description || "No description available."}
       </p>
     </header>
   );

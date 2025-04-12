@@ -14,7 +14,7 @@ function Journal({ characterId }: { characterId: number }) {
     queryFn: () => client.characters.logs.get(characterId),
   });
 
-  const logs = query.data?.payload.data ?? [];
+  const logs = query.data?.payload ?? [];
 
   return (
     <section className="flex flex-col gap-1.5">

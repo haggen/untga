@@ -25,7 +25,7 @@ export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
     throw new NotFoundError();
   }
 
-  return NextResponse.json({ data: character });
+  return NextResponse.json(character);
 });
 
 export const PATCH = withMiddleware(
@@ -44,6 +44,6 @@ export const PATCH = withMiddleware(
       data: { description },
     });
 
-    return NextResponse.json({ data: character });
+    return NextResponse.json(character);
   }
 );

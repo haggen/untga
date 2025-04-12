@@ -20,8 +20,8 @@ function Summary({ characterId }: { characterId: number }) {
     queryFn: () => client.characters.resources.get(characterId),
   });
 
-  const character = characterQuery.data?.payload.data;
-  const resources = resourcesQuery.data?.payload.data ?? [];
+  const character = characterQuery.data?.payload;
+  const resources = resourcesQuery.data?.payload ?? [];
 
   return (
     <section className="flex flex-col gap-1.5">
@@ -58,7 +58,7 @@ function Skills({ characterId }: { characterId: number }) {
     queryFn: () => client.characters.skills.get(characterId),
   });
 
-  const skills = data?.payload.data ?? [];
+  const skills = data?.payload ?? [];
 
   return (
     <section className="flex flex-col gap-1.5">

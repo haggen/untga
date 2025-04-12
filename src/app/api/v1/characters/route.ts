@@ -45,6 +45,6 @@ export const POST = withMiddleware(
       },
     });
 
-    return NextResponse.json({ data: character }, { status: 201 });
+    return NextResponse.json(character, { status: 201 });
   }
 );

@@ -23,5 +23,7 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
     where: { entry: { id: locationId } },
   });
 
-  return NextResponse.json({ data: location.exits, total });
+  return NextResponse.json(location.exits, {
+    headers: { "X-Total": total.toString() },
+  });
 });

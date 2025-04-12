@@ -92,7 +92,6 @@ export default function Page() {
           >
             <Textarea
               rows={4}
-              required
               maxLength={256}
               placeholder="e.g. The child of a blacksmith..."
             />

@@ -11,12 +11,10 @@ import { use } from "react";
 import { Header } from "../header";
 
 function Equipment({ characterId }: { characterId: number }) {
-  const { data } = useQuery({
+  const { data: { payload: slots } = {} } = useQuery({
     queryKey: client.characters.slots.queryKey(characterId),
     queryFn: () => client.characters.slots.get(characterId),
   });
-
-  const slots = data?.payload.data;
 
   return (
     <section className="flex flex-col gap-1.5">
@@ -40,7 +38,7 @@ function Equipment({ characterId }: { characterId: number }) {
 }
 
 function Storage({ characterId }: { characterId: number }) {
-  const { data: { payload: { data: slots } = {} } = {} } = useQuery({
+  const { data: { payload: slots } = {} } = useQuery({
     queryKey: [...client.characters.slots.queryKey(characterId)],
     queryFn: () => client.characters.slots.get(characterId),
   });
@@ -49,12 +47,11 @@ function Storage({ characterId }: { characterId: number }) {
   const backpack = slot?.items[0];
   const backpackId = backpack?.id ?? 0;
 
-  const { data: { payload: { data: storage } = {} } = {}, isLoading } =
-    useQuery({
-      queryKey: client.items.storage.queryKey(backpackId),
-      queryFn: () => client.items.storage.get(backpackId),
-      enabled: !!backpack,
-    });
+  const { data: { payload: storage } = {}, isLoading } = useQuery({
+    queryKey: client.items.storage.queryKey(backpackId),
+    queryFn: () => client.items.storage.get(backpackId),
+    enabled: !!backpack,
+  });
 
   return (
     <section className="flex flex-col gap-1.5">

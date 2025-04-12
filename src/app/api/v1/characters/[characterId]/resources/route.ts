@@ -24,5 +24,7 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
 
   const total = await db.attribute.count({ where });
 
-  return NextResponse.json({ data: attributes, total });
+  return NextResponse.json(attributes, {
+    headers: { "X-Total": total.toString() },
+  });
 });

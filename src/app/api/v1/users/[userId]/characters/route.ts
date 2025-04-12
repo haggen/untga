@@ -19,5 +19,7 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
 
   const total = await db.character.count({ where });
 
-  return NextResponse.json({ data: characters, total });
+  return NextResponse.json(characters, {
+    headers: { "X-Total": total.toString() },
+  });
 });

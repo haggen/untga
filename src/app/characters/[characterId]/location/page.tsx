@@ -15,7 +15,7 @@ function Location({ locationId }: { locationId: number }) {
     queryFn: () => client.locations.get(locationId),
   });
 
-  const location = query.data?.payload.data;
+  const location = query.data?.payload;
 
   return (
     <section className="flex flex-col gap-1.5">
@@ -37,7 +37,7 @@ function Characters({ locationId }: { locationId: number }) {
     queryFn: () => client.locations.characters.get(locationId),
   });
 
-  const characters = query.data?.payload.data ?? [];
+  const characters = query.data?.payload ?? [];
 
   return (
     <section className="flex flex-col gap-1.5">
@@ -62,7 +62,7 @@ function Exits({ locationId }: { locationId: number }) {
     queryFn: () => client.locations.exits.get(locationId),
   });
 
-  const routes = query.data?.payload.data ?? [];
+  const routes = query.data?.payload ?? [];
 
   return (
     <section className="flex flex-col gap-1.5">
@@ -95,7 +95,7 @@ export default function Page({ params }: Props) {
     queryFn: () => client.characters.get(characterId),
   });
 
-  const { locationId } = query.data?.payload.data ?? {};
+  const { locationId } = query.data?.payload ?? {};
 
   if (!locationId) {
     return (

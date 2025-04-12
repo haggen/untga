@@ -22,5 +22,5 @@ export const GET = withMiddleware(withErrorHandling(), async (context) => {
     throw new NotFoundError("Container not found.");
   }
 
-  return NextResponse.json({ data: container });
+  return NextResponse.json(container);
 });
