@@ -2,7 +2,6 @@ import { db, Session } from "@/lib/db";
 import { UnauthorizedError } from "@/lib/error";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import "server-only";
 
 const cookieId = "session";
 

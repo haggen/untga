@@ -5,34 +5,31 @@ import { setActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
-export const POST = withMiddleware(
-  withErrorHandling(),
-  async ({ request: req }) => {
-    const payload = parse(await req.json(), {
-      email: schemas.email,
-      password: schemas.password,
-    });
+export const POST = withMiddleware(withErrorHandling(), async ({ request }) => {
+  const payload = parse(await request.json(), {
+    email: schemas.email,
+    password: schemas.password,
+  });
 
-    const user = await db.user.create({
-      data: {
-        email: payload.email,
-        password: payload.password,
-      },
-      omit: {
-        password: true,
-      },
-    });
+  const user = await db.user.create({
+    data: {
+      email: payload.email,
+      password: payload.password,
+    },
+    omit: {
+      password: true,
+    },
+  });
 
-    const session = await db.session.create({
-      data: {
-        userId: user.id,
-        ip: getRemoteAddr(req),
-        userAgent: getUserAgent(req),
-      },
-    });
+  const session = await db.session.create({
+    data: {
+      userId: user.id,
+      ip: getRemoteAddr(request),
+      userAgent: getUserAgent(request),
+    },
+  });
 
-    await setActiveSession(session);
+  await setActiveSession(session);
 
-    return NextResponse.json(user, { status: 201 });
-  }
-);
+  return NextResponse.json(user, { status: 201 });
+});
