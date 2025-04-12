@@ -14,7 +14,7 @@ RUN npm ci
 EXPOSE 3000
 
 # Sets the environment.
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Copy the rest of the application code.
 COPY . .
