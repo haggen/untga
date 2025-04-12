@@ -1,4 +1,5 @@
 import {
+  BadRequestError,
   ForbiddenError,
   GameStateError,
   NotFoundError,
@@ -51,6 +52,10 @@ export function withErrorHandling() {
     } catch (error) {
       if (isRedirectError(error)) {
         throw error;
+      }
+
+      if (error instanceof BadRequestError) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
       }
 
       if (error instanceof UnauthorizedError) {

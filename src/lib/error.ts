@@ -1,6 +1,15 @@
 /**
  * ...
  */
+export class BadRequestError extends Error {
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message ?? "Request is malformed.", options);
+  }
+}
+
+/**
+ * ...
+ */
 export class ForbiddenError extends Error {
   constructor(message?: string, options?: ErrorOptions) {
     super(message ?? "That is forbidden.", options);
