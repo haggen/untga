@@ -1,4 +1,8 @@
+# Docker files.
 compose*.yml
 Dockerfile
-node_modules
+
+# Generated artifacts.
+node_modules 
 .next
+prisma/client

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prestart:development": "test -d node_modules || npm ci",
+    "prestart:development": "test -d node_modules || npm ci; test -d prisma/client || prisma generate",
     "start": "npm run start:${NODE_ENV:-development}",
     "start:development": "next dev --turbo",
     "start:production": "next start",
