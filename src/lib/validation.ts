@@ -10,11 +10,13 @@ export const schemas = {
   password: z.string().trim().min(12),
 };
 
+type Payload = FormData | URLSearchParams | Record<string, unknown>;
+
 /**
  * Parse payload using a schema.
  */
-export function parse<Shape extends z.ZodRawShape>(
-  payload: unknown,
+export function parse<P extends Payload, Shape extends z.ZodRawShape>(
+  payload: P,
   shape: Shape
 ) {
   return z
@@ -28,7 +30,7 @@ export function parse<Shape extends z.ZodRawShape>(
             : payload instanceof URLSearchParams
             ? payload.get(key) ?? undefined
             : typeof payload === "object" && payload !== null
-            ? (payload as Record<string, unknown>)[key]
+            ? payload[key]
             : undefined,
         ])
       )
