@@ -1,8 +1,8 @@
-import { Button } from "@/components/Button";
-import { Heading } from "@/components/Heading";
-import { client } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { Button } from "~/components/Button";
+import { Heading } from "~/components/Heading";
+import { client } from "~/lib/client";
 
 export function Header({ characterId }: { characterId: number }) {
   const { data, isLoading } = useQuery({

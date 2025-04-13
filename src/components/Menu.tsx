@@ -1,7 +1,7 @@
-import { Slot } from "@/components/Slot";
 import Link from "next/link";
 import { HTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
+import { Slot } from "~/components/Slot";
 
 type MenuProps = HTMLAttributes<HTMLElement> & {
   asChild?: boolean;

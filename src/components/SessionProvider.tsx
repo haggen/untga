@@ -1,7 +1,7 @@
 "use client";
 
-import { Session } from "@/lib/db";
 import { createContext, ReactNode, useContext } from "react";
+import { Session } from "~/lib/db";
 
 type Value = Session<{ include: { user: { omit: { password: true } } } }>;
 

@@ -1,15 +1,15 @@
 "use client";
 
-import { Alert } from "@/components/Alert";
-import { Button } from "@/components/Button";
-import { Field } from "@/components/Field";
-import { Heading } from "@/components/Heading";
-import { Input } from "@/components/Input";
-import { client } from "@/lib/client";
-import { Session } from "@/lib/db";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
+import { Alert } from "~/components/Alert";
+import { Button } from "~/components/Button";
+import { Field } from "~/components/Field";
+import { Heading } from "~/components/Heading";
+import { Input } from "~/components/Input";
+import { client } from "~/lib/client";
+import { Session } from "~/lib/db";
 
 export default function Page() {
   const router = useRouter();

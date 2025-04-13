@@ -1,4 +1,4 @@
-import { BadRequestError } from "@/lib/error";
+import { BadRequestError } from "~/lib/error";
 
 export function getRemoteAddr(request: Request) {
   // I'm assuming it's behind a proxy that sets this header and that I can trust it.

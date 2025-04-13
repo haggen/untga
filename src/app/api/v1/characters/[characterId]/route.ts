@@ -1,9 +1,9 @@
-import { withErrorHandling, withMiddleware } from "@/lib/api";
-import { db } from "@/lib/db";
-import { NotFoundError } from "@/lib/error";
-import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { db } from "~/lib/db";
+import { NotFoundError } from "~/lib/error";
+import { parse, schemas } from "~/lib/validation";
 
 export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
   const { characterId } = parse(params, {

@@ -1,6 +1,6 @@
-import { Link } from "@/components/Link";
 import { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
+import { Link } from "~/components/Link";
 
 type TabProps = ComponentProps<"li"> & {
   href: string;

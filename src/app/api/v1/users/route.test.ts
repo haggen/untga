@@ -1,6 +1,6 @@
-import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { afterAll, expect, test } from "vitest";
+import { db } from "~/lib/db";
 import { POST } from "./route";
 
 afterAll(async () => {

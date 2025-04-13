@@ -1,8 +1,3 @@
-import { SessionProvider } from "@/components/SessionProvider";
-import { Tab } from "@/components/Tab";
-import { serializable } from "@/lib/serializable";
-import { requireActiveSession } from "@/lib/session";
-import { parse, schemas } from "@/lib/validation";
 import {
   BookOpenTextIcon,
   PackageOpenIcon,
@@ -10,6 +5,11 @@ import {
   UserCircleIcon,
 } from "lucide-react";
 import { ReactNode } from "react";
+import { SessionProvider } from "~/components/SessionProvider";
+import { Tab } from "~/components/Tab";
+import { serializable } from "~/lib/serializable";
+import { requireActiveSession } from "~/lib/session";
+import { parse, schemas } from "~/lib/validation";
 
 type Props = {
   params: Promise<{ characterId: string }>;

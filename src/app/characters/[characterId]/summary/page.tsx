@@ -1,12 +1,12 @@
 "use client";
 
-import { Alert } from "@/components/Alert";
-import { Definition } from "@/components/Definition";
-import { Heading } from "@/components/Heading";
-import { client } from "@/lib/client";
-import { parse, schemas } from "@/lib/validation";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { Alert } from "~/components/Alert";
+import { Definition } from "~/components/Definition";
+import { Heading } from "~/components/Heading";
+import { client } from "~/lib/client";
+import { parse, schemas } from "~/lib/validation";
 import { Header } from "../header";
 
 function Summary({ characterId }: { characterId: number }) {

@@ -1,9 +1,9 @@
-import { withErrorHandling, withMiddleware } from "@/lib/api";
-import { db } from "@/lib/db";
-import { getBody, getRemoteAddr, getUserAgent } from "@/lib/request";
-import { setActiveSession } from "@/lib/session";
-import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
+import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { db } from "~/lib/db";
+import { getBody, getRemoteAddr, getUserAgent } from "~/lib/request";
+import { setActiveSession } from "~/lib/session";
+import { parse, schemas } from "~/lib/validation";
 
 export const POST = withMiddleware(withErrorHandling(), async ({ request }) => {
   const payload = parse(await getBody(request), {

@@ -1,7 +1,7 @@
-import { db, Session } from "@/lib/db";
-import { UnauthorizedError } from "@/lib/error";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { db, Session } from "~/lib/db";
+import { UnauthorizedError } from "~/lib/error";
 
 const cookieId = "session";
 

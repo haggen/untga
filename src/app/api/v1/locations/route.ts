@@ -1,6 +1,6 @@
-import { withErrorHandling, withMiddleware } from "@/lib/api";
-import { db, Prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { db, Prisma } from "~/lib/db";
 
 export const GET = withMiddleware(withErrorHandling(), async () => {
   const where: Prisma.LocationWhereInput = {};

@@ -1,19 +1,19 @@
 "use client";
 
-import { Alert } from "@/components/Alert";
-import { Button } from "@/components/Button";
-import { Field } from "@/components/Field";
-import { Geolocation } from "@/components/Geolocation";
-import { Heading } from "@/components/Heading";
-import { Input } from "@/components/Input";
-import { Menu } from "@/components/Menu";
-import { useSession } from "@/components/SessionProvider";
-import { client } from "@/lib/client";
-import { format } from "@/lib/format";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 import { UAParser } from "ua-parser-js";
+import { Alert } from "~/components/Alert";
+import { Button } from "~/components/Button";
+import { Field } from "~/components/Field";
+import { Geolocation } from "~/components/Geolocation";
+import { Heading } from "~/components/Heading";
+import { Input } from "~/components/Input";
+import { Menu } from "~/components/Menu";
+import { useSession } from "~/components/SessionProvider";
+import { client } from "~/lib/client";
+import { format } from "~/lib/format";
 
 // @todo: Move this to ./src/lib/something.
 function getFormattedUserAgent(userAgent: string) {

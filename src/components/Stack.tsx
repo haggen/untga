@@ -1,6 +1,6 @@
-import { Slot } from "@/components/Slot";
 import { ReactNode } from "react";
 import { tv } from "tailwind-variants";
+import { Slot } from "~/components/Slot";
 
 const variants = tv({
   base: "flex flex-col",

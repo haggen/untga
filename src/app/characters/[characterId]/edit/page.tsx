@@ -1,17 +1,17 @@
 "use client";
 
-import { Alert } from "@/components/Alert";
-import { Button } from "@/components/Button";
-import { Field } from "@/components/Field";
-import { Heading } from "@/components/Heading";
-import { Input } from "@/components/Input";
-import { useSession } from "@/components/SessionProvider";
-import { Textarea } from "@/components/Textarea";
-import { client } from "@/lib/client";
-import { parse, schemas } from "@/lib/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent, use } from "react";
+import { Alert } from "~/components/Alert";
+import { Button } from "~/components/Button";
+import { Field } from "~/components/Field";
+import { Heading } from "~/components/Heading";
+import { Input } from "~/components/Input";
+import { useSession } from "~/components/SessionProvider";
+import { Textarea } from "~/components/Textarea";
+import { client } from "~/lib/client";
+import { parse, schemas } from "~/lib/validation";
 
 type Props = {
   params: Promise<{ characterId: string }>;

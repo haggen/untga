@@ -1,12 +1,12 @@
 "use client";
 
-import { State, StatefulAction } from "@/lib/actions";
 import {
   ComponentProps,
   createContext,
   ReactNode,
   useActionState,
 } from "react";
+import { State, StatefulAction } from "~/lib/actions";
 
 type Props<T extends State> = Omit<
   ComponentProps<"form">,

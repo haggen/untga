@@ -1,8 +1,8 @@
-import { withErrorHandling, withMiddleware } from "@/lib/api";
-import { db, Prisma } from "@/lib/db";
-import { parse, schemas } from "@/lib/validation";
-import * as tags from "@/static/tags";
 import { NextResponse } from "next/server";
+import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { db, Prisma } from "~/lib/db";
+import { parse, schemas } from "~/lib/validation";
+import * as tags from "~/static/tags";
 
 export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
   const { characterId } = parse(params, {

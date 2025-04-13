@@ -1,10 +1,10 @@
 "use client";
 
-import { Heading } from "@/components/Heading";
-import { Menu } from "@/components/Menu";
-import { useSession } from "@/components/SessionProvider";
-import { client } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
+import { Heading } from "~/components/Heading";
+import { Menu } from "~/components/Menu";
+import { useSession } from "~/components/SessionProvider";
+import { client } from "~/lib/client";
 
 export default function Page() {
   const session = useSession();

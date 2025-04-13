@@ -1,14 +1,14 @@
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { NextRequest, NextResponse } from "next/server";
+import z, { ZodError } from "zod";
 import {
   BadRequestError,
   ForbiddenError,
   GameStateError,
   NotFoundError,
   UnauthorizedError,
-} from "@/lib/error";
-import { getBody } from "@/lib/request";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { NextRequest, NextResponse } from "next/server";
-import z, { ZodError } from "zod";
+} from "~/lib/error";
+import { getBody } from "~/lib/request";
 
 export type Context<State> = {
   request: NextRequest;

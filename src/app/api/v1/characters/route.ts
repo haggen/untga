@@ -1,11 +1,11 @@
-import { withErrorHandling, withMiddleware } from "@/lib/api";
-import { db } from "@/lib/db";
-import { UnauthorizedError } from "@/lib/error";
-import { requireActiveSession } from "@/lib/session";
-import { parse, schemas } from "@/lib/validation";
-import * as tags from "@/static/tags";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { db } from "~/lib/db";
+import { UnauthorizedError } from "~/lib/error";
+import { requireActiveSession } from "~/lib/session";
+import { parse, schemas } from "~/lib/validation";
+import * as tags from "~/static/tags";
 
 export const POST = withMiddleware(
   withErrorHandling(),

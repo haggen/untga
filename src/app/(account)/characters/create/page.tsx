@@ -1,19 +1,19 @@
 "use client";
 
-import { Alert } from "@/components/Alert";
-import { Button } from "@/components/Button";
-import { Field } from "@/components/Field";
-import { Heading } from "@/components/Heading";
-import { Input } from "@/components/Input";
-import { useSession } from "@/components/SessionProvider";
-import { Textarea } from "@/components/Textarea";
-import { client } from "@/lib/client";
-import { draw } from "@/lib/random";
-import { characters } from "@/static/names";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useRef } from "react";
+import { Alert } from "~/components/Alert";
+import { Button } from "~/components/Button";
+import { Field } from "~/components/Field";
+import { Heading } from "~/components/Heading";
+import { Input } from "~/components/Input";
+import { useSession } from "~/components/SessionProvider";
+import { Textarea } from "~/components/Textarea";
+import { client } from "~/lib/client";
+import { draw } from "~/lib/random";
+import { characters } from "~/static/names";
 
 export default function Page() {
   const session = useSession();

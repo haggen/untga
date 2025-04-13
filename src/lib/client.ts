@@ -9,7 +9,7 @@ import type {
   Route,
   Session,
   User,
-} from "@/lib/db";
+} from "~/lib/db";
 
 export {
   Attribute,

@@ -1,5 +1,5 @@
-import { db } from "@/lib/db";
-import * as tags from "@/static/tags";
+import { db } from "~/lib/db";
+import * as tags from "~/static/tags";
 
 const data = {
   locations: [

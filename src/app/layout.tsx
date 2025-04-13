@@ -1,8 +1,8 @@
-import QueryClientProvider from "@/components/QueryClientProvider";
 import type { Metadata } from "next";
 import { Cabin, Macondo } from "next/font/google";
 import Link from "next/link";
 import { ReactNode } from "react";
+import QueryClientProvider from "~/components/QueryClientProvider";
 
 import "./global.css";
 

@@ -1,11 +1,11 @@
-import { Prisma, PrismaClient } from "@/../prisma/client";
-import * as tags from "@/static/tags";
 import type {
   Operation,
   PrismaClientOptions,
 } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
+import { Prisma, PrismaClient } from "~/../prisma/client";
+import * as tags from "~/static/tags";
 
 export { Prisma };
 

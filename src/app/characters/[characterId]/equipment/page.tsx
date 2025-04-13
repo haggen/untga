@@ -1,13 +1,13 @@
 "use client";
 
-import { Alert } from "@/components/Alert";
-import { Definition } from "@/components/Definition";
-import { Heading } from "@/components/Heading";
-import { client } from "@/lib/client";
-import { parse, schemas } from "@/lib/validation";
-import * as tags from "@/static/tags";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { Alert } from "~/components/Alert";
+import { Definition } from "~/components/Definition";
+import { Heading } from "~/components/Heading";
+import { client } from "~/lib/client";
+import { parse, schemas } from "~/lib/validation";
+import * as tags from "~/static/tags";
 import { Header } from "../header";
 
 function Equipment({ characterId }: { characterId: number }) {

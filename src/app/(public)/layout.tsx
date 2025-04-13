@@ -1,6 +1,6 @@
-import { Tab } from "@/components/Tab";
 import { ClipboardSignatureIcon, KeyIcon, LogInIcon } from "lucide-react";
 import { ReactNode } from "react";
+import { Tab } from "~/components/Tab";
 
 type Props = {
   children: ReactNode;

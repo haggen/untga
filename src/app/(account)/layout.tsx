@@ -1,9 +1,9 @@
-import { SessionProvider } from "@/components/SessionProvider";
-import { Tab } from "@/components/Tab";
-import { serializable } from "@/lib/serializable";
-import { requireActiveSession } from "@/lib/session";
 import { CogIcon, UsersIcon } from "lucide-react";
 import { ReactNode } from "react";
+import { SessionProvider } from "~/components/SessionProvider";
+import { Tab } from "~/components/Tab";
+import { serializable } from "~/lib/serializable";
+import { requireActiveSession } from "~/lib/session";
 
 type Props = {
   children: ReactNode;
