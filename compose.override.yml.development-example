@@ -1,8 +1,10 @@
 services:
   app:
-    develop: &develop
+    develop:
       watch:
-        - action: sync
+        - # x-initialSync was introduced in v2.29.2 but it doesn't seem to be documented.
+          x-initialSync: true
+          action: sync
           path: .
           target: /app
           ignore:
@@ -16,15 +18,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.untga.rule=Host(`untga.local.crz.li`)"
-  test:
-    develop: *develop
-    build: .
-    depends_on:
-      - db
-    environment:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://app:0123456789abcdef@db/test
-    command: npm test
   db:
     ports: 
       # Support local connections to the database.
