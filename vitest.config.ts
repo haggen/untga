@@ -8,5 +8,6 @@ export default defineConfig({
     typecheck: {
       enabled: true,
     },
+    setupFiles: "./src/testing/setup.ts",
   },
 });
