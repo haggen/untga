@@ -13,6 +13,7 @@
     "fix": "next lint --fix && tsc --noEmit",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "pretest": "test test = \"$NODE_ENV\" || exit 1; prisma migrate reset --force",
     "test": "vitest"
   },
   "prisma": {
