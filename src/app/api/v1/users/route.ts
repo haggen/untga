@@ -1,12 +1,12 @@
 import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
-import { getRemoteAddr, getUserAgent } from "@/lib/request";
+import { getBody, getRemoteAddr, getUserAgent } from "@/lib/request";
 import { setActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
 export const POST = withMiddleware(withErrorHandling(), async ({ request }) => {
-  const payload = parse(await request.json(), {
+  const payload = parse(await getBody(request), {
     email: schemas.email,
     password: schemas.password,
   });
