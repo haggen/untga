@@ -1,4 +1,4 @@
-name: Code checks
+name: Code quality control
 
 on:
   - push
@@ -6,7 +6,7 @@ on:
 
 jobs:
   checks:
-    name: Lint, type checking, build and CodeQL
+    name: Linting, type checking, tests, build and CodeQL
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: 23
       - run: npm ci
+      - run: npm test
       - run: npm run build
       - uses: github/codeql-action/init@v3
         with:
