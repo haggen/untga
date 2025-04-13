@@ -5,48 +5,54 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "@/lib/error";
+import { getBody } from "@/lib/request";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { NextRequest, NextResponse } from "next/server";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 
-export type Context<S = unknown> = {
+export type Context<State> = {
   request: NextRequest;
   params: unknown;
-  state: S;
+  state: State;
   next: () => Promise<NextResponse>;
 };
 
-export type Handler<S> = (context: Context<S>) => Promise<NextResponse>;
+export type Handler<State> = (context: Context<State>) => Promise<NextResponse>;
 
-export type Middleware<S> = (...arg: unknown[]) => Handler<S>;
+// export type Middleware<S> = (...arg: unknown[]) => Handler<S>;
 
-export function withMiddleware<S>(...handlers: Handler<S>[]) {
-  const initial = async () => {
-    throw new Error("Handler chain ended without producing a response.");
-  };
+const initial = async () => {
+  throw new Error("Handler chain ended without producing a response.");
+};
 
-  return async (req: NextRequest, extra: { params: Promise<unknown> }) => {
+export function withMiddleware<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  State = any,
+  H extends ReadonlyArray<Handler<State>> = ReadonlyArray<Handler<State>>
+>(...handlers: H) {
+  return async (request: NextRequest, extra: { params: Promise<unknown> }) => {
     const params = await extra.params;
 
-    const context: Context<S> = {
-      request: req,
+    const context = {
+      request,
       params,
-      state: {} as S,
+      state: {} as State,
       next: initial,
     };
 
-    const chain = handlers.reduceRight((next, handler: Handler<S>) => {
-      return async (context: Context<S>) => {
-        return await handler({ ...context, next: () => next(context) });
-      };
-    }, initial);
+    const chain = handlers.reduceRight<Handler<State>>(
+      (next, handler) => (context) =>
+        handler({ ...context, next: () => next(context) }),
+
+      initial
+    );
 
     return await chain(context);
   };
 }
 
 export function withErrorHandling() {
-  return async ({ next }: Context) => {
+  return async ({ next }: Context<unknown>) => {
     try {
       return await next();
     } catch (error) {
@@ -92,5 +98,15 @@ export function withErrorHandling() {
         { status: 500 }
       );
     }
+  };
+}
+
+export function withPayload<Shape extends z.ZodRawShape>(shape: Shape) {
+  return async (context: Context<{ payload: z.infer<z.ZodObject<Shape>> }>) => {
+    const payload = await getBody(context.request);
+
+    context.state.payload = z.object(shape).parse(payload);
+
+    return await context.next();
   };
 }
