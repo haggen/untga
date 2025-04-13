@@ -9,7 +9,7 @@ export function getUserAgent(request: Request) {
   return request.headers.get("user-agent") ?? "";
 }
 
-export function getBody(request: Request) {
+export async function getBody(request: Request) {
   const contentType = request.headers.get("content-type");
 
   if (!contentType) {
@@ -18,7 +18,7 @@ export function getBody(request: Request) {
 
   if (contentType.includes("application/json")) {
     try {
-      return request.json();
+      return await request.json();
     } catch (error) {
       throw new BadRequestError("Could not parse JSON.", { cause: error });
     }
@@ -26,7 +26,7 @@ export function getBody(request: Request) {
 
   if (contentType.includes("application/x-www-form-urlencoded")) {
     try {
-      return request.formData();
+      return await request.formData();
     } catch (error) {
       throw new BadRequestError("Could not parse form data.", { cause: error });
     }
