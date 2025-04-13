@@ -2,7 +2,12 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "./client"
+  // Prisma is deprecating automatic generation in node_modules
+  // and instead requiring the developer to specify the output 
+  // directory. But while trying out Prismock, I found that 
+  // they still rely on the old behavior. Se I'm holding out 
+  // on this change.
+  // output   = "./client"
 }
 
 datasource db {
