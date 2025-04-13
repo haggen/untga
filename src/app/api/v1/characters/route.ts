@@ -1,7 +1,7 @@
 import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
 import { UnauthorizedError } from "@/lib/error";
-import { getActiveSessionOrThrow } from "@/lib/session";
+import { requireActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import * as tags from "@/static/tags";
 import { NextResponse } from "next/server";
@@ -16,7 +16,7 @@ export const POST = withMiddleware(
       description: z.string().max(256).optional(),
     });
 
-    const session = await getActiveSessionOrThrow();
+    const session = await requireActiveSession();
 
     if (session.userId !== payload.userId) {
       throw new UnauthorizedError(

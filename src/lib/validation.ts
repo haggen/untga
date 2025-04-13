@@ -11,7 +11,17 @@ export const schemas = {
 };
 
 /**
- * Parse payload using a schema.
+ * Guard that the value is an object and is indexable by the given key.
+ */
+function isIndexable<T extends string>(
+  key: T,
+  value: unknown
+): value is { [key in T]: unknown } {
+  return typeof value === "object" && value !== null && key in value;
+}
+
+/**
+ * Parse some payload using a given schema.
  */
 export function parse<Shape extends z.ZodRawShape>(
   payload: unknown,
@@ -27,7 +37,7 @@ export function parse<Shape extends z.ZodRawShape>(
             ? payload.get(key) ?? undefined
             : payload instanceof URLSearchParams
             ? payload.get(key) ?? undefined
-            : typeof payload === "object" && payload !== null
+            : isIndexable(key, payload)
             ? payload[key]
             : undefined,
         ])

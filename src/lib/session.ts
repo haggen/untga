@@ -6,7 +6,8 @@ import { redirect } from "next/navigation";
 const cookieId = "session";
 
 export async function getActiveSessionSecret() {
-  return (await cookies()).get(cookieId)?.value;
+  const store = await cookies();
+  return store.get(cookieId)?.value;
 }
 
 export async function getActiveSession() {
@@ -22,36 +23,37 @@ export async function getActiveSession() {
   });
 }
 
-export async function getActiveSessionOrThrow() {
+export async function requireActiveSession(recover = false) {
   const session = await getActiveSession();
 
   if (!session) {
+    if (recover) {
+      redirect("/login");
+    }
     throw new UnauthorizedError();
   }
 
   return session;
 }
 
-export async function getActiveSessionOrRedirect() {
-  const session = await getActiveSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  return session;
-}
-
-export async function setActiveSession(session: Session) {
-  (await cookies()).set(cookieId, session.secret, {
+export function createCookie(session: Session) {
+  return {
+    name: cookieId,
+    value: session.secret,
     expires: session.expiresAt,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-  });
+  } as const;
 }
 
-export async function clearActiveSession() {
-  (await cookies()).delete(cookieId);
+export async function setActiveSession(session: Session) {
+  const store = await cookies();
+  store.set(createCookie(session));
+}
+
+export async function unsetActiveSession() {
+  const store = await cookies();
+  store.delete(cookieId);
 }

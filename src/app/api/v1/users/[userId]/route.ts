@@ -1,7 +1,7 @@
 import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
 import { NotFoundError, UnauthorizedError } from "@/lib/error";
-import { getActiveSessionOrThrow } from "@/lib/session";
+import { requireActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
@@ -10,7 +10,7 @@ export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
     userId: schemas.id,
   });
 
-  const session = await getActiveSessionOrThrow();
+  const session = await requireActiveSession();
 
   if (userId !== session.userId) {
     throw new UnauthorizedError();
@@ -42,7 +42,7 @@ export const PATCH = withMiddleware(
       password: schemas.password.optional(),
     });
 
-    const session = await getActiveSessionOrThrow();
+    const session = await requireActiveSession();
 
     if (userId !== session.userId) {
       throw new UnauthorizedError();
@@ -70,7 +70,7 @@ export const DELETE = withMiddleware(
       userId: schemas.id,
     });
 
-    const session = await getActiveSessionOrThrow();
+    const session = await requireActiveSession();
 
     if (userId !== session.userId) {
       throw new UnauthorizedError();

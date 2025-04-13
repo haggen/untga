@@ -1,10 +1,10 @@
 import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
-import { getActiveSessionOrThrow } from "@/lib/session";
+import { requireActiveSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 
 export const GET = withMiddleware(withErrorHandling(), async () => {
-  const { userId } = await getActiveSessionOrThrow();
+  const { userId } = await requireActiveSession();
 
   const where = { userId };
 

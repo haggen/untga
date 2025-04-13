@@ -1,7 +1,7 @@
 import { SessionProvider } from "@/components/SessionProvider";
 import { Tab } from "@/components/Tab";
 import { serializable } from "@/lib/serializable";
-import { getActiveSessionOrRedirect } from "@/lib/session";
+import { requireActiveSession } from "@/lib/session";
 import { CogIcon, UsersIcon } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default async function Layout({ children }: Props) {
-  const session = await getActiveSessionOrRedirect();
+  const session = await requireActiveSession(true);
 
   return (
     <SessionProvider session={serializable(session)}>

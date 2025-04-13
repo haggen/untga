@@ -1,7 +1,7 @@
 import { withErrorHandling, withMiddleware } from "@/lib/api";
 import { db } from "@/lib/db";
 import { NotFoundError, UnauthorizedError } from "@/lib/error";
-import { clearActiveSession, getActiveSessionOrThrow } from "@/lib/session";
+import { requireActiveSession, unsetActiveSession } from "@/lib/session";
 import { parse, schemas } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export const DELETE = withMiddleware(
       sessionId: schemas.id,
     });
 
-    const { userId, id: activeSessionId } = await getActiveSessionOrThrow();
+    const { userId, id: activeSessionId } = await requireActiveSession();
 
     let session = await db.session.findUnique({
       omit: { secret: true },
@@ -34,7 +34,7 @@ export const DELETE = withMiddleware(
     });
 
     if (activeSessionId === sessionId) {
-      await clearActiveSession();
+      await unsetActiveSession();
     }
 
     return NextResponse.json(session);
