@@ -34,13 +34,13 @@ test("format.plural", () => {
 });
 
 test("format.datetime", () => {
-  const subject = new Date("2020-02-20T00:00:00Z");
-  expect(format.datetime(subject)).toBe("2/19/2020");
+  const subject = new Date("2020-02-20T00:00:00");
+  expect(format.datetime(subject)).toBe("2/20/2020");
   expect(
     format.datetime(subject, {
       locale: "pt-BR",
       dateStyle: "long",
       timeStyle: "short",
     })
-  ).toBe("19 de fevereiro de 2020 às 21:00");
+  ).toBe("20 de fevereiro de 2020 às 00:00");
 });
