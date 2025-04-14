@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { db } from "~/lib/db";
 import { NotFoundError, UnauthorizedError } from "~/lib/error";
 import { getBody } from "~/lib/request";
 import { requireActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
+export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
   const { userId } = parse(params, {
     userId: schemas.id,
   });
@@ -31,7 +31,7 @@ export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
   return NextResponse.json(user);
 });
 
-export const PATCH = withMiddleware(
+export const PATCH = withPipeline(
   withErrorHandling(),
   async ({ params, request }) => {
     const { userId } = parse(params, {
@@ -64,24 +64,21 @@ export const PATCH = withMiddleware(
   }
 );
 
-export const DELETE = withMiddleware(
-  withErrorHandling(),
-  async ({ params }) => {
-    const { userId } = parse(params, {
-      userId: schemas.id,
-    });
+export const DELETE = withPipeline(withErrorHandling(), async ({ params }) => {
+  const { userId } = parse(params, {
+    userId: schemas.id,
+  });
 
-    const session = await requireActiveSession();
+  const session = await requireActiveSession();
 
-    if (userId !== session.userId) {
-      throw new UnauthorizedError();
-    }
-
-    const user = await db.user.update({
-      where: { id: userId },
-      data: { deletedAt: new Date() },
-    });
-
-    return NextResponse.json(user);
+  if (userId !== session.userId) {
+    throw new UnauthorizedError();
   }
-);
+
+  const user = await db.user.update({
+    where: { id: userId },
+    data: { deletedAt: new Date() },
+  });
+
+  return NextResponse.json(user);
+});

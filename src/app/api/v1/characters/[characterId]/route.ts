@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { db } from "~/lib/db";
 import { NotFoundError } from "~/lib/error";
 import { getBody } from "~/lib/request";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
+export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
   const { characterId } = parse(params, {
     characterId: schemas.id,
   });
@@ -29,7 +29,7 @@ export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
   return NextResponse.json(character);
 });
 
-export const PATCH = withMiddleware(
+export const PATCH = withPipeline(
   withErrorHandling(),
   async ({ params, request }) => {
     const { characterId } = parse(params, {

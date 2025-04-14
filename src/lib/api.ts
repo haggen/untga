@@ -19,13 +19,11 @@ export type Context<State> = {
 
 export type Handler<State> = (context: Context<State>) => Promise<NextResponse>;
 
-// export type Middleware<S> = (...arg: unknown[]) => Handler<S>;
-
 const initial = async () => {
-  throw new Error("Handler chain ended without producing a response.");
+  throw new Error("Handler pipeline ended without producing a response.");
 };
 
-export function withMiddleware<
+export function withPipeline<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   State = any,
   H extends ReadonlyArray<Handler<State>> = ReadonlyArray<Handler<State>>
@@ -40,14 +38,14 @@ export function withMiddleware<
       next: initial,
     };
 
-    const chain = handlers.reduceRight<Handler<State>>(
+    const pipeline = handlers.reduceRight<Handler<State>>(
       (next, handler) => (context) =>
         handler({ ...context, next: () => next(context) }),
 
       initial
     );
 
-    return await chain(context);
+    return await pipeline(context);
   };
 }
 

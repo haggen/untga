@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { getClientId, setClientId } from "~/lib/clientId";
 
-export const GET = withMiddleware(withErrorHandling(), async () => {
+export const GET = withPipeline(withErrorHandling(), async () => {
   const clientId = await getClientId();
 
   if (clientId) {

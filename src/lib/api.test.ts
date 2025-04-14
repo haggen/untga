@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { expect, test, vi } from "vitest";
-import { Context, withMiddleware } from "./api";
+import { Context, withPipeline } from "./api";
 
 test("", async () => {
   const url = new URL("http://localhost");
@@ -22,9 +22,9 @@ test("", async () => {
   const c = vi.fn(async () => response);
   const d = vi.fn(async () => response);
 
-  const chain = withMiddleware(a, b, c, d);
+  const pipeline = withPipeline(a, b, c, d);
 
-  expect(await chain(request, extra)).toBe(response);
+  expect(await pipeline(request, extra)).toBe(response);
 
   expect(a).toHaveBeenCalledBefore(b);
   expect(b).toHaveBeenCalledBefore(c);

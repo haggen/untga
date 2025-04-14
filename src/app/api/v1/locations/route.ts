@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { db, Prisma } from "~/lib/db";
 
-export const GET = withMiddleware(withErrorHandling(), async () => {
+export const GET = withPipeline(withErrorHandling(), async () => {
   const where: Prisma.LocationWhereInput = {};
 
   const locations = await db.location.findMany({

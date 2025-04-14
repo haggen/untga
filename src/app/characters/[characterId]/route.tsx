@@ -1,8 +1,8 @@
 import { permanentRedirect } from "next/navigation";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
+export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
   const { characterId } = parse(params, {
     characterId: schemas.id,
   });

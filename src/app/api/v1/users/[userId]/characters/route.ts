@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { db, Prisma } from "~/lib/db";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withMiddleware(withErrorHandling(), async (context) => {
+export const GET = withPipeline(withErrorHandling(), async (context) => {
   const { params } = context;
   const { userId } = parse(params, {
     userId: schemas.id,

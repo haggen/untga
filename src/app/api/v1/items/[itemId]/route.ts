@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { db } from "~/lib/db";
 import { NotFoundError } from "~/lib/error";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
+export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
   const { itemId } = parse(params, {
     itemId: schemas.id,
   });

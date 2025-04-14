@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { withErrorHandling, withMiddleware } from "~/lib/api";
+import { withErrorHandling, withPipeline } from "~/lib/api";
 import { db } from "~/lib/db";
 import { requireActiveSession } from "~/lib/session";
 
-export const GET = withMiddleware(withErrorHandling(), async () => {
+export const GET = withPipeline(withErrorHandling(), async () => {
   const { userId } = await requireActiveSession();
 
   const where = { userId };
