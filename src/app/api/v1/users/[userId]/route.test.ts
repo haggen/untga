@@ -6,7 +6,7 @@ import { createSession } from "~/testing/session";
 import { DELETE, GET, PATCH } from "./route";
 
 const userId = 1;
-const url = new URL(`http://localhost/api/v1/users/${userId}`);
+const url = new URL("http://localhost");
 const params = { userId };
 const extra = { params: Promise.resolve(params) };
 const headers = {

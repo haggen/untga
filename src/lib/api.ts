@@ -23,6 +23,9 @@ const initial = async () => {
   throw new Error("Handler pipeline ended without producing a response.");
 };
 
+/**
+ * Creates a pipeline of handlers that can be used to process a request.
+ */
 export function withPipeline<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   State = any,
