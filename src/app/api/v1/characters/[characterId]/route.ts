@@ -3,6 +3,7 @@ import { z } from "zod";
 import { withErrorHandling, withMiddleware } from "~/lib/api";
 import { db } from "~/lib/db";
 import { NotFoundError } from "~/lib/error";
+import { getBody } from "~/lib/request";
 import { parse, schemas } from "~/lib/validation";
 
 export const GET = withMiddleware(withErrorHandling(), async ({ params }) => {
@@ -35,7 +36,7 @@ export const PATCH = withMiddleware(
       characterId: schemas.id,
     });
 
-    const { description } = parse(await request.json(), {
+    const { description } = parse(await getBody(request), {
       description: z.string().max(256).optional(),
     });
 
