@@ -23,25 +23,27 @@ const initial = async () => {
   throw new Error("Handler pipeline ended without producing a response.");
 };
 
+// Just so we don't have to add the comment between the function signature and its docstring.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Any = any;
+
 /**
  * Creates a pipeline of handlers that can be used to process a request.
  */
-export function withPipeline<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  State = any,
-  H extends ReadonlyArray<Handler<State>> = ReadonlyArray<Handler<State>>
->(...handlers: H) {
+export function withPipeline<S = Any, H extends Handler<S>[] = Handler<S>[]>(
+  ...handlers: H
+) {
   return async (request: NextRequest, extra: { params: Promise<unknown> }) => {
     const params = await extra.params;
 
     const context = {
       request,
       params,
-      state: {} as State,
+      state: {} as S,
       next: initial,
     };
 
-    const pipeline = handlers.reduceRight<Handler<State>>(
+    const pipeline = handlers.reduceRight<Handler<S>>(
       (next, handler) => (context) =>
         handler({ ...context, next: () => next(context) }),
 
