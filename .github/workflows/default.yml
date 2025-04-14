@@ -6,8 +6,10 @@ on:
 
 jobs:
   dependencies:
-    name: Install dependencies
+    name: Linting, type checking, tests, build and CodeQL
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required by CodeQL.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,32 +19,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('**/package-lock.json') }}
+          key: node-modules-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             node-modules-
       - if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
-      - uses: actions/upload-artifact@v4
-        with:
-          name: node-modules-${{ github.run_id }}
-          path: node_modules
-
-  checks:
-    name: Linting, type checking, tests, build and CodeQL
-    runs-on: ubuntu-latest
-    needs: dependencies
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 23
-      - uses: actions/download-artifact@v4
-        with:
-          name: node-modules-${{ github.run_id }}
-          path: node_modules
+      - run: npm test
       - uses: github/codeql-action/init@v3
         with:
           languages: javascript
-      - run: npm test
       - run: npm run build
       - uses: github/codeql-action/analyze@v3
