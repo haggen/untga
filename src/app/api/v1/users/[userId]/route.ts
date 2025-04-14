@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withErrorHandling, withMiddleware } from "~/lib/api";
 import { db } from "~/lib/db";
 import { NotFoundError, UnauthorizedError } from "~/lib/error";
+import { getBody } from "~/lib/request";
 import { requireActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
@@ -37,7 +38,7 @@ export const PATCH = withMiddleware(
       userId: schemas.id,
     });
 
-    const payload = parse(await request.json(), {
+    const payload = parse(await getBody(request), {
       email: schemas.email.optional(),
       password: schemas.password.optional(),
     });

@@ -1,14 +1,16 @@
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
+import { cookies } from "./cookies";
 
-vi.mock("next/headers", () => ({
-  cookies: vi.fn(async () => ({
-    get: vi.fn(),
-    set: vi.fn(),
-    delete: vi.fn(),
-  })),
+vi.mock("next/headers", async () => ({
+  ...(await vi.importActual("next/headers")),
+  cookies: vi.fn(async () => cookies),
 }));
 
 vi.mock("@prisma/client", async () => ({
   ...(await vi.importActual("@prisma/client")),
   PrismaClient: (await vi.importActual("prismock")).PrismockClient,
 }));
+
+beforeEach(() => {
+  cookies.clear();
+});
