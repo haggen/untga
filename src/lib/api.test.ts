@@ -9,28 +9,27 @@ test("", async () => {
   const extra = { params: Promise.resolve(params) };
   const response = new NextResponse();
 
-  const a = vi.fn(async (context: Context<{ a: true }>) => {
-    context.state.a = true;
+  const one = vi.fn(async (context: Context<{ one: true }>) => {
+    context.state.one = true;
     return await context.next();
   });
 
-  const b = vi.fn(async (context: Context<{ b: true }>) => {
-    context.state.b = true;
-    return await context.next();
+  const two = vi.fn(async (context: Context<{ two: true }>) => {
+    context.state.two = true;
+    return response;
   });
 
-  const c = vi.fn(async () => response);
-  const d = vi.fn(async () => response);
+  const three = vi.fn(async () => response);
 
-  const pipeline = withPipeline(a, b, c, d);
+  const pipeline = withPipeline(one, two, three);
 
   expect(await pipeline(request, extra)).toBe(response);
 
-  expect(a).toHaveBeenCalledBefore(b);
-  expect(b).toHaveBeenCalledBefore(c);
-  expect(d).not.toHaveBeenCalled();
+  expect(one).toHaveBeenCalledBefore(two);
+  expect(two).toHaveBeenCalled();
+  expect(three).not.toHaveBeenCalled();
 
-  expect(a.mock.calls[0][0]).toEqual({
+  expect(one.mock.calls[0][0]).toEqual({
     request,
     params,
     state: expect.any(Object),
