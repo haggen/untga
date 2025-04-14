@@ -133,6 +133,9 @@ async function request<T>(
 // --
 // --
 
+/**
+ * API client.
+ */
 export const client = {
   request,
 
