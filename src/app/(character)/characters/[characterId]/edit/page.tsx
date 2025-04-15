@@ -13,6 +13,55 @@ import { Textarea } from "~/components/Textarea";
 import { client } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
 
+function DeleteForm({ characterId }: { characterId: number }) {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const { mutate, data, error, isPending } = useMutation({
+    mutationFn: () => client.characters.delete(characterId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: client.characters.queryKey(),
+      });
+      router.push("/characters");
+    },
+  });
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    mutate();
+  };
+
+  return (
+    <form
+      className="flex flex-col gap-6"
+      onSubmit={onSubmit}
+      aria-busy={isPending}
+    >
+      <header className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Delete your character</h2>
+        </Heading>
+        <p>
+          By clicking on the button below you agree to have this
+          character&apos;s data and progression be irrevocably purged from our
+          system.
+        </p>
+      </header>
+
+      <Alert type="negative" dump={error} />
+
+      <Alert type="positive" dump={data} />
+
+      <footer className="flex justify-end">
+        <Button type="submit" size="default" disabled={isPending}>
+          Delete this character
+        </Button>
+      </footer>
+    </form>
+  );
+}
+
 type Props = {
   params: Promise<{ characterId: string }>;
 };
@@ -21,6 +70,7 @@ export default function Page({ params }: Props) {
   const session = useSession();
   const router = useRouter();
   const queryClient = useQueryClient();
+
   const { characterId } = parse(use(params), {
     characterId: schemas.id,
   });
@@ -97,6 +147,8 @@ export default function Page({ params }: Props) {
           </Button>
         </footer>
       </form>
+
+      <DeleteForm characterId={characterId} />
     </main>
   );
 }
