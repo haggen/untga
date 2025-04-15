@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { expect, test, vi } from "vitest";
 import { Context, withPipeline } from "./api";
 
-test("", async () => {
+test("withPipeline", async () => {
   const url = new URL("http://localhost");
   const request = new NextRequest(url);
   const params = {};
