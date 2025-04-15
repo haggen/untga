@@ -18,6 +18,7 @@ export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
 
   const where: Prisma.CharacterWhereInput = {
     userId,
+    deletedAt: null,
   };
 
   const characters = await db.character.findMany({

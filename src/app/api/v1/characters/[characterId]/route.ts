@@ -87,7 +87,7 @@ export const DELETE = withPipeline(withErrorHandling(), async ({ params }) => {
     throw new UnauthorizedError();
   }
 
-  await db.user.update({
+  await db.character.update({
     where: { id: characterId },
     data: { deletedAt: new Date() },
   });
