@@ -1,8 +1,8 @@
-import { ComponentProps } from "react";
+import { ComponentProps, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
 type DefinitionProps = ComponentProps<"div"> & {
-  label: string;
+  label: ReactNode;
 };
 
 export function Definition({
