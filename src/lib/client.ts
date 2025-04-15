@@ -162,9 +162,6 @@ export const client = {
     },
 
     characters: {
-      queryKey: (userId: number) =>
-        [...client.users.queryKey(userId), "characters"] as const,
-
       get: async (userId: number) => {
         return request<Character[]>(`/api/v1/users/${userId}/characters`);
       },

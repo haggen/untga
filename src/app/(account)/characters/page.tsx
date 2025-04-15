@@ -10,7 +10,7 @@ export default function Page() {
   const session = useSession();
 
   const { data, isFetching } = useQuery({
-    queryKey: client.users.characters.queryKey(session.userId),
+    queryKey: client.characters.queryKey(),
     queryFn: () => client.users.characters.get(session.userId),
   });
 

@@ -25,7 +25,7 @@ export default function Page() {
     mutationFn: (payload: FormData) => client.characters.post(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: client.users.characters.queryKey(session.userId),
+        queryKey: client.characters.queryKey(),
       });
       router.push("/characters");
     },
