@@ -1,10 +1,18 @@
 # Untga (working title)
 
-> A text-based multiplayer RPG that you can play idly on your browser.
+> Untga is a text-based multiplayer browser RPG that borrows ideas from [incremental games](https://en.wikipedia.org/wiki/Incremental_game) and [MMORPGs](https://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game).
 
-Untga is a text-based multiplayer RPG that borrows ideas from [incremental games](https://en.wikipedia.org/wiki/Incremental_game) and [MMORPGs](https://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game).
+The project is still under development but take a look at what you can expect.
 
-Read and comment on the basic design of the game: https://github.com/haggen/untga/discussions/21
+- 📜 Text-based multiplayer RPG you can play on desktop, tablet, or phone.
+- 💪 No levels — improve skills by using them.
+- 🗺️ Explore a vast low-fantasy world, but be prepared.
+- ⚔️ Face dangers as you seek treasure, resources, and lore.
+- 🛠️ Be what you want: a gatherer, crafter, trader, adventurer, bandit — or anything in between.
+- 🤝 Strengthen your social skills through trading, PvP, and teaming up.
+- ✨ Discover hidden stories scattered across the world and embark on quests.
+
+[Read and comment on the design of the core gameplay](https://github.com/haggen/untga/discussions/21)
 
 ## Development
 
