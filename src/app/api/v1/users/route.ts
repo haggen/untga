@@ -1,20 +1,19 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
+import { createApiHandler } from "~/lib/api";
 import { db } from "~/lib/db";
-import { getBody, getRemoteAddr, getUserAgent } from "~/lib/request";
+import { getRemoteAddr, getUserAgent } from "~/lib/request";
 import { setActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
-export const POST = withPipeline(withErrorHandling(), async ({ request }) => {
-  const payload = parse(await getBody(request), {
+export const POST = createApiHandler(async ({ request, payload }) => {
+  const data = parse(payload, {
     email: schemas.email,
     password: schemas.password,
   });
 
   const user = await db.user.create({
     data: {
-      email: payload.email,
-      password: payload.password,
+      email: data.email,
+      password: data.password,
     },
     omit: {
       password: true,
@@ -31,5 +30,7 @@ export const POST = withPipeline(withErrorHandling(), async ({ request }) => {
 
   await setActiveSession(session);
 
-  return NextResponse.json(user, { status: 201 });
+  return {
+    payload: user,
+  };
 });

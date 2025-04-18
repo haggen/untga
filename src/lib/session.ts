@@ -18,7 +18,12 @@ export async function getActiveSession() {
   }
 
   return await db.session.findUnique({
-    where: { secret, expiresAt: { gt: new Date() } },
+    where: {
+      secret,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
     include: { user: true },
   });
 }

@@ -1,17 +1,8 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
-import { db, Prisma } from "~/lib/db";
+import { createApiHandler } from "~/lib/api";
+import { db } from "~/lib/db";
 
-export const GET = withPipeline(withErrorHandling(), async () => {
-  const where: Prisma.LocationWhereInput = {};
+export const GET = createApiHandler(async () => {
+  const locations = await db.location.findMany();
 
-  const locations = await db.location.findMany({
-    where,
-  });
-
-  const total = await db.location.count({ where });
-
-  const response = NextResponse.json(locations);
-  response.headers.set("X-Total", total.toString());
-  return response;
+  return { payload: locations };
 });

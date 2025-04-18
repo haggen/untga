@@ -1,23 +1,22 @@
-import { NextResponse } from "next/server";
 import { z } from "zod";
-import { withErrorHandling, withPipeline } from "~/lib/api";
+import { createApiHandler } from "~/lib/api";
 import { db } from "~/lib/db";
 import { UnauthorizedError } from "~/lib/error";
-import { getBody } from "~/lib/request";
-import { requireActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import * as tags from "~/static/tags";
 
-export const POST = withPipeline(withErrorHandling(), async ({ request }) => {
-  const payload = parse(await getBody(request), {
+export const POST = createApiHandler(async ({ payload, session }) => {
+  const data = parse(payload, {
     name: schemas.name,
     userId: schemas.id,
     description: z.string().max(256).optional(),
   });
 
-  const session = await requireActiveSession();
+  if (!session) {
+    throw new UnauthorizedError();
+  }
 
-  if (session.userId !== payload.userId) {
+  if (session.userId !== data.userId) {
     throw new UnauthorizedError(
       "You can't create a character for someone else."
     );
@@ -29,8 +28,8 @@ export const POST = withPipeline(withErrorHandling(), async ({ request }) => {
 
   const character = await db.character.create({
     data: {
-      name: payload.name,
-      description: payload.description,
+      name: data.name,
+      description: data.description,
       user: { connect: { id: session.userId } },
       tags: [tags.Player],
       logs: { create: [{ message: "I'm an adult now and I'm on my own." }] },
@@ -44,5 +43,5 @@ export const POST = withPipeline(withErrorHandling(), async ({ request }) => {
     },
   });
 
-  return NextResponse.json(character, { status: 201 });
+  return { payload: character };
 });

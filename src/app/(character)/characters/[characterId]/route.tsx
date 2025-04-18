@@ -1,11 +1,14 @@
 import { permanentRedirect } from "next/navigation";
-import { withErrorHandling, withPipeline } from "~/lib/api";
+import { NextRequest } from "next/server";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
-  const { characterId } = parse(params, {
+export async function GET(
+  _: NextRequest,
+  { params }: { params: Promise<unknown> }
+) {
+  const { characterId } = parse(await params, {
     characterId: schemas.id,
   });
 
   permanentRedirect(`/characters/${characterId}/summary`);
-});
+}

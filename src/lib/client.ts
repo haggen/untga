@@ -9,6 +9,15 @@ import type {
   Route,
   Session,
   User,
+  WithAttributes,
+  WithEffects,
+  WithEntry,
+  WithExit,
+  WithItems,
+  WithLocation,
+  WithSlots,
+  WithSource,
+  WithSpec,
 } from "~/lib/db";
 
 export {
@@ -21,44 +30,15 @@ export {
   Route,
   Session,
   User,
-};
-
-export type WithLocation = {
-  include: {
-    location: true;
-  };
-};
-
-export type WithSpec = {
-  include: { spec: true };
-};
-
-export type WithAttributes = {
-  include: { attributes: WithSpec };
-};
-
-export type WithEffects = {
-  include: { effects: WithSpec };
-};
-
-export type WithSlots = {
-  include: { slots: WithItems };
-};
-
-export type WithItems = {
-  include: { items: WithSpec };
-};
-
-export type WithSource = {
-  include: { source: WithSpec };
-};
-
-export type WithEntry = {
-  include: { entry: true };
-};
-
-export type WithExit = {
-  include: { exit: true };
+  WithAttributes,
+  WithEffects,
+  WithEntry,
+  WithExit,
+  WithItems,
+  WithLocation,
+  WithSlots,
+  WithSource,
+  WithSpec,
 };
 
 // --

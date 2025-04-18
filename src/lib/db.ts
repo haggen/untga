@@ -5,6 +5,7 @@ import type {
 } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
+import { NotFoundError, UnauthorizedError } from "~/lib/error";
 import * as tags from "~/static/tags";
 
 export { Prisma };
@@ -87,6 +88,48 @@ export type Route<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
+export type WithLocation = {
+  include: {
+    location: true;
+  };
+};
+
+export type WithSpec = {
+  include: { spec: true };
+};
+
+export type WithAttributes = {
+  include: { attributes: WithSpec };
+};
+
+export type WithEffects = {
+  include: { effects: WithSpec };
+};
+
+export type WithSlots = {
+  include: { slots: WithItems };
+};
+
+export type WithItems = {
+  include: { items: WithSpec };
+};
+
+export type WithSource = {
+  include: { source: WithSpec };
+};
+
+export type WithEntry = {
+  include: { entry: true };
+};
+
+export type WithExit = {
+  include: { exit: true };
+};
+
+export type WithUser = {
+  include: { user: true };
+};
+
 /**
  * Isolate data from the query args and pass it to a handler.
  */
@@ -121,7 +164,7 @@ const ext = Prisma.defineExtension((client) => {
   return client.$extends({
     model: {
       user: {
-        async findByCredentials({
+        async authenticate({
           data,
         }: {
           data: { email: string; password: string };
@@ -131,14 +174,23 @@ const ext = Prisma.defineExtension((client) => {
           });
 
           if (!user) {
-            throw new Error("E-mail not found");
+            throw new NotFoundError("E-mail was not found.");
           }
 
           if (!(await bcrypt.compare(data.password, user.password))) {
-            throw new Error("Password doesn't match");
+            throw new UnauthorizedError("Password doesn't match.");
           }
 
           return user;
+        },
+      },
+      session: {
+        valid() {
+          return {
+            expiresAt: {
+              gt: new Date(),
+            },
+          };
         },
       },
       itemSpecification: {
@@ -229,6 +281,16 @@ const ext = Prisma.defineExtension((client) => {
       user: {
         async $allOperations({ operation, args, query }) {
           switch (operation) {
+            case "findFirst":
+            case "findFirstOrThrow":
+            case "findUnique":
+            case "findUniqueOrThrow":
+            case "findMany":
+              args.where = {
+                ...args.where,
+                deletedAt: args.where?.deletedAt ?? null,
+              };
+              break;
             case "create":
             case "createMany":
             case "createManyAndReturn":
@@ -241,6 +303,23 @@ const ext = Prisma.defineExtension((client) => {
                   data.password = await bcrypt.hash(data.password, 10);
                 }
               });
+              break;
+          }
+          return await query(args);
+        },
+      },
+      character: {
+        async $allOperations({ operation, args, query }) {
+          switch (operation) {
+            case "findFirst":
+            case "findFirstOrThrow":
+            case "findUnique":
+            case "findUniqueOrThrow":
+            case "findMany":
+              args.where = {
+                ...args.where,
+                deletedAt: args.where?.deletedAt ?? null,
+              };
               break;
           }
           return await query(args);
@@ -269,6 +348,22 @@ const ext = Prisma.defineExtension((client) => {
       },
     },
     result: {
+      user: {
+        deleted: {
+          needs: { deletedAt: true },
+          compute(user) {
+            return user.deletedAt !== null;
+          },
+        },
+      },
+      character: {
+        deleted: {
+          needs: { deletedAt: true },
+          compute(character) {
+            return character.deletedAt !== null;
+          },
+        },
+      },
       session: {
         expired: {
           needs: { expiresAt: true },
@@ -286,14 +381,10 @@ function createClient() {
   return new PrismaClient(opts).$extends(ext);
 }
 
-// Update global interface with our client.
-declare global {
-  // eslint-disable-next-line no-var
-  var db: ReturnType<typeof createClient>;
-}
+export type Client = ReturnType<typeof createClient>;
 
 // Prisma client needs to be a singleton, otherwise it eventually exhausts the database connection pool.
 export const db =
   process.env.NODE_ENV === "production"
-    ? (global.db ??= createClient())
+    ? ((global as unknown as { db: Client }).db ??= createClient())
     : createClient();

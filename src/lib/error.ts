@@ -1,47 +1,36 @@
-/**
- * ...
- */
-export class BadRequestError extends Error {
-  constructor(message?: string, options?: ErrorOptions) {
-    super(message ?? "Request is malformed.", options);
+export class HttpError extends Error {
+  status: number;
+
+  constructor(
+    status = 500,
+    message = "Unexpected error.",
+    options?: ErrorOptions
+  ) {
+    super(message, options);
+    this.status = status;
   }
 }
 
-/**
- * ...
- */
-export class ForbiddenError extends Error {
+export class BadRequestError extends HttpError {
   constructor(message?: string, options?: ErrorOptions) {
-    super(message ?? "That is forbidden.", options);
+    super(400, message ?? "Request is malformed.", options);
   }
 }
 
-/**
- * ...
- */
-export class UnauthorizedError extends Error {
+export class ForbiddenError extends HttpError {
   constructor(message?: string, options?: ErrorOptions) {
-    super(message ?? "You are not authorized to do that.", options);
+    super(403, message ?? "That is forbidden.", options);
   }
 }
 
-/**
- * ...
- */
-export class NotFoundError extends Error {
+export class UnauthorizedError extends HttpError {
   constructor(message?: string, options?: ErrorOptions) {
-    super(message ?? "A required record was not found.", options);
+    super(401, message ?? "You are not authorized to do that.", options);
   }
 }
 
-/**
- * ...
- */
-export class GameStateError extends Error {
+export class NotFoundError extends HttpError {
   constructor(message?: string, options?: ErrorOptions) {
-    super(
-      message ?? "Game state doesn't allow that action to be performed.",
-      options
-    );
+    super(404, message ?? "A required record was not found.", options);
   }
 }

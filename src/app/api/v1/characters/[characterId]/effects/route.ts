@@ -1,27 +1,20 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
-import { db, Prisma } from "~/lib/db";
+import { createApiHandler } from "~/lib/api";
+import { db } from "~/lib/db";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
+export const GET = createApiHandler(async ({ params }) => {
   const { characterId } = parse(params, {
     characterId: schemas.id,
   });
 
-  const where: Prisma.EffectWhereInput = {
-    character: { id: characterId },
-  };
-
   const effects = await db.effect.findMany({
-    where,
+    where: {
+      character: { id: characterId },
+    },
     include: {
       spec: true,
     },
   });
 
-  const total = await db.effect.count({ where });
-
-  return NextResponse.json(effects, {
-    headers: { "X-Total": total.toString() },
-  });
+  return { payload: effects };
 });

@@ -1,11 +1,9 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
-import { db, Prisma } from "~/lib/db";
+import { createApiHandler } from "~/lib/api";
+import { db } from "~/lib/db";
 import { NotFoundError } from "~/lib/error";
 import { parse, schemas } from "~/lib/validation";
 
-export const GET = withPipeline(withErrorHandling(), async (context) => {
-  const { params } = context;
+export const GET = createApiHandler(async ({ params }) => {
   const { locationId } = parse(params, {
     locationId: schemas.id,
   });
@@ -18,17 +16,9 @@ export const GET = withPipeline(withErrorHandling(), async (context) => {
     throw new NotFoundError("Location not found.");
   }
 
-  const where: Prisma.CharacterWhereInput = { locationId };
-
   const characters = await db.character.findMany({
-    where,
+    where: { locationId },
   });
 
-  const total = await db.character.count({
-    where,
-  });
-
-  return NextResponse.json(characters, {
-    headers: { "X-Total": total.toString() },
-  });
+  return { payload: characters };
 });

@@ -1,29 +1,22 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
-import { db, Prisma } from "~/lib/db";
+import { createApiHandler } from "~/lib/api";
+import { db } from "~/lib/db";
 import { parse, schemas } from "~/lib/validation";
 import * as tags from "~/static/tags";
 
-export const GET = withPipeline(withErrorHandling(), async ({ params }) => {
+export const GET = createApiHandler(async ({ params }) => {
   const { characterId } = parse(params, {
     characterId: schemas.id,
   });
 
-  const where: Prisma.AttributeWhereInput = {
-    character: { id: characterId },
-    spec: { tags: { has: tags.Skill } },
-  };
-
   const attributes = await db.attribute.findMany({
-    where,
+    where: {
+      character: { id: characterId },
+      spec: { tags: { has: tags.Skill } },
+    },
     include: {
       spec: true,
     },
   });
 
-  const total = await db.attribute.count({ where });
-
-  return NextResponse.json(attributes, {
-    headers: { "X-Total": total.toString() },
-  });
+  return { payload: attributes };
 });

@@ -1,39 +1,27 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
+import { createApiHandler } from "~/lib/api";
 import { db } from "~/lib/db";
-import { NotFoundError, UnauthorizedError } from "~/lib/error";
-import { requireActiveSession, unsetActiveSession } from "~/lib/session";
+import { NotFoundError } from "~/lib/error";
+import { unsetActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
-export const DELETE = withPipeline(withErrorHandling(), async ({ params }) => {
+export const DELETE = createApiHandler(async ({ params, ...context }) => {
   const { sessionId } = parse(params, {
     sessionId: schemas.id,
   });
 
-  const { userId, id: activeSessionId } = await requireActiveSession();
-
-  let session = await db.session.findUnique({
-    omit: { secret: true },
-    where: { id: sessionId },
-  });
-
-  if (!session) {
+  if (!context.session) {
     throw new NotFoundError();
   }
 
-  if (session.userId !== userId) {
-    throw new UnauthorizedError();
-  }
-
-  session = await db.session.update({
+  const session = await db.session.update({
     omit: { secret: true },
-    where: { id: sessionId },
+    where: { id: sessionId, userId: context.session.userId },
     data: { expiresAt: new Date() },
   });
 
-  if (activeSessionId === sessionId) {
+  if (session.id === context.session.id) {
     await unsetActiveSession();
   }
 
-  return NextResponse.json(session);
+  return { payload: session };
 });

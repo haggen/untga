@@ -9,7 +9,13 @@ export function getUserAgent(request: Request) {
   return request.headers.get("user-agent") ?? "";
 }
 
-export async function getBody(request: Request) {
+const methodsWithPayload = ["POST", "PUT", "PATCH"];
+
+export async function getRequestPayload(request: Request): Promise<unknown> {
+  if (!methodsWithPayload.includes(request.method)) {
+    return null;
+  }
+
   const contentType = request.headers.get("content-type");
 
   if (!contentType) {

@@ -1,24 +1,24 @@
-import { NextResponse } from "next/server";
-import { withErrorHandling, withPipeline } from "~/lib/api";
+import { createApiHandler } from "~/lib/api";
 import { db } from "~/lib/db";
-import { requireActiveSession } from "~/lib/session";
+import { UnauthorizedError } from "~/lib/error";
+import { parse, schemas } from "~/lib/validation";
 
-export const GET = withPipeline(withErrorHandling(), async () => {
-  const { userId } = await requireActiveSession();
+export const GET = createApiHandler(async ({ params, session }) => {
+  const { userId } = parse(params, {
+    userId: schemas.id,
+  });
 
-  const where = { userId };
+  if (userId !== session?.userId) {
+    throw new UnauthorizedError();
+  }
 
   const sessions = await db.session.findMany({
-    where,
+    where: { userId },
     omit: {
       secret: true,
     },
     orderBy: [{ expiresAt: "desc" }, { createdAt: "desc" }],
   });
 
-  const total = await db.session.count({ where });
-
-  return NextResponse.json(sessions, {
-    headers: { "X-Total": total.toString() },
-  });
+  return { payload: sessions };
 });

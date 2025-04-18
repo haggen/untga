@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { withErrorHandling, withPipeline } from "~/lib/api";
 import { getClientId, setClientId } from "~/lib/clientId";
 
-export const GET = withPipeline(withErrorHandling(), async () => {
+export async function GET() {
   const clientId = await getClientId();
 
   if (clientId) {
@@ -12,4 +11,4 @@ export const GET = withPipeline(withErrorHandling(), async () => {
 
   setClientId();
   redirect("/register");
-});
+}

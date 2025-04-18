@@ -1,91 +1,75 @@
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { NextRequest, NextResponse } from "next/server";
-import z, { ZodError } from "zod";
-import {
-  BadRequestError,
-  ForbiddenError,
-  GameStateError,
-  NotFoundError,
-  UnauthorizedError,
-} from "~/lib/error";
-import { getBody } from "~/lib/request";
+import { ZodError } from "zod";
+import { Session, WithUser } from "~/lib/db";
+import { HttpError } from "~/lib/error";
+import { getRequestPayload } from "~/lib/request";
+import { getActiveSession } from "~/lib/session";
 
-export type Context<State> = {
+export type Context = {
   request: NextRequest;
   params: unknown;
-  state: State;
-  next: () => Promise<NextResponse>;
+  session: Session<WithUser> | null;
+  payload: unknown;
 };
 
-export type Handler<State> = (context: Context<State>) => Promise<NextResponse>;
-
-const threshold = async () => {
-  throw new Error("Handler pipeline ended without producing a response.");
+export type Response = {
+  payload?: unknown;
+  status?: number;
+  headers?: Record<string, unknown>;
 };
 
-/**
- * Creates a pipeline of handlers that can be used to process a request.
- */
-export function withPipeline<
-  S extends never,
-  H extends Handler<S>[] = Handler<S>[]
->(...handlers: H) {
-  return async (request: NextRequest, extra: { params: Promise<unknown> }) => {
-    const params = await extra.params;
+export type Handler = (context: Context) => Promise<Response>;
 
-    const context = {
-      request,
-      params,
-      state: {} as S,
-      next: threshold,
-    };
-
-    const pipeline = handlers.reduceRight(
-      (next, handler) => (context) =>
-        handler({ ...context, next: () => next(context) }),
-
-      threshold
-    );
-
-    return await pipeline(context);
-  };
+function makeHeaders(headers: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(headers).map(([key, value]) => {
+      return [key, String(value)];
+    })
+  ) satisfies HeadersInit;
 }
 
-export function withErrorHandling() {
-  return async ({ next }: Context<unknown>) => {
+export function createApiHandler(handler: Handler) {
+  return async (
+    request: NextRequest,
+    { params }: { params: Promise<unknown> }
+  ) => {
     try {
-      return await next();
+      const context = {
+        request,
+        params: await params,
+        payload: await getRequestPayload(request),
+        session: await getActiveSession(),
+      };
+
+      const response = await handler(context);
+
+      if (request.method === "POST") {
+        response.status ??= 201;
+      }
+
+      return NextResponse.json(response.payload, {
+        status: response.status,
+        headers: makeHeaders(response.headers ?? {}),
+      });
     } catch (error) {
       if (isRedirectError(error)) {
         throw error;
       }
 
-      if (error instanceof BadRequestError) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
-      }
-
-      if (error instanceof UnauthorizedError) {
-        return NextResponse.json({ error: error.message }, { status: 401 });
-      }
-
-      if (error instanceof ForbiddenError) {
-        return NextResponse.json({ error: error.message }, { status: 403 });
-      }
-
-      if (error instanceof NotFoundError) {
-        return NextResponse.json({ error: error.message }, { status: 404 });
+      if (error instanceof HttpError) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: error.status }
+        );
       }
 
       if (error instanceof ZodError) {
         return NextResponse.json({ error }, { status: 422 });
       }
 
-      if (error instanceof GameStateError) {
-        return NextResponse.json({ error: error.message }, { status: 422 });
-      }
-
       if (error instanceof Error) {
-        // Fix https://www.reddit.com/r/nextjs/comments/1gkxdqe/comment/m19kxgn/
+        // @see https://www.reddit.com/r/nextjs/comments/1gkxdqe/comment/m19kxgn/
         console.error(error.stack);
 
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -98,15 +82,5 @@ export function withErrorHandling() {
         { status: 500 }
       );
     }
-  };
-}
-
-export function withPayload<Shape extends z.ZodRawShape>(shape: Shape) {
-  return async (context: Context<{ payload: z.infer<z.ZodObject<Shape>> }>) => {
-    const payload = await getBody(context.request);
-
-    context.state.payload = z.object(shape).parse(payload);
-
-    return await context.next();
   };
 }
