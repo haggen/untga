@@ -130,6 +130,10 @@ export type WithUser = {
   include: { user: true };
 };
 
+export type WithStorage = {
+  include: { items: WithSpec & { include: { storage: WithItems } } };
+};
+
 /**
  * Isolate data from the query args and pass it to a handler.
  */
@@ -369,6 +373,46 @@ const ext = Prisma.defineExtension((client) => {
           needs: { expiresAt: true },
           compute(session) {
             return session.expiresAt <= new Date();
+          },
+        },
+      },
+      container: {
+        slot: {
+          needs: { tags: true },
+          compute(container) {
+            if (!container.tags.includes(tags.Slot)) {
+              return null;
+            }
+
+            if (container.tags.includes(tags.Head)) {
+              return "Head";
+            }
+
+            if (container.tags.includes(tags.Chest)) {
+              return "Chest";
+            }
+
+            if (container.tags.includes(tags.Waist)) {
+              return "Waist";
+            }
+
+            if (container.tags.includes(tags.Hands)) {
+              return "Hands";
+            }
+
+            if (container.tags.includes(tags.Legs)) {
+              return "Legs";
+            }
+
+            if (container.tags.includes(tags.Feet)) {
+              return "Feet";
+            }
+
+            if (container.tags.includes(tags.Back)) {
+              return "Back";
+            }
+
+            return "Unknown";
           },
         },
       },

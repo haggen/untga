@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
-import { format } from "./format";
+import { fmt } from "./fmt";
 
 test("format.number", () => {
   const value = 1000;
-  expect(format.number(value)).toBe("1,000");
+  expect(fmt.number(value)).toBe("1,000");
   expect(
-    format.number(value, {
+    fmt.number(value, {
       locale: "pt-BR",
       style: "currency",
       currency: "BRL",
@@ -15,9 +15,9 @@ test("format.number", () => {
 
 test("format.plural", () => {
   const options = { one: "an elf", zero: "nobody", other: "# elves" };
-  expect(format.plural(0, options)).toBe("nobody");
-  expect(format.plural(1, options)).toBe("an elf");
-  expect(format.plural(2, options)).toBe("2 elves");
+  expect(fmt.plural(0, options)).toBe("nobody");
+  expect(fmt.plural(1, options)).toBe("an elf");
+  expect(fmt.plural(2, options)).toBe("2 elves");
 });
 
 test("format.plural", () => {
@@ -28,16 +28,16 @@ test("format.plural", () => {
     zero: "Disqualified",
   };
 
-  expect(format.plural(0, options)).toBe("Disqualified");
-  expect(format.plural(1, options)).toBe("Pole position");
-  expect(format.plural(2, options)).toBe("Position #2");
+  expect(fmt.plural(0, options)).toBe("Disqualified");
+  expect(fmt.plural(1, options)).toBe("Pole position");
+  expect(fmt.plural(2, options)).toBe("Position #2");
 });
 
 test("format.datetime", () => {
   const subject = new Date("2020-02-20T00:00:00");
-  expect(format.datetime(subject)).toBe("2/20/2020");
+  expect(fmt.datetime(subject)).toBe("2/20/2020");
   expect(
-    format.datetime(subject, {
+    fmt.datetime(subject, {
       locale: "pt-BR",
       dateStyle: "long",
       timeStyle: "short",

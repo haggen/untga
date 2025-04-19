@@ -2,84 +2,118 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Alert } from "~/components/Alert";
 import { Definition } from "~/components/Definition";
 import { Heading } from "~/components/Heading";
 import { client } from "~/lib/client";
+import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
 import { Header } from "../header";
 
-function Summary({ characterId }: { characterId: number }) {
-  const characterQuery = useQuery({
+function CharacterStats({ characterId }: { characterId: number }) {
+  const query = useQuery({
     queryKey: client.characters.queryKey(characterId),
     queryFn: () => client.characters.get(characterId),
   });
 
-  const resourcesQuery = useQuery({
+  if (query.isLoading) {
+    return [
+      <Definition key={0} label="Name">
+        Loading...
+      </Definition>,
+      <Definition key={1} label="Birth">
+        Loading...
+      </Definition>,
+      <Definition key={2} label="Location">
+        Loading...
+      </Definition>,
+      <Definition key={3} label="Status">
+        Loading...
+      </Definition>,
+    ];
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const character = query.data.payload;
+
+  return [
+    <Definition key={0} label="Name">
+      {character.name}
+    </Definition>,
+    <Definition key={1} label="Birth">
+      {new Date(character.createdAt).toLocaleDateString()}
+    </Definition>,
+    <Definition key={2} label="Location">
+      ...
+    </Definition>,
+    <Definition key={3} label="Status">
+      {character.status}
+    </Definition>,
+  ];
+}
+
+function CharacterResources({ characterId }: { characterId: number }) {
+  const query = useQuery({
     queryKey: client.characters.resources.queryKey(characterId),
     queryFn: () => client.characters.resources.get(characterId),
   });
 
-  const character = characterQuery.data?.payload;
-  const resources = resourcesQuery.data?.payload ?? [];
+  if (query.isLoading) {
+    return <Definition label="Loading..." />;
+  }
 
-  return (
-    <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>Summary</h2>
-      </Heading>
+  if (!query.data) {
+    return null;
+  }
 
-      {character ? (
-        <Definition.List>
-          <Definition label="Name">{character.name}</Definition>
-          <Definition label="Birth">
-            {new Date(character.createdAt).toLocaleDateString()}
-          </Definition>
-          <Definition label="Location">...</Definition>
-          <Definition label="Status">{character.status}</Definition>
-          {resources.map((resource) => (
-            <Definition label={resource.spec.name} key={resource.id}>
-              {resource.level}/{resource.cap}
-            </Definition>
-          ))}
-        </Definition.List>
-      ) : (
-        <Alert>
-          <p>Loading...</p>
-        </Alert>
-      )}
-    </section>
-  );
+  const resources = query.data.payload;
+
+  return resources.map((resource) => (
+    <Definition label={resource.spec.name} key={resource.id}>
+      {resource.level}/{resource.cap}
+    </Definition>
+  ));
 }
 
-function Skills({ characterId }: { characterId: number }) {
-  const { data } = useQuery({
+function CharacterSkills({ characterId }: { characterId: number }) {
+  const query = useQuery({
     queryKey: client.characters.skills.queryKey(characterId),
     queryFn: () => client.characters.skills.get(characterId),
   });
 
-  const skills = data?.payload ?? [];
+  if (query.isLoading) {
+    return [
+      <Definition key={0} label="Loading...">
+        Loading...
+      </Definition>,
+      <Definition key={1} label="Loading...">
+        Loading...
+      </Definition>,
+      <Definition key={2} label="Loading...">
+        Loading...
+      </Definition>,
+    ];
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const skills = query.data.payload;
 
   return (
-    <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>Skills</h2>
-      </Heading>
-
-      {skills.length > 0 ? (
-        <Definition.List>
-          {skills.map((skill) => (
-            <Definition label={skill.spec.name} key={skill.id}>
-              {Math.floor(skill.level * 100)}
-            </Definition>
-          ))}
-        </Definition.List>
-      ) : (
-        <Alert>
-          <p>Loading...</p>
-        </Alert>
-      )}
-    </section>
+    <Definition.List>
+      {skills.map((skill) => (
+        <Definition label={skill.spec.name} key={skill.id}>
+          {fmt.number(skill.level, {
+            style: "percent",
+            maximumFractionDigits: 0,
+          })}
+        </Definition>
+      ))}
+    </Definition.List>
   );
 }
 
@@ -95,8 +129,25 @@ export default function Page({ params }: Props) {
   return (
     <main className="flex flex-col gap-12">
       <Header characterId={characterId} />
-      <Summary characterId={characterId} />
-      <Skills characterId={characterId} />
+
+      <section className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Summary</h2>
+        </Heading>
+
+        <Definition.List>
+          <CharacterStats characterId={characterId} />
+          <CharacterResources characterId={characterId} />
+        </Definition.List>
+      </section>
+
+      <section className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Skills</h2>
+        </Heading>
+
+        <CharacterSkills characterId={characterId} />
+      </section>
     </main>
   );
 }

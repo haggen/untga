@@ -20,21 +20,17 @@ export const GET = createApiHandler(async ({ params }) => {
 
   const containers = await db.container.findMany({
     where: {
-      character: { id: characterId },
+      source: { container: { characterId } },
     },
     include: {
+      source: {
+        include: {
+          spec: true,
+        },
+      },
       items: {
         include: {
           spec: true,
-          storage: {
-            include: {
-              items: {
-                include: {
-                  spec: true,
-                },
-              },
-            },
-          },
         },
       },
     },

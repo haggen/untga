@@ -5,65 +5,61 @@ import { use } from "react";
 import { Alert } from "~/components/Alert";
 import { Definition } from "~/components/Definition";
 import { Heading } from "~/components/Heading";
-import { client } from "~/lib/client";
+import { client, Container, WithItems, WithSource } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
-import * as tags from "~/static/tags";
 import { Header } from "../header";
 
-function Equipment({ characterId }: { characterId: number }) {
-  const { data: { payload: slots } = {} } = useQuery({
+function Slots({ characterId }: { characterId: number }) {
+  const query = useQuery({
     queryKey: client.characters.slots.queryKey(characterId),
     queryFn: () => client.characters.slots.get(characterId),
   });
 
-  return (
-    <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>Equipment</h2>
-      </Heading>
-
+  if (query.isLoading) {
+    return (
       <Definition.List>
-        {slots ? (
-          slots.map((slot) => (
-            <Definition key={slot.id} label={slot.tags.join()}>
-              {slot.items[0]?.spec.name ?? "Empty"}
+        {Array(7)
+          .fill(undefined)
+          .map((_, index) => (
+            <Definition key={index} label="Loading...">
+              Loading...
             </Definition>
-          ))
-        ) : (
-          <Definition label="Loading...">Loading...</Definition>
-        )}
+          ))}
       </Definition.List>
-    </section>
+    );
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const slots = query.data.payload;
+
+  return (
+    <Definition.List>
+      {slots.map((slot) => (
+        <Definition key={slot.id} label={slot.slot}>
+          {slot.items[0]?.spec.name ?? "Empty"}
+        </Definition>
+      ))}
+    </Definition.List>
   );
 }
 
-function Storage({ characterId }: { characterId: number }) {
-  const { data: { payload: slots } = {} } = useQuery({
-    queryKey: [...client.characters.slots.queryKey(characterId)],
-    queryFn: () => client.characters.slots.get(characterId),
-  });
-
-  const slot = slots?.find((slot) => slot.tags.includes(tags.Back));
-  const backpack = slot?.items[0];
-  const backpackId = backpack?.id ?? 0;
-
-  const { data: { payload: storage } = {}, isLoading } = useQuery({
-    queryKey: client.items.storage.queryKey(backpackId),
-    queryFn: () => client.items.storage.get(backpackId),
-    enabled: !!backpack,
-  });
-
+function Contents({
+  container,
+}: {
+  container: Container<WithSource & WithItems>;
+}) {
   return (
-    <section className="flex flex-col gap-1.5">
+    <section key={container.id} className="flex flex-col gap-1.5">
       <Heading variant="small" asChild>
-        <h2>{backpack?.spec.name}</h2>
+        <h2>{container.items[0].spec.name}</h2>
       </Heading>
 
-      {isLoading ? (
-        <Alert type="neutral">Loading...</Alert>
-      ) : storage?.items.length ? (
+      {container.items.length ? (
         <Definition.List>
-          {storage.items.map((item) => (
+          {container.items.map((item) => (
             <Definition key={item.id} label={item.spec.name}>
               &times;{item.amount}
             </Definition>
@@ -74,6 +70,27 @@ function Storage({ characterId }: { characterId: number }) {
       )}
     </section>
   );
+}
+
+function Storage({ characterId }: { characterId: number }) {
+  const query = useQuery({
+    queryKey: client.characters.storage.queryKey(characterId),
+    queryFn: () => client.characters.storage.get(characterId),
+  });
+
+  if (query.isLoading) {
+    return <Alert type="neutral">Loading...</Alert>;
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const storage = query.data.payload;
+
+  return storage.map((container) => (
+    <Contents key={container.id} container={container} />
+  ));
 }
 
 type Props = {
@@ -89,7 +106,13 @@ export default function Page({ params }: Props) {
     <main className="flex flex-col gap-12">
       <Header characterId={characterId} />
 
-      <Equipment characterId={characterId} />
+      <section className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Equipment</h2>
+        </Heading>
+
+        <Slots characterId={characterId} />
+      </section>
 
       <Storage characterId={characterId} />
     </main>

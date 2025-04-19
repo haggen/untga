@@ -224,6 +224,17 @@ export const client = {
       },
     },
 
+    storage: {
+      queryKey: (characterId: number) =>
+        [...client.characters.queryKey(characterId), "storage"] as const,
+
+      get: async (characterId: number) => {
+        return request<Container<WithSource & WithItems>[]>(
+          `/api/v1/characters/${characterId}/storage`
+        );
+      },
+    },
+
     logs: {
       queryKey: (characterId: number) =>
         [...client.characters.queryKey(characterId), "logs"] as const,

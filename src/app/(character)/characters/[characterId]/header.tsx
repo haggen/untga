@@ -15,18 +15,18 @@ export function Header({ characterId }: { characterId: number }) {
   return (
     <header className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
-        <Heading asChild>
+        <Heading asChild className="truncate">
           <h1>{isLoading ? "Loading..." : character?.name}</h1>
         </Heading>
 
-        <menu className="flex gap-1.5">
+        <menu className="flex items-center">
           <li>
-            <Button asChild variant="secondary" size="small">
+            <Button asChild variant="nested" size="small">
               <Link href={`/characters/${characterId}/edit`}>Edit</Link>
             </Button>
           </li>
           <li>
-            <Button asChild variant="secondary" size="small">
+            <Button asChild variant="nested" size="small">
               <Link href="/characters">Switch</Link>
             </Button>
           </li>

@@ -76,7 +76,7 @@ function datetime(
   return new Intl.DateTimeFormat(locale, options).format(new Date(date));
 }
 
-export const format = {
+export const fmt = {
   number,
   plural,
   datetime,

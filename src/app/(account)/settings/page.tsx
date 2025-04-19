@@ -13,7 +13,7 @@ import { Input } from "~/components/Input";
 import { Menu } from "~/components/Menu";
 import { useSession } from "~/components/SessionProvider";
 import { client } from "~/lib/client";
-import { format } from "~/lib/format";
+import { fmt } from "~/lib/fmt";
 
 // @todo: Move this to ./src/lib/something.
 function getFormattedUserAgent(userAgent: string) {
@@ -79,14 +79,14 @@ function Sessions() {
               <div className="flex items-center justify-between gap-6 p-3">
                 <p>
                   Created at{" "}
-                  {format.datetime(session.createdAt, {
+                  {fmt.datetime(session.createdAt, {
                     dateStyle: "short",
                     timeStyle: "short",
                   })}
                   , from <Geolocation ip={session.ip} />, on{" "}
                   {getFormattedUserAgent(session.userAgent)}.{" "}
                   {session.expired ? "Expired" : "Expires"} on{" "}
-                  {format.datetime(session.expiresAt, {
+                  {fmt.datetime(session.expiresAt, {
                     dateStyle: "short",
                     timeStyle: "short",
                   })}
