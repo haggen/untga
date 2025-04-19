@@ -5,6 +5,7 @@ import { use } from "react";
 import { Alert } from "~/components/Alert";
 import { Heading } from "~/components/Heading";
 import { client } from "~/lib/client";
+import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
 import { Header } from "../header";
 
@@ -14,26 +15,37 @@ function Journal({ characterId }: { characterId: number }) {
     queryFn: () => client.characters.logs.get(characterId),
   });
 
-  const logs = query.data?.payload ?? [];
+  if (query.isLoading) {
+    return (
+      <Alert>
+        <p>Loading...</p>
+      </Alert>
+    );
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const logs = query.data.payload;
 
   return (
-    <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>Journal</h2>
-      </Heading>
+    <ul className="flex flex-col gap-1.5">
+      {logs.map((log) => (
+        <li key={log.id} className="flex gap-1.5 before:content-['⬥']">
+          <article>
+            <h1 className="text-sm text-stone-600">
+              {fmt.datetime(log.createdAt, {
+                dateStyle: "short",
+                timeStyle: "short",
+              })}
+            </h1>
 
-      {logs.length > 0 ? (
-        <ul>
-          {logs.map((log) => (
-            <li key={log.id}>{log.message}</li>
-          ))}
-        </ul>
-      ) : (
-        <Alert>
-          <p>Loading...</p>
-        </Alert>
-      )}
-    </section>
+            <p>{log.message}</p>
+          </article>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -49,7 +61,14 @@ export default function Page({ params }: Props) {
   return (
     <main className="flex flex-col gap-12">
       <Header characterId={characterId} />
-      <Journal characterId={characterId} />
+
+      <section className="flex flex-col gap-3">
+        <Heading variant="small" asChild>
+          <h2>Journal</h2>
+        </Heading>
+
+        <Journal characterId={characterId} />
+      </section>
     </main>
   );
 }
