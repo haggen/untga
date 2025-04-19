@@ -130,6 +130,14 @@ export type WithUser = {
   include: { user: true };
 };
 
+export type WithCharacters = {
+  include: { characters: true };
+};
+
+export type WithExits = {
+  include: { exits: WithExit };
+};
+
 export type WithStorage = {
   include: { items: WithSpec & { include: { storage: WithItems } } };
 };

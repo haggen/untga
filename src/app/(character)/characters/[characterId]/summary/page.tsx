@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { use } from "react";
 import { Definition } from "~/components/Definition";
 import { Heading } from "~/components/Heading";
@@ -46,7 +47,9 @@ function CharacterStats({ characterId }: { characterId: number }) {
       {new Date(character.createdAt).toLocaleDateString()}
     </Definition>,
     <Definition key={2} label="Location">
-      ...
+      <Link href="./location" className="text-orange-700">
+        {character.location.name}
+      </Link>
     </Definition>,
     <Definition key={3} label="Status">
       {character.status}

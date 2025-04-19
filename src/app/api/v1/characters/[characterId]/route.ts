@@ -11,6 +11,9 @@ export const GET = createApiHandler(async ({ params }) => {
 
   const character = await db.character.findUnique({
     where: { id: characterId },
+    include: {
+      location: true,
+    },
   });
 
   if (!character) {

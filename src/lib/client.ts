@@ -10,9 +10,11 @@ import type {
   Session,
   User,
   WithAttributes,
+  WithCharacters,
   WithEffects,
   WithEntry,
   WithExit,
+  WithExits,
   WithItems,
   WithLocation,
   WithSlots,
@@ -197,7 +199,9 @@ export const client = {
     },
 
     get: async (characterId: number) => {
-      return request<Character>(`/api/v1/characters/${characterId}`);
+      return request<Character<WithLocation>>(
+        `/api/v1/characters/${characterId}`
+      );
     },
 
     patch: async (characterId: number, payload: FormData) => {
@@ -249,7 +253,9 @@ export const client = {
         [...client.characters.queryKey(characterId), "location"] as const,
 
       get: async (characterId: number) => {
-        return request<Location>(`/api/v1/characters/${characterId}/location`);
+        return request<Location<WithCharacters & WithExits>>(
+          `/api/v1/characters/${characterId}/location`
+        );
       },
     },
 

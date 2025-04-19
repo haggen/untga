@@ -18,18 +18,19 @@ export const GET = createApiHandler(async ({ params }) => {
     throw new NotFoundError("Character not found.");
   }
 
-  const containers = await db.container.findMany({
+  const location = await db.location.findFirstOrThrow({
     where: {
-      character: { id: characterId },
+      characters: { some: { id: characterId } },
     },
     include: {
-      items: {
+      characters: true,
+      exits: {
         include: {
-          spec: true,
+          exit: true,
         },
       },
     },
   });
 
-  return { payload: containers };
+  return { payload: location };
 });

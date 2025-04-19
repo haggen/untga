@@ -2,17 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Alert } from "~/components/Alert";
 import { Definition } from "~/components/Definition";
 import { Heading } from "~/components/Heading";
 import { client } from "~/lib/client";
+import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
 import { Header } from "../header";
 
-function Location({ locationId }: { locationId: number }) {
+function Summary({ characterId }: { characterId: number }) {
   const query = useQuery({
-    queryKey: client.locations.queryKey(locationId),
-    queryFn: () => client.locations.get(locationId),
+    queryKey: client.characters.location.queryKey(characterId),
+    queryFn: () => client.characters.location.get(characterId),
   });
 
   const location = query.data?.payload;
@@ -31,53 +31,65 @@ function Location({ locationId }: { locationId: number }) {
   );
 }
 
-function Characters({ locationId }: { locationId: number }) {
+function Exits({ characterId }: { characterId: number }) {
   const query = useQuery({
-    queryKey: client.locations.characters.queryKey(locationId),
-    queryFn: () => client.locations.characters.get(locationId),
+    queryKey: client.characters.location.queryKey(characterId),
+    queryFn: () => client.characters.location.get(characterId),
   });
 
-  const characters = query.data?.payload ?? [];
+  if (query.isLoading) {
+    return (
+      <Definition.List>
+        <Definition label="Loading...">Loading...</Definition>
+      </Definition.List>
+    );
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const { exits } = query.data.payload;
 
   return (
-    <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>Characters</h2>
-      </Heading>
-
-      <Definition.List>
-        {characters.map((character) => (
-          <Definition key={character.id} label={character.name}>
-            {character.status}
-          </Definition>
-        ))}
-      </Definition.List>
-    </section>
+    <Definition.List>
+      {exits.map((route) => (
+        <Definition key={route.id} label={route.exit.name}>
+          {fmt.plural(route.length, { one: "# mile" })}
+        </Definition>
+      ))}
+    </Definition.List>
   );
 }
 
-function Exits({ locationId }: { locationId: number }) {
+function Characters({ characterId }: { characterId: number }) {
   const query = useQuery({
-    queryKey: client.locations.exits.queryKey(locationId),
-    queryFn: () => client.locations.exits.get(locationId),
+    queryKey: client.characters.location.queryKey(characterId),
+    queryFn: () => client.characters.location.get(characterId),
   });
 
-  const routes = query.data?.payload ?? [];
+  if (query.isLoading) {
+    return (
+      <Definition.List>
+        <Definition label="Loading...">Loading...</Definition>
+      </Definition.List>
+    );
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const { characters } = query.data.payload;
 
   return (
-    <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>Exits</h2>
-      </Heading>
-
-      <Definition.List>
-        {routes.map((route) => (
-          <Definition key={route.id} label={route.exit.name}>
-            0 mi
-          </Definition>
-        ))}
-      </Definition.List>
-    </section>
+    <Definition.List>
+      {characters.map((character) => (
+        <Definition key={character.id} label={character.name}>
+          {character.status}
+        </Definition>
+      ))}
+    </Definition.List>
   );
 }
 
@@ -90,29 +102,27 @@ export default function Page({ params }: Props) {
     characterId: schemas.id,
   });
 
-  const query = useQuery({
-    queryKey: client.characters.queryKey(characterId),
-    queryFn: () => client.characters.get(characterId),
-  });
-
-  const { locationId } = query.data?.payload ?? {};
-
-  if (!locationId) {
-    return (
-      <main className="flex flex-col gap-12">
-        <Header characterId={characterId} />
-
-        <Alert>Loading...</Alert>
-      </main>
-    );
-  }
-
   return (
     <main className="flex flex-col gap-12">
       <Header characterId={characterId} />
-      <Location locationId={locationId} />
-      <Characters locationId={locationId} />
-      <Exits locationId={locationId} />
+
+      <Summary characterId={characterId} />
+
+      <section className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Exits</h2>
+        </Heading>
+
+        <Exits characterId={characterId} />
+      </section>
+
+      <section className="flex flex-col gap-1.5">
+        <Heading variant="small" asChild>
+          <h2>Characters</h2>
+        </Heading>
+
+        <Characters characterId={characterId} />
+      </section>
     </main>
   );
 }
