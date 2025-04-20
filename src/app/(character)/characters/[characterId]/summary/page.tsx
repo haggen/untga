@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { use } from "react";
-import { Definition, List } from "~/components/simple/Definition";
+import { Header } from "~/components/CharacterCard";
+import * as Definition from "~/components/simple/Definition";
 import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
-import { Header } from "../header";
 
 function CharacterStats({ characterId }: { characterId: number }) {
   const query = useQuery({
@@ -18,18 +18,18 @@ function CharacterStats({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return [
-      <Definition key={0} label="Name">
+      <Definition.Item key={0} label="Name">
         Loading...
-      </Definition>,
-      <Definition key={1} label="Birth">
+      </Definition.Item>,
+      <Definition.Item key={1} label="Birth">
         Loading...
-      </Definition>,
-      <Definition key={2} label="Location">
+      </Definition.Item>,
+      <Definition.Item key={2} label="Location">
         Loading...
-      </Definition>,
-      <Definition key={3} label="Status">
+      </Definition.Item>,
+      <Definition.Item key={3} label="Status">
         Loading...
-      </Definition>,
+      </Definition.Item>,
     ];
   }
 
@@ -40,20 +40,20 @@ function CharacterStats({ characterId }: { characterId: number }) {
   const character = query.data.payload;
 
   return [
-    <Definition key={0} label="Name">
+    <Definition.Item key={0} label="Name">
       {character.name}
-    </Definition>,
-    <Definition key={1} label="Birth">
+    </Definition.Item>,
+    <Definition.Item key={1} label="Birth">
       {new Date(character.createdAt).toLocaleDateString()}
-    </Definition>,
-    <Definition key={2} label="Location">
+    </Definition.Item>,
+    <Definition.Item key={2} label="Location">
       <Link href="./location" className="text-orange-700">
         {character.location.name}
       </Link>
-    </Definition>,
-    <Definition key={3} label="Status">
+    </Definition.Item>,
+    <Definition.Item key={3} label="Status">
       {character.status}
-    </Definition>,
+    </Definition.Item>,
   ];
 }
 
@@ -64,7 +64,7 @@ function CharacterResources({ characterId }: { characterId: number }) {
   });
 
   if (query.isLoading) {
-    return <Definition label="Loading..." />;
+    return <Definition.Item label="Loading..." />;
   }
 
   if (!query.data) {
@@ -74,9 +74,9 @@ function CharacterResources({ characterId }: { characterId: number }) {
   const resources = query.data.payload;
 
   return resources.map((resource) => (
-    <Definition label={resource.spec.name} key={resource.id}>
+    <Definition.Item label={resource.spec.name} key={resource.id}>
       {resource.level}/{resource.cap}
-    </Definition>
+    </Definition.Item>
   ));
 }
 
@@ -88,15 +88,15 @@ function CharacterSkills({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return [
-      <Definition key={0} label="Loading...">
+      <Definition.Item key={0} label="Loading...">
         Loading...
-      </Definition>,
-      <Definition key={1} label="Loading...">
+      </Definition.Item>,
+      <Definition.Item key={1} label="Loading...">
         Loading...
-      </Definition>,
-      <Definition key={2} label="Loading...">
+      </Definition.Item>,
+      <Definition.Item key={2} label="Loading...">
         Loading...
-      </Definition>,
+      </Definition.Item>,
     ];
   }
 
@@ -107,16 +107,16 @@ function CharacterSkills({ characterId }: { characterId: number }) {
   const skills = query.data.payload;
 
   return (
-    <List>
+    <Definition.List>
       {skills.map((skill) => (
-        <Definition label={skill.spec.name} key={skill.id}>
+        <Definition.Item label={skill.spec.name} key={skill.id}>
           {fmt.number(skill.level, {
             style: "percent",
             maximumFractionDigits: 0,
           })}
-        </Definition>
+        </Definition.Item>
       ))}
-    </List>
+    </Definition.List>
   );
 }
 
@@ -138,10 +138,10 @@ export default function Page({ params }: Props) {
           <h2>Summary</h2>
         </Heading>
 
-        <List>
+        <Definition.List>
           <CharacterStats characterId={characterId} />
           <CharacterResources characterId={characterId} />
-        </List>
+        </Definition.List>
       </section>
 
       <section className="flex flex-col gap-1.5">

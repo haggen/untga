@@ -2,12 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { Header } from "~/components/CharacterCard";
 import { Alert } from "~/components/simple/Alert";
-import { Definition, List as DList } from "~/components/simple/Definition";
+import * as Definition from "~/components/simple/Definition";
 import { Heading } from "~/components/simple/Heading";
 import { client, Container, WithItems, WithSource } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
-import { Header } from "../header";
 
 function Slots({ characterId }: { characterId: number }) {
   const query = useQuery({
@@ -17,15 +17,15 @@ function Slots({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return (
-      <DList>
+      <Definition.List>
         {Array(7)
           .fill(undefined)
           .map((_, index) => (
-            <Definition key={index} label="Loading...">
+            <Definition.Item key={index} label="Loading...">
               Loading...
-            </Definition>
+            </Definition.Item>
           ))}
-      </DList>
+      </Definition.List>
     );
   }
 
@@ -36,13 +36,13 @@ function Slots({ characterId }: { characterId: number }) {
   const slots = query.data.payload;
 
   return (
-    <DList>
+    <Definition.List>
       {slots.map((slot) => (
-        <Definition key={slot.id} label={slot.slot}>
+        <Definition.Item key={slot.id} label={slot.slot}>
           {slot.items[0]?.spec.name ?? "Empty"}
-        </Definition>
+        </Definition.Item>
       ))}
-    </DList>
+    </Definition.List>
   );
 }
 
@@ -58,13 +58,13 @@ function Contents({
       </Heading>
 
       {container.items.length ? (
-        <DList>
+        <Definition.List>
           {container.items.map((item) => (
-            <Definition key={item.id} label={item.spec.name}>
+            <Definition.Item key={item.id} label={item.spec.name}>
               &times;{item.amount}
-            </Definition>
+            </Definition.Item>
           ))}
-        </DList>
+        </Definition.List>
       ) : (
         <Alert type="neutral">Empty.</Alert>
       )}

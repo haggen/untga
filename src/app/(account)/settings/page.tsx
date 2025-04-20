@@ -11,7 +11,7 @@ import { Field } from "~/components/simple/Field";
 import { Geolocation } from "~/components/simple/Geolocation";
 import { Heading } from "~/components/simple/Heading";
 import { Input } from "~/components/simple/Input";
-import { Menu } from "~/components/simple/Menu";
+import * as Menu from "~/components/simple/Menu";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 
@@ -73,7 +73,7 @@ function Sessions() {
           <p>Loading...</p>
         </Alert>
       ) : (
-        <Menu>
+        <Menu.Menu>
           {sessions?.map((session) => (
             <Menu.Item key={session.id}>
               <div className="flex items-center justify-between gap-6 p-3">
@@ -106,7 +106,7 @@ function Sessions() {
               </div>
             </Menu.Item>
           ))}
-        </Menu>
+        </Menu.Menu>
       )}
     </section>
   );

@@ -41,5 +41,3 @@ export function Item({ href, onClick, className, ...props }: ItemProps) {
     </li>
   );
 }
-
-Menu.Item = Item;

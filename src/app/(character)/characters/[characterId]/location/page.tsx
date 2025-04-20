@@ -2,12 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Definition, List } from "~/components/simple/Definition";
+import { Header } from "~/components/CharacterCard";
+import * as Definition from "~/components/simple/Definition";
 import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
-import { Header } from "../header";
 
 function Summary({ characterId }: { characterId: number }) {
   const query = useQuery({
@@ -39,9 +39,9 @@ function Exits({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return (
-      <List>
-        <Definition label="Loading...">Loading...</Definition>
-      </List>
+      <Definition.List>
+        <Definition.Item label="Loading...">Loading...</Definition.Item>
+      </Definition.List>
     );
   }
 
@@ -52,13 +52,13 @@ function Exits({ characterId }: { characterId: number }) {
   const { exits } = query.data.payload;
 
   return (
-    <List>
+    <Definition.List>
       {exits.map((route) => (
-        <Definition key={route.id} label={route.exit.name}>
+        <Definition.Item key={route.id} label={route.exit.name}>
           {fmt.plural(route.length, { one: "# mile" })}
-        </Definition>
+        </Definition.Item>
       ))}
-    </List>
+    </Definition.List>
   );
 }
 
@@ -70,9 +70,9 @@ function Characters({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return (
-      <List>
-        <Definition label="Loading...">Loading...</Definition>
-      </List>
+      <Definition.List>
+        <Definition.Item label="Loading...">Loading...</Definition.Item>
+      </Definition.List>
     );
   }
 
@@ -83,13 +83,13 @@ function Characters({ characterId }: { characterId: number }) {
   const { characters } = query.data.payload;
 
   return (
-    <List>
+    <Definition.List>
       {characters.map((character) => (
-        <Definition key={character.id} label={character.name}>
+        <Definition.Item key={character.id} label={character.name}>
           {character.status}
-        </Definition>
+        </Definition.Item>
       ))}
-    </List>
+    </Definition.List>
   );
 }
 

@@ -2,12 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { Header } from "~/components/CharacterCard";
 import { Alert } from "~/components/simple/Alert";
 import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
-import { Header } from "../header";
 
 function Journal({ characterId }: { characterId: number }) {
   const query = useQuery({

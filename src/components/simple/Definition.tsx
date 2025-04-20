@@ -1,16 +1,11 @@
 import { ComponentProps, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
-type DefinitionProps = ComponentProps<"div"> & {
+type ItemProps = ComponentProps<"div"> & {
   label: ReactNode;
 };
 
-export function Definition({
-  label,
-  children,
-  className,
-  ...props
-}: DefinitionProps) {
+export function Item({ label, children, className, ...props }: ItemProps) {
   return (
     <div
       className={twMerge("flex items-center gap-2 py-0.5", className)}

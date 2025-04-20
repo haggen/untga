@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "~/components/SessionProvider";
 import { Heading } from "~/components/simple/Heading";
-import { Menu } from "~/components/simple/Menu";
+import * as Menu from "~/components/simple/Menu";
 import { client } from "~/lib/client";
 
 export default function Page() {
@@ -25,7 +25,7 @@ export default function Page() {
         <p>Select the character with whom you&apos;d like to play.</p>
       </header>
 
-      <Menu>
+      <Menu.Menu>
         <Menu.Item
           href={
             isFetching
@@ -71,7 +71,7 @@ export default function Page() {
               : characters[2]?.name ?? "Empty (create new character)"}
           </div>
         </Menu.Item>
-      </Menu>
+      </Menu.Menu>
     </main>
   );
 }
