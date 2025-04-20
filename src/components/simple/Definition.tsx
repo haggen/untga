@@ -29,5 +29,3 @@ type ListProps = ComponentProps<"dl">;
 export function List({ className, ...props }: ListProps) {
   return <dl className={twMerge("flex flex-col", className)} {...props} />;
 }
-
-Definition.List = List;

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { HTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
-import { Slot } from "~/components/Slot";
+import { Slot } from "~/components/simple/Slot";
 
 type MenuProps = HTMLAttributes<HTMLElement> & {
   asChild?: boolean;
@@ -12,7 +12,7 @@ export function Menu({ asChild, ...props }: MenuProps) {
   const Component = asChild ? Slot : "ul";
   return (
     <Component
-      className="flex flex-col gap-px rounded border border-stone-400 overflow-hidden"
+      className="flex flex-col gap-px rounded-sm border border-stone-400 overflow-hidden"
       {...props}
     />
   );

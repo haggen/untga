@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { ReactNode } from "react";
 import { SessionProvider } from "~/components/SessionProvider";
-import { Tab } from "~/components/Tab";
+import { Bar, Tab } from "~/components/simple/Tab";
 import { serializable } from "~/lib/serializable";
 import { requireActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
@@ -28,7 +28,7 @@ export default async function Layout({ params, children }: Props) {
       <div className="grow flex flex-col gap-12">
         <div className="grow">{children}</div>
 
-        <Tab.Bar>
+        <Bar>
           <Tab href={`/characters/${characterId}/summary`}>
             <UserCircleIcon /> Summary
           </Tab>
@@ -41,7 +41,7 @@ export default async function Layout({ params, children }: Props) {
           <Tab href={`/characters/${characterId}/journal`}>
             <BookOpenTextIcon /> Journal
           </Tab>
-        </Tab.Bar>
+        </Bar>
       </div>
     </SessionProvider>
   );

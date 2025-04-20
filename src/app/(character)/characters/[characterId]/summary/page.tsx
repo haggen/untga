@@ -3,8 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { use } from "react";
-import { Definition } from "~/components/Definition";
-import { Heading } from "~/components/Heading";
+import { Definition, List } from "~/components/simple/Definition";
+import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
@@ -107,7 +107,7 @@ function CharacterSkills({ characterId }: { characterId: number }) {
   const skills = query.data.payload;
 
   return (
-    <Definition.List>
+    <List>
       {skills.map((skill) => (
         <Definition label={skill.spec.name} key={skill.id}>
           {fmt.number(skill.level, {
@@ -116,7 +116,7 @@ function CharacterSkills({ characterId }: { characterId: number }) {
           })}
         </Definition>
       ))}
-    </Definition.List>
+    </List>
   );
 }
 
@@ -138,10 +138,10 @@ export default function Page({ params }: Props) {
           <h2>Summary</h2>
         </Heading>
 
-        <Definition.List>
+        <List>
           <CharacterStats characterId={characterId} />
           <CharacterResources characterId={characterId} />
-        </Definition.List>
+        </List>
       </section>
 
       <section className="flex flex-col gap-1.5">

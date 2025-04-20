@@ -1,6 +1,6 @@
 import { ClipboardSignatureIcon, KeyIcon, LogInIcon } from "lucide-react";
 import { ReactNode } from "react";
-import { Tab } from "~/components/Tab";
+import { Bar, Tab } from "~/components/simple/Tab";
 
 type Props = {
   children: ReactNode;
@@ -11,7 +11,7 @@ export default async function Layout({ children }: Props) {
     <div className="grow flex flex-col gap-12">
       <div className="grow">{children}</div>
 
-      <Tab.Bar>
+      <Bar>
         <Tab href="/register">
           <ClipboardSignatureIcon /> Register
         </Tab>
@@ -21,7 +21,7 @@ export default async function Layout({ children }: Props) {
         <Tab href="/recovery">
           <KeyIcon /> Recovery
         </Tab>
-      </Tab.Bar>
+      </Bar>
     </div>
   );
 }

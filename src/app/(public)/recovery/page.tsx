@@ -3,11 +3,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
-import { Alert } from "~/components/Alert";
-import { Button } from "~/components/Button";
-import { Field } from "~/components/Field";
-import { Heading } from "~/components/Heading";
-import { Input } from "~/components/Input";
+import { Alert } from "~/components/simple/Alert";
+import { Button } from "~/components/simple/Button";
+import { Field } from "~/components/simple/Field";
+import { Heading } from "~/components/simple/Heading";
+import { Input } from "~/components/simple/Input";
 import { client } from "~/lib/client";
 import { Session } from "~/lib/db";
 

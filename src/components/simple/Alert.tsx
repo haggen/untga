@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "p-3 rounded inset-ring mix-blend-multiply",
+  base: "p-3 rounded-sm inset-ring mix-blend-multiply",
   variants: {
     type: {
       neutral: "bg-sky-100 text-sky-800 inset-ring-sky-800/10",

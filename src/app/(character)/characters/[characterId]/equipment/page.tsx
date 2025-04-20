@@ -2,9 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Alert } from "~/components/Alert";
-import { Definition } from "~/components/Definition";
-import { Heading } from "~/components/Heading";
+import { Alert } from "~/components/simple/Alert";
+import { Definition, List as DList } from "~/components/simple/Definition";
+import { Heading } from "~/components/simple/Heading";
 import { client, Container, WithItems, WithSource } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
 import { Header } from "../header";
@@ -17,7 +17,7 @@ function Slots({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return (
-      <Definition.List>
+      <DList>
         {Array(7)
           .fill(undefined)
           .map((_, index) => (
@@ -25,7 +25,7 @@ function Slots({ characterId }: { characterId: number }) {
               Loading...
             </Definition>
           ))}
-      </Definition.List>
+      </DList>
     );
   }
 
@@ -36,13 +36,13 @@ function Slots({ characterId }: { characterId: number }) {
   const slots = query.data.payload;
 
   return (
-    <Definition.List>
+    <DList>
       {slots.map((slot) => (
         <Definition key={slot.id} label={slot.slot}>
           {slot.items[0]?.spec.name ?? "Empty"}
         </Definition>
       ))}
-    </Definition.List>
+    </DList>
   );
 }
 
@@ -58,13 +58,13 @@ function Contents({
       </Heading>
 
       {container.items.length ? (
-        <Definition.List>
+        <DList>
           {container.items.map((item) => (
             <Definition key={item.id} label={item.spec.name}>
               &times;{item.amount}
             </Definition>
           ))}
-        </Definition.List>
+        </DList>
       ) : (
         <Alert type="neutral">Empty.</Alert>
       )}

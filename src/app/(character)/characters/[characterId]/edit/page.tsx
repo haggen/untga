@@ -3,13 +3,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent, use } from "react";
-import { Alert } from "~/components/Alert";
-import { Button } from "~/components/Button";
-import { Field } from "~/components/Field";
-import { Heading } from "~/components/Heading";
-import { Input } from "~/components/Input";
 import { useSession } from "~/components/SessionProvider";
-import { Textarea } from "~/components/Textarea";
+import { Alert } from "~/components/simple/Alert";
+import { Button } from "~/components/simple/Button";
+import { Field } from "~/components/simple/Field";
+import { Heading } from "~/components/simple/Heading";
+import { Input } from "~/components/simple/Input";
+import { Textarea } from "~/components/simple/Textarea";
 import { client } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
 

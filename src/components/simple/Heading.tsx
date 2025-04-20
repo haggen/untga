@@ -1,6 +1,6 @@
 import { HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
-import { Slot } from "~/components/Slot";
+import { Slot } from "~/components/simple/Slot";
 
 const variants = tv({
   base: "font-serif font-medium",

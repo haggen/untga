@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Definition } from "~/components/Definition";
-import { Heading } from "~/components/Heading";
+import { Definition, List } from "~/components/simple/Definition";
+import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
@@ -39,9 +39,9 @@ function Exits({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return (
-      <Definition.List>
+      <List>
         <Definition label="Loading...">Loading...</Definition>
-      </Definition.List>
+      </List>
     );
   }
 
@@ -52,13 +52,13 @@ function Exits({ characterId }: { characterId: number }) {
   const { exits } = query.data.payload;
 
   return (
-    <Definition.List>
+    <List>
       {exits.map((route) => (
         <Definition key={route.id} label={route.exit.name}>
           {fmt.plural(route.length, { one: "# mile" })}
         </Definition>
       ))}
-    </Definition.List>
+    </List>
   );
 }
 
@@ -70,9 +70,9 @@ function Characters({ characterId }: { characterId: number }) {
 
   if (query.isLoading) {
     return (
-      <Definition.List>
+      <List>
         <Definition label="Loading...">Loading...</Definition>
-      </Definition.List>
+      </List>
     );
   }
 
@@ -83,13 +83,13 @@ function Characters({ characterId }: { characterId: number }) {
   const { characters } = query.data.payload;
 
   return (
-    <Definition.List>
+    <List>
       {characters.map((character) => (
         <Definition key={character.id} label={character.name}>
           {character.status}
         </Definition>
       ))}
-    </Definition.List>
+    </List>
   );
 }
 

@@ -1,7 +1,7 @@
 import { CogIcon, UsersIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { SessionProvider } from "~/components/SessionProvider";
-import { Tab } from "~/components/Tab";
+import { Bar, Tab } from "~/components/simple/Tab";
 import { serializable } from "~/lib/serializable";
 import { requireActiveSession } from "~/lib/session";
 
@@ -17,8 +17,8 @@ export default async function Layout({ children }: Props) {
       <div className="grow flex flex-col gap-12">
         <div className="grow">{children}</div>
 
-        <Tab.Bar>
-          <Tab href="/characters">
+        <Bar>
+          <Tab href="/characters" exact={false}>
             <UsersIcon />
             Characters
           </Tab>
@@ -26,7 +26,7 @@ export default async function Layout({ children }: Props) {
             <CogIcon />
             Settings
           </Tab>
-        </Tab.Bar>
+        </Bar>
       </div>
     </SessionProvider>
   );

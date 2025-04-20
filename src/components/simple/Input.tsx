@@ -2,7 +2,7 @@ import { ComponentProps } from "react";
 import { tv } from "tailwind-variants";
 
 const variants = tv({
-  base: "flex h-10 px-2 items-center bg-stone-100 border border-stone-400 rounded placeholder:text-stone-500",
+  base: "flex h-10 px-2 items-center bg-stone-100 border border-stone-400 rounded-sm placeholder:text-stone-500",
   variants: {
     disabled: {
       true: "cursor-not-allowed opacity-50",

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Button } from "~/components/Button";
-import { Heading } from "~/components/Heading";
+import { Button } from "~/components/simple/Button";
+import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 
 export function Header({ characterId }: { characterId: number }) {

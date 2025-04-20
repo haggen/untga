@@ -1,9 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Heading } from "~/components/Heading";
-import { Menu } from "~/components/Menu";
 import { useSession } from "~/components/SessionProvider";
+import { Heading } from "~/components/simple/Heading";
+import { Menu } from "~/components/simple/Menu";
 import { client } from "~/lib/client";
 
 export default function Page() {
