@@ -228,6 +228,7 @@ const ext = Prisma.defineExtension((client) => {
             tag.Equipment,
             tag.Feet
           );
+
           const pack = await db.itemSpecification.findByTags(
             tag.Starting,
             tag.Equipment,
@@ -252,7 +253,7 @@ const ext = Prisma.defineExtension((client) => {
 
           const wine = await db.itemSpecification.findByTags(
             tag.Starting,
-            tag.Food
+            tag.Drink
           );
 
           return {
@@ -346,7 +347,7 @@ const ext = Prisma.defineExtension((client) => {
         async startingAttributes() {
           const attributes = await db.attributeSpecification.findMany({
             where: {
-              tags: { has: tag.Starting, hasSome: [tag.Skill, tag.Resource] },
+              tags: { has: tag.Starting },
             },
           });
 
@@ -364,7 +365,7 @@ const ext = Prisma.defineExtension((client) => {
          */
         async startingLocation() {
           const location = await db.location.findFirstOrThrow({
-            where: { tags: { has: tag.StartingLocation } },
+            where: { tags: { has: tag.Starting } },
           });
 
           return {

@@ -6,7 +6,7 @@ import { z } from "zod";
 export const schemas = {
   id: z.coerce.number().positive(),
   name: z.string().trim().max(32),
-  email: z.email().trim(),
+  email: z.email(),
   password: z.string().trim().min(12),
 };
 

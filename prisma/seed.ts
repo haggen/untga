@@ -356,22 +356,22 @@ const seed = {
     {
       name: "Loaf of Hard Bread",
       description: "Dense, long-lasting bread. Chewing it's half the battle.",
-      tags: [tag.Consumable, tag.Starting],
+      tags: [tag.Consumable, tag.Food, tag.Starting],
     },
     {
       name: "Flask of Red Wine",
       description: "Cheap village wine. Sour but warming.",
-      tags: [tag.Consumable, tag.Starting],
+      tags: [tag.Consumable, tag.Drink, tag.Starting],
     },
     {
       name: "Dried Apples",
       description: "Slices of apple, dried over the hearth. Sweet and chewy.",
-      tags: [tag.Consumable],
+      tags: [tag.Consumable, tag.Food],
     },
     {
       name: "Bandage Roll",
       description: "Clean cloth strips used to dress wounds. Slows bleeding.",
-      tags: [tag.Consumable],
+      tags: [tag.Consumable, tag.Healing],
     },
     {
       name: "Tarnished Locket",
