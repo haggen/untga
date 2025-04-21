@@ -143,21 +143,19 @@ CREATE TABLE "Location" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "area" INTEGER NOT NULL,
+    "difficulty" DECIMAL(65,30) NOT NULL,
     "tags" TEXT[],
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Route" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "length" INTEGER NOT NULL DEFAULT 1,
-    "entryId" INTEGER NOT NULL,
-    "exitId" INTEGER NOT NULL,
+CREATE TABLE "_route" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
 
-    CONSTRAINT "Route_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "_route_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -170,10 +168,16 @@ CREATE UNIQUE INDEX "Session_secret_key" ON "Session"("secret");
 CREATE INDEX "Session_expiresAt_idx" ON "Session"("expiresAt");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Character_name_key" ON "Character"("name");
+
+-- CreateIndex
 CREATE INDEX "Character_tags_idx" ON "Character"("tags");
 
 -- CreateIndex
 CREATE INDEX "Character_deletedAt_idx" ON "Character"("deletedAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AttributeSpecification_name_key" ON "AttributeSpecification"("name");
 
 -- CreateIndex
 CREATE INDEX "AttributeSpecification_tags_idx" ON "AttributeSpecification"("tags");
@@ -185,7 +189,13 @@ CREATE UNIQUE INDEX "Container_sourceId_key" ON "Container"("sourceId");
 CREATE INDEX "Container_tags_idx" ON "Container"("tags");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "ItemSpecification_name_key" ON "ItemSpecification"("name");
+
+-- CreateIndex
 CREATE INDEX "ItemSpecification_tags_idx" ON "ItemSpecification"("tags");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EffectSpecification_name_key" ON "EffectSpecification"("name");
 
 -- CreateIndex
 CREATE INDEX "EffectSpecification_tags_idx" ON "EffectSpecification"("tags");
@@ -197,7 +207,13 @@ CREATE INDEX "Effect_startedAt_idx" ON "Effect"("startedAt");
 CREATE INDEX "Effect_expiresAt_idx" ON "Effect"("expiresAt");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Location_name_key" ON "Location"("name");
+
+-- CreateIndex
 CREATE INDEX "Location_tags_idx" ON "Location"("tags");
+
+-- CreateIndex
+CREATE INDEX "_route_B_index" ON "_route"("B");
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -236,7 +252,7 @@ ALTER TABLE "Effect" ADD CONSTRAINT "Effect_specId_fkey" FOREIGN KEY ("specId") 
 ALTER TABLE "Effect" ADD CONSTRAINT "Effect_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Route" ADD CONSTRAINT "Route_entryId_fkey" FOREIGN KEY ("entryId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "_route" ADD CONSTRAINT "_route_A_fkey" FOREIGN KEY ("A") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Route" ADD CONSTRAINT "Route_exitId_fkey" FOREIGN KEY ("exitId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "_route" ADD CONSTRAINT "_route_B_fkey" FOREIGN KEY ("B") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;

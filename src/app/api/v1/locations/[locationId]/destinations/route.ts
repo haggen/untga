@@ -10,12 +10,14 @@ export const GET = createApiHandler(async ({ params }) => {
 
   const location = await db.location.findUnique({
     where: { id: locationId },
-    include: { exits: { include: { exit: true } } },
+    include: {
+      destinations: true,
+    },
   });
 
   if (!location) {
     throw new NotFoundError("Location not found.");
   }
 
-  return { payload: location.exits };
+  return { payload: location.destinations };
 });

@@ -6,17 +6,15 @@ import type {
   Item,
   Location,
   Log,
-  Route,
   Session,
   User,
   WithAttributes,
   WithCharacters,
   WithEffects,
   WithEntry,
-  WithExit,
-  WithExits,
   WithItems,
   WithLocation,
+  WithRoutes,
   WithSlots,
   WithSource,
   WithSpec,
@@ -29,13 +27,11 @@ export {
   Effect,
   Location,
   Log,
-  Route,
   Session,
   User,
   WithAttributes,
   WithEffects,
   WithEntry,
-  WithExit,
   WithItems,
   WithLocation,
   WithSlots,
@@ -253,7 +249,7 @@ export const client = {
         [...client.characters.queryKey(characterId), "location"] as const,
 
       get: async (characterId: number) => {
-        return request<Location<WithCharacters & WithExits>>(
+        return request<Location<WithCharacters & WithRoutes>>(
           `/api/v1/characters/${characterId}/location`
         );
       },
@@ -334,14 +330,23 @@ export const client = {
       },
     },
 
-    exits: {
+    destinations: {
       queryKey: (locationId: number) =>
-        [...client.locations.queryKey(), locationId, "exits"] as const,
+        [...client.locations.queryKey(), locationId, "destinations"] as const,
 
       get: async (locationId: number) => {
-        return request<Route<WithEntry & WithExit>[]>(
-          `/api/v1/locations/${locationId}/exits`
+        return request<Location[]>(
+          `/api/v1/locations/${locationId}/destinations`
         );
+      },
+    },
+
+    routes: {
+      queryKey: (locationId: number) =>
+        [...client.locations.queryKey(), locationId, "routes"] as const,
+
+      get: async (locationId: number) => {
+        return request<Location[]>(`/api/v1/locations/${locationId}/routes`);
       },
     },
   },

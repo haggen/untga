@@ -6,7 +6,7 @@ import type {
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
 import { NotFoundError, UnauthorizedError } from "~/lib/error";
-import * as tags from "~/static/tags";
+import { tag } from "~/static/tag";
 
 export { Prisma };
 
@@ -82,12 +82,6 @@ export type Location<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
-export type Route<T = unknown> = Prisma.Result<
-  typeof db.route,
-  T,
-  "findFirstOrThrow"
->;
-
 export type WithLocation = {
   include: {
     location: true;
@@ -122,8 +116,8 @@ export type WithEntry = {
   include: { entry: true };
 };
 
-export type WithExit = {
-  include: { exit: true };
+export type WithRoutes = {
+  include: { routes: true };
 };
 
 export type WithUser = {
@@ -134,8 +128,8 @@ export type WithCharacters = {
   include: { characters: true };
 };
 
-export type WithExits = {
-  include: { exits: WithExit };
+export type WithDestinations = {
+  include: { destinations: true };
 };
 
 export type WithStorage = {
@@ -214,40 +208,128 @@ const ext = Prisma.defineExtension((client) => {
       },
       character: {
         /**
-         * Get character creation input data for starting slots.
+         * Equipment slots and initial gear for new characters.
          */
-        async startingSlots({
-          items,
-        }: {
-          items?: Prisma.ItemCreateNestedManyWithoutContainerInput;
-        }) {
+        async startingSlots() {
+          const tunic = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Equipment,
+            tag.Torso
+          );
+
+          const trousers = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Equipment,
+            tag.Legs
+          );
+
+          const shoes = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Equipment,
+            tag.Feet
+          );
+          const pack = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Equipment,
+            tag.Pack,
+            tag.Storage
+          );
+
+          const gold = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Currency
+          );
+
+          const dagger = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Weapon
+          );
+
+          const food = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Food
+          );
+
+          const wine = await db.itemSpecification.findByTags(
+            tag.Starting,
+            tag.Food
+          );
+
           return {
             slots: {
               create: [
-                { tags: [tags.Slot, tags.Head] },
-                { tags: [tags.Slot, tags.Chest] },
-                { tags: [tags.Slot, tags.Waist] },
-                { tags: [tags.Slot, tags.Hands] },
-                { tags: [tags.Slot, tags.Legs] },
-                { tags: [tags.Slot, tags.Feet] },
+                { tags: [tag.Slot, tag.Head] },
+                { tags: [tag.Slot, tag.Overgarment] },
                 {
-                  tags: [tags.Slot, tags.Back],
+                  tags: [tag.Slot, tag.Torso],
+                  items: {
+                    create: { amount: 1, spec: { connect: { id: tunic.id } } },
+                  },
+                },
+                { tags: [tag.Slot, tag.Waist] },
+                { tags: [tag.Slot, tag.Hands] },
+                {
+                  tags: [tag.Slot, tag.Legs],
+                  items: {
+                    create: {
+                      amount: 1,
+                      spec: { connect: { id: trousers.id } },
+                    },
+                  },
+                },
+                {
+                  tags: [tag.Slot, tag.Feet],
+                  items: {
+                    create: { amount: 1, spec: { connect: { id: shoes.id } } },
+                  },
+                },
+                {
+                  tags: [tag.Slot, tag.Pack],
                   items: {
                     create: {
                       spec: {
                         connect: {
-                          id: (
-                            await db.itemSpecification.findByTags(
-                              tags.Equipment,
-                              tags.Back,
-                              tags.Storage
-                            )
-                          ).id,
+                          id: pack.id,
                         },
                       },
                       storage: {
                         create: {
-                          items,
+                          items: {
+                            create: [
+                              {
+                                amount: 100,
+                                spec: {
+                                  connect: {
+                                    id: gold.id,
+                                  },
+                                },
+                              },
+                              {
+                                amount: 1,
+                                spec: {
+                                  connect: {
+                                    id: dagger.id,
+                                  },
+                                },
+                              },
+                              {
+                                amount: 1,
+                                spec: {
+                                  connect: {
+                                    id: food.id,
+                                  },
+                                },
+                              },
+                              {
+                                amount: 1,
+                                spec: {
+                                  connect: {
+                                    id: wine.id,
+                                  },
+                                },
+                              },
+                            ],
+                          },
                         },
                       },
                     },
@@ -259,11 +341,13 @@ const ext = Prisma.defineExtension((client) => {
         },
 
         /**
-         * Get character creation input data for starting attributes.
+         * Set of default resources and skills for new characters.
          */
         async startingAttributes() {
           const attributes = await db.attributeSpecification.findMany({
-            where: { tags: { hasSome: [tags.Skill, tags.Resource] } },
+            where: {
+              tags: { has: tag.Starting, hasSome: [tag.Skill, tag.Resource] },
+            },
           });
 
           return {
@@ -276,16 +360,28 @@ const ext = Prisma.defineExtension((client) => {
         },
 
         /**
-         * Get character creation input data for starting location.
+         * Get character creation input data for initial location.
          */
         async startingLocation() {
           const location = await db.location.findFirstOrThrow({
-            where: { tags: { has: tags.StartingLocation } },
+            where: { tags: { has: tag.StartingLocation } },
           });
 
           return {
             location: { connect: { id: location.id } },
           } satisfies Pick<Prisma.CharacterCreateInput, "location">;
+        },
+
+        async startingLogs() {
+          return {
+            logs: {
+              create: [
+                {
+                  message: "I'm an adult now and I'm on my own.",
+                },
+              ],
+            },
+          } satisfies Pick<Prisma.CharacterCreateInput, "logs">;
         },
       },
     },
@@ -388,36 +484,40 @@ const ext = Prisma.defineExtension((client) => {
         slot: {
           needs: { tags: true },
           compute(container) {
-            if (!container.tags.includes(tags.Slot)) {
+            if (!container.tags.includes(tag.Slot)) {
               return null;
             }
 
-            if (container.tags.includes(tags.Head)) {
+            if (container.tags.includes(tag.Head)) {
               return "Head";
             }
 
-            if (container.tags.includes(tags.Chest)) {
+            if (container.tags.includes(tag.Overgarment)) {
+              return "Overgarment";
+            }
+
+            if (container.tags.includes(tag.Torso)) {
               return "Chest";
             }
 
-            if (container.tags.includes(tags.Waist)) {
+            if (container.tags.includes(tag.Waist)) {
               return "Waist";
             }
 
-            if (container.tags.includes(tags.Hands)) {
+            if (container.tags.includes(tag.Hands)) {
               return "Hands";
             }
 
-            if (container.tags.includes(tags.Legs)) {
+            if (container.tags.includes(tag.Legs)) {
               return "Legs";
             }
 
-            if (container.tags.includes(tags.Feet)) {
+            if (container.tags.includes(tag.Feet)) {
               return "Feet";
             }
 
-            if (container.tags.includes(tags.Back)) {
-              return "Back";
+            if (container.tags.includes(tag.Pack)) {
+              return "Pack";
             }
 
             return "Unknown";

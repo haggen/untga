@@ -1,7 +1,7 @@
 import { createApiHandler } from "~/lib/api";
 import { db } from "~/lib/db";
 import { parse, schemas } from "~/lib/validation";
-import * as tags from "~/static/tags";
+import { tag } from "~/static/tag";
 
 export const GET = createApiHandler(async ({ params }) => {
   const { characterId } = parse(params, {
@@ -11,7 +11,7 @@ export const GET = createApiHandler(async ({ params }) => {
   const attributes = await db.attribute.findMany({
     where: {
       character: { id: characterId },
-      spec: { tags: { has: tags.Resource } },
+      spec: { tags: { has: tag.Resource } },
     },
     include: {
       spec: true,

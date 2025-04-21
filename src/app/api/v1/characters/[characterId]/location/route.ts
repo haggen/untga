@@ -24,11 +24,7 @@ export const GET = createApiHandler(async ({ params }) => {
     },
     include: {
       characters: true,
-      exits: {
-        include: {
-          exit: true,
-        },
-      },
+      routes: true,
     },
   });
 

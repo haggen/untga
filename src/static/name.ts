@@ -1,4 +1,4 @@
-export const characters = [
+export const character = [
   "Adalbert",
   "Adelheid",
   "Aedan",

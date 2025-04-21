@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 import { Header } from "~/components/CharacterCard";
+import { Alert } from "~/components/simple/Alert";
 import * as Definition from "~/components/simple/Definition";
 import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
@@ -31,10 +32,10 @@ function Summary({ characterId }: { characterId: number }) {
   );
 }
 
-function Exits({ characterId }: { characterId: number }) {
+function Destinations({ routeId }: { routeId: number }) {
   const query = useQuery({
-    queryKey: client.characters.location.queryKey(characterId),
-    queryFn: () => client.characters.location.get(characterId),
+    queryKey: client.locations.destinations.queryKey(routeId),
+    queryFn: () => client.locations.destinations.get(routeId),
   });
 
   if (query.isLoading) {
@@ -49,17 +50,64 @@ function Exits({ characterId }: { characterId: number }) {
     return null;
   }
 
-  const { exits } = query.data.payload;
+  const destinations = query.data.payload;
 
   return (
     <Definition.List>
-      {exits.map((route) => (
-        <Definition.Item key={route.id} label={route.exit.name}>
-          {fmt.plural(route.length, { one: "# mile" })}
+      {destinations.map((destination) => (
+        <Definition.Item key={destination.id} label={destination.name}>
+          {fmt.plural(destination.area, { one: "# mile" })}
         </Definition.Item>
       ))}
     </Definition.List>
   );
+}
+
+function Route({ locationId }: { locationId: number }) {
+  const query = useQuery({
+    queryKey: client.locations.queryKey(locationId),
+    queryFn: () => client.locations.get(locationId),
+  });
+
+  const route = query.data?.payload;
+
+  return (
+    <section className="flex flex-col gap-1.5">
+      <Heading variant="small" asChild>
+        <h2>{route?.name ?? "Loading..."}</h2>
+      </Heading>
+      <p>
+        {query.isLoading
+          ? "Loading..."
+          : route?.description ?? "No description given."}
+      </p>
+
+      <Destinations routeId={locationId} />
+    </section>
+  );
+}
+
+function Routes({ characterId }: { characterId: number }) {
+  const query = useQuery({
+    queryKey: client.characters.location.queryKey(characterId),
+    queryFn: () => client.characters.location.get(characterId),
+  });
+
+  if (query.isLoading) {
+    return (
+      <Alert>
+        <p>Loading...</p>
+      </Alert>
+    );
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const { routes } = query.data.payload;
+
+  return routes.map((route) => <Route key={route.id} locationId={route.id} />);
 }
 
 function Characters({ characterId }: { characterId: number }) {
@@ -108,13 +156,7 @@ export default function Page({ params }: Props) {
 
       <Summary characterId={characterId} />
 
-      <section className="flex flex-col gap-1.5">
-        <Heading variant="small" asChild>
-          <h2>Exits</h2>
-        </Heading>
-
-        <Exits characterId={characterId} />
-      </section>
+      <Routes characterId={characterId} />
 
       <section className="flex flex-col gap-1.5">
         <Heading variant="small" asChild>

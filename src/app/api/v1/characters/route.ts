@@ -3,7 +3,7 @@ import { createApiHandler } from "~/lib/api";
 import { db } from "~/lib/db";
 import { UnauthorizedError } from "~/lib/error";
 import { parse, schemas } from "~/lib/validation";
-import * as tags from "~/static/tags";
+import { tag } from "~/static/tag";
 
 export const POST = createApiHandler(async ({ payload, session }) => {
   const data = parse(payload, {
@@ -22,24 +22,16 @@ export const POST = createApiHandler(async ({ payload, session }) => {
     );
   }
 
-  const gold = await db.itemSpecification.findFirstOrThrow({
-    where: { tags: { hasEvery: ["currency"] } },
-  });
-
   const character = await db.character.create({
     data: {
       name: data.name,
       description: data.description,
       user: { connect: { id: session.userId } },
-      tags: [tags.Player],
-      logs: { create: [{ message: "I'm an adult now and I'm on my own." }] },
+      tags: [tag.Player, tag.Idle],
+      ...(await db.character.startingLogs()),
       ...(await db.character.startingAttributes()),
       ...(await db.character.startingLocation()),
-      ...(await db.character.startingSlots({
-        items: {
-          create: [{ spec: { connect: { id: gold.id } }, amount: 100 }],
-        },
-      })),
+      ...(await db.character.startingSlots()),
     },
   });
 

@@ -13,7 +13,7 @@ import { Input } from "~/components/simple/Input";
 import { Textarea } from "~/components/simple/Textarea";
 import { client } from "~/lib/client";
 import { draw } from "~/lib/random";
-import { characters } from "~/static/names";
+import { character } from "~/static/name";
 
 export default function Page() {
   const session = useSession();
@@ -42,7 +42,7 @@ export default function Page() {
 
   const typeRandomName = () => {
     if (inputRef.current) {
-      inputRef.current.value = draw(characters);
+      inputRef.current.value = draw(character);
     }
   };
 

@@ -70,12 +70,12 @@ model Character {
   /// When it was deleted.
   deletedAt   DateTime?
   /// The name of the character.
-  name        String
+  name        String    @unique
   /// Character's bio.
   description String?
   /// The current status of the character.
   status      String    @default("idle")
-  /// Tags allow for attaching behavior.
+  /// User tags.
   tags        String[]
 
   /// The user to whom the character belongs.
@@ -108,10 +108,10 @@ model AttributeSpecification {
   /// When it was last updated.
   updatedAt   DateTime @updatedAt
   /// Attribute's name.
-  name        String
+  name        String   @unique
   /// Human-readable description.
   description String?
-  /// Tags allow for attaching behavior.
+  /// Attribute tags.
   tags        String[]
 
   /// Attributes specified by this specification.
@@ -168,7 +168,7 @@ model Container {
   createdAt DateTime @default(now())
   /// When it was last updated.
   updatedAt DateTime @updatedAt
-  /// Tags allow for attaching behavior.
+  /// Container tags.
   tags      String[]
 
   /// If the container is provided by an item, Item source of the container.
@@ -194,12 +194,12 @@ model ItemSpecification {
   /// When it was last updated.
   updatedAt   DateTime @updatedAt
   /// Name of the item.
-  name        String
+  name        String   @unique
   /// Human-readable description.
   description String?
   /// The item's base price.
   price       Int      @default(0)
-  /// Tags allow for attaching behavior.
+  /// Specification tags.
   tags        String[]
 
   /// Items it specifies.
@@ -242,10 +242,10 @@ model EffectSpecification {
   /// When it was last updated.
   updatedAt   DateTime @updatedAt
   /// Name of the effect.
-  name        String
+  name        String   @unique
   /// Human-readable description.
   description String?
-  /// Tags allow for attaching behavior.
+  /// Specification tags.
   tags        String[]
 
   /// Effects 
@@ -285,39 +285,22 @@ model Location {
   /// When it was last updated.
   updatedAt   DateTime @updatedAt
   /// Location's name.
-  name        String
+  name        String   @unique
   /// Human-readable description.
   description String?
-  /// Tags allow for attaching behavior.
+  /// Area of the location.
+  area        Int
+  /// Location difficulty.
+  difficulty  Decimal
+  /// Location tags.
   tags        String[]
 
   /// Characters currently in the location.
-  characters Character[]
-  /// Routes that lead away from the location. Please note that the exit of a location is the entry of a route.
-  exits      Route[]     @relation("exit")
-  /// Routes that lead into the location. Please note that the entry of a location is the exit of a route.
-  entries    Route[]     @relation("entry")
+  characters   Character[]
+  /// Routes from which you can enter this location.
+  routes       Location[]  @relation("route")
+  /// Locations connected to this route.
+  destinations Location[]  @relation("route")
 
   @@index([tags])
-}
-
-/// Routes allow travel between locations.
-model Route {
-  /// Primary key.
-  id        Int      @id @default(autoincrement())
-  /// When it was created.
-  createdAt DateTime @default(now())
-  /// When it was last updated.
-  updatedAt DateTime @updatedAt
-  /// The route's length.
-  length    Int      @default(1)
-
-  /// Location from where the route starts. Please note that the entry of a route is the exit of a location.
-  entryId Int
-  /// Location from where the route starts. Please note that the entry of a route is the exit of a location.
-  entry   Location @relation("exit", fields: [entryId], references: [id], onDelete: Restrict)
-  /// Location to where the route leads. Please note that the exit of a route is the entry of a location.
-  exitId  Int
-  /// Location to where the route leads. Please note that the exit of a route is the entry of a location.
-  exit    Location @relation("entry", fields: [exitId], references: [id], onDelete: Restrict)
 }
