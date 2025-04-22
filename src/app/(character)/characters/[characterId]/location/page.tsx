@@ -34,8 +34,8 @@ function Summary({ characterId }: { characterId: number }) {
 
 function Destinations({ routeId }: { routeId: number }) {
   const query = useQuery({
-    queryKey: client.locations.destinations.queryKey(routeId),
-    queryFn: () => client.locations.destinations.get(routeId),
+    queryKey: client.locations.queryKey(routeId),
+    queryFn: () => client.locations.get(routeId),
   });
 
   if (query.isLoading) {
@@ -50,7 +50,7 @@ function Destinations({ routeId }: { routeId: number }) {
     return null;
   }
 
-  const destinations = query.data.payload;
+  const { destinations } = query.data.payload;
 
   return (
     <Definition.List>
@@ -73,9 +73,10 @@ function Route({ locationId }: { locationId: number }) {
 
   return (
     <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
-        <h2>{route?.name ?? "Loading..."}</h2>
+      <Heading as="h2" variant="small">
+        {route?.name ?? "Loading..."}
       </Heading>
+
       <p>
         {query.isLoading
           ? "Loading..."

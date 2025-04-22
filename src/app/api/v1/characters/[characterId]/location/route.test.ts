@@ -23,6 +23,8 @@ beforeAll(async () => {
     data: {
       id: 1,
       name: "Test",
+      area: 1,
+      difficulty: 1,
     },
   });
 

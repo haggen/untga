@@ -434,12 +434,12 @@ async function main() {
       })),
     });
 
-    seed.locations.forEach((data) => {
+    seed.locations.forEach(async (data) => {
       if (!data.destinations) {
         return;
       }
 
-      tx.location.update({
+      await tx.location.update({
         where: { name: data.name },
         data: {
           destinations: {

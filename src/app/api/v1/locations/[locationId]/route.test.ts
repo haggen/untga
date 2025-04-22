@@ -22,7 +22,7 @@ beforeAll(async () => {
 test("GET not found", async () => {
   const request = new NextRequest(url, { method: "GET" });
   const response = await GET(request, {
-    params: Promise.resolve({ characterId: 99 }),
+    params: Promise.resolve({ locationId: 99 }),
   });
 
   expect(response.status).toBe(404);

@@ -10,6 +10,7 @@ import type {
   User,
   WithAttributes,
   WithCharacters,
+  WithDestinations,
   WithEffects,
   WithEntry,
   WithItems,
@@ -311,12 +312,14 @@ export const client = {
 
     get: (async (locationId?: number) => {
       if (locationId) {
-        return request<Location>(`/api/v1/locations/${locationId}`);
+        return request(`/api/v1/locations/${locationId}`);
       }
-      return request<Location[]>(`/api/v1/locations`);
+      return request(`/api/v1/locations`);
     }) as {
-      (locationId: number): Promise<ClientResp<Location>>;
-      (): Promise<ClientResp<Location[]>>;
+      (locationId: number): Promise<
+        ClientResp<Location<WithDestinations & WithRoutes>>
+      >;
+      (): Promise<ClientResp<Location<WithDestinations & WithRoutes>[]>>;
     },
 
     characters: {

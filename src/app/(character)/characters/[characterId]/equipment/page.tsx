@@ -54,7 +54,7 @@ function Contents({
   return (
     <section key={container.id} className="flex flex-col gap-1.5">
       <Heading variant="small" asChild>
-        <h2>{container.items[0].spec.name}</h2>
+        <h2>{container.source?.spec.name}</h2>
       </Heading>
 
       {container.items.length ? (
@@ -66,7 +66,7 @@ function Contents({
           ))}
         </Definition.List>
       ) : (
-        <Alert type="neutral">Empty.</Alert>
+        <Alert>Empty.</Alert>
       )}
     </section>
   );

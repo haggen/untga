@@ -3,22 +3,28 @@ import { tv } from "tailwind-variants";
 import { Slot } from "~/components/simple/Slot";
 
 const variants = tv({
-  base: "font-serif font-medium",
+  base: "font-serif",
   variants: {
     variant: {
-      default: "text-5xl",
+      large: "text-5xl",
       small: "text-3xl",
     },
   },
 });
 
-type Props = HTMLAttributes<HTMLHeadingElement> & {
+type Props = HTMLAttributes<HTMLElement> & {
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
   asChild?: boolean;
   variant?: keyof typeof variants.variants.variant;
 };
 
-export function Heading({ asChild, variant = "default", ...props }: Props) {
-  const Component = asChild ? Slot : "h1";
+export function Heading({
+  as = "h1",
+  asChild,
+  variant = "large",
+  ...props
+}: Props) {
+  const Component = asChild ? Slot : as;
   return (
     <Component
       {...props}
