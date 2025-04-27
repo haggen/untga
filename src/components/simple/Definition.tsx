@@ -1,14 +1,27 @@
-import { ComponentProps, ReactNode } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
+import { tv } from "tailwind-variants";
 
-type ItemProps = ComponentProps<"div"> & {
+const styles = tv({
+  base: "flex items-center gap-2 py-0.5",
+  variants: {
+    interactable: {
+      true: "cursor-pointer hover:text-orange-700",
+    },
+  },
+});
+
+export function Item({
+  label,
+  children,
+  className,
+  ...props
+}: HTMLAttributes<HTMLElement> & {
   label: ReactNode;
-};
-
-export function Item({ label, children, className, ...props }: ItemProps) {
+}) {
   return (
     <div
-      className={twMerge("flex items-center gap-2 py-0.5", className)}
+      className={styles({ className, interactable: !!props.onClick })}
       {...props}
     >
       <dt className="flex items-center gap-2 grow after:content after:grow after:border-t-2 after:border-dotted after:border-current/35">
@@ -19,8 +32,9 @@ export function Item({ label, children, className, ...props }: ItemProps) {
   );
 }
 
-type ListProps = ComponentProps<"dl">;
-
-export function List({ className, ...props }: ListProps) {
+export function List({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDListElement>) {
   return <dl className={twMerge("flex flex-col", className)} {...props} />;
 }

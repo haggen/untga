@@ -1,13 +1,17 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { use } from "react";
+import { Fragment, use } from "react";
+import { createPortal } from "react-dom";
 import { Header } from "~/components/CharacterCard";
+import { LocationMenu } from "~/components/LocationMenu";
 import { Alert } from "~/components/simple/Alert";
 import * as Definition from "~/components/simple/Definition";
+import { useDialog } from "~/components/simple/Dialog";
 import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
+import { useTypedParams } from "~/lib/useTypedParams";
 import { parse, schemas } from "~/lib/validation";
 
 function Summary({ characterId }: { characterId: number }) {
@@ -29,6 +33,50 @@ function Summary({ characterId }: { characterId: number }) {
           : location?.description ?? "No description available."}
       </p>
     </section>
+  );
+}
+
+function Destination({ locationId }: { locationId: number }) {
+  const { characterId } = useTypedParams({
+    characterId: schemas.id,
+  });
+
+  const dialog = useDialog();
+
+  const query = useQuery({
+    queryKey: client.locations.queryKey(locationId),
+    queryFn: () => client.locations.get(locationId),
+  });
+
+  if (query.isLoading) {
+    return <Definition.Item label="Loading...">Loading...</Definition.Item>;
+  }
+
+  if (!query.data) {
+    return null;
+  }
+
+  const location = query.data.payload;
+
+  return (
+    <Fragment>
+      {createPortal(
+        <LocationMenu
+          ref={dialog.ref}
+          locationId={location.id}
+          characterId={characterId}
+        />,
+        document.body
+      )}
+
+      <Definition.Item
+        key={location.id}
+        label={location.name}
+        onClick={() => dialog.open()}
+      >
+        {fmt.plural(location.area, { one: "# mile" })}
+      </Definition.Item>
+    </Fragment>
   );
 }
 
@@ -55,9 +103,7 @@ function Destinations({ routeId }: { routeId: number }) {
   return (
     <Definition.List>
       {destinations.map((destination) => (
-        <Definition.Item key={destination.id} label={destination.name}>
-          {fmt.plural(destination.area, { one: "# mile" })}
-        </Definition.Item>
+        <Destination key={destination.id} locationId={destination.id} />
       ))}
     </Definition.List>
   );

@@ -38,7 +38,7 @@ export default function Layout({ children }: Props) {
     >
       <body>
         <QueryClientProvider>
-          <div className="flex flex-col mx-auto max-w-md min-h-dvh px-2 pb-2 filter-[url(#grain)]">
+          <div className="flex flex-col mx-auto max-w-md min-h-dvh px-2 pb-2">
             <header className="flex items-center justify-between px-3 h-9">
               <h1 className="font-bold">
                 <Link href="/">✠ Untga</Link>
@@ -52,25 +52,14 @@ export default function Layout({ children }: Props) {
               </p>
             </header>
 
-            <div className="grow flex flex-col px-3 pt-12 pb-3  text-stone-800 rounded-sm bg-slate-200 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply">
+            <div
+              id="dialog-context"
+              className="relative grow flex flex-col px-3 pt-12 pb-3 text-stone-800 rounded-sm bg-slate-300 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply"
+            >
               {children}
             </div>
           </div>
         </QueryClientProvider>
-
-        <svg xmlns="http://www.w3.org/2000/svg" height="0" width="0">
-          <defs>
-            <filter id="grain">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="1"
-                numOctaves="2"
-                stitchTiles="stitch"
-              />
-              <feDisplacementMap in="SourceGraphic" scale="1.5" />
-            </filter>
-          </defs>
-        </svg>
       </body>
     </html>
   );

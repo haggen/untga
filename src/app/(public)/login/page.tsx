@@ -30,10 +30,8 @@ export default function Page() {
 
   return (
     <main className="flex flex-col gap-12">
-      <header className="flex flex-col gap-2">
-        <Heading asChild>
-          <h1>Log in</h1>
-        </Heading>
+      <header className="flex flex-col gap-1.5">
+        <Heading as="h1">Log in</Heading>
 
         <p>
           Welcome back, adventurer! Before you can resume your journey,

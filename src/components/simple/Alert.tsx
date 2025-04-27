@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { tv } from "tailwind-variants";
+import { toJSON } from "~/lib/error";
 
 const variants = tv({
   base: "p-3 rounded-sm border mix-blend-multiply",
@@ -23,7 +24,9 @@ export function Alert({ type = "neutral", children, dump }: Props) {
     return (
       <div className={variants({ type })}>
         <pre className="overflow-scroll text-xs">
-          {JSON.stringify(dump, null, 2)}
+          {dump instanceof Error
+            ? JSON.stringify(toJSON(dump), null, 2)
+            : JSON.stringify(dump, null, 2)}
         </pre>
       </div>
     );

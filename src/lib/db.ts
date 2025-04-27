@@ -466,6 +466,32 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
       character: {
+        status: {
+          needs: { tags: true },
+          compute(character) {
+            if (character.tags.includes(tag.Idle)) {
+              return "Idle";
+            }
+
+            if (character.tags.includes(tag.Travelling)) {
+              return "Travelling";
+            }
+
+            if (character.tags.includes(tag.Healing)) {
+              return "Healing";
+            }
+
+            if (character.tags.includes(tag.Crafting)) {
+              return "Crafting";
+            }
+
+            if (character.tags.includes(tag.Foraging)) {
+              return "Foraging";
+            }
+
+            return "Unknown";
+          },
+        },
         deleted: {
           needs: { deletedAt: true },
           compute(character) {

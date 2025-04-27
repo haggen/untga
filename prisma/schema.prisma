@@ -73,8 +73,6 @@ model Character {
   name        String    @unique
   /// Character's bio.
   description String?
-  /// The current status of the character.
-  status      String    @default("idle")
   /// User tags.
   tags        String[]
 

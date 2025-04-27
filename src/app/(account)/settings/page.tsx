@@ -75,35 +75,33 @@ function Sessions() {
       ) : (
         <Menu.Menu>
           {sessions?.map((session) => (
-            <Menu.Item key={session.id}>
-              <div className="flex items-center justify-between gap-6 p-3">
-                <p>
-                  Created at{" "}
-                  {fmt.datetime(session.createdAt, {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
-                  , from <Geolocation ip={session.ip} />, on{" "}
-                  {getFormattedUserAgent(session.userAgent)}.{" "}
-                  {session.expired ? "Expired" : "Expires"} on{" "}
-                  {fmt.datetime(session.expiresAt, {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
-                  .
-                </p>
-                <aside>
-                  {session.expired ? null : (
-                    <Button
-                      size="small"
-                      variant="secondary"
-                      onClick={() => mutation.mutate(session.id)}
-                    >
-                      Invalidate
-                    </Button>
-                  )}
-                </aside>
-              </div>
+            <Menu.Item key={session.id} className="justify-between gap-6">
+              <p>
+                Created at{" "}
+                {fmt.datetime(session.createdAt, {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+                , from <Geolocation ip={session.ip} />, on{" "}
+                {getFormattedUserAgent(session.userAgent)}.{" "}
+                {session.expired ? "Expired" : "Expires"} on{" "}
+                {fmt.datetime(session.expiresAt, {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+                .
+              </p>
+              <aside>
+                {session.expired ? null : (
+                  <Button
+                    size="small"
+                    variant="secondary"
+                    onClick={() => mutation.mutate(session.id)}
+                  >
+                    Invalidate
+                  </Button>
+                )}
+              </aside>
             </Menu.Item>
           ))}
         </Menu.Menu>
@@ -270,10 +268,12 @@ export default function Page() {
         </Heading>
       </header>
 
-      <Sessions />
-      <ChangeEmail />
-      <ChangePassword />
-      <DeleteAccount />
+      <div className="flex flex-col gap-18">
+        <Sessions />
+        <ChangeEmail />
+        <ChangePassword />
+        <DeleteAccount />
+      </div>
     </main>
   );
 }

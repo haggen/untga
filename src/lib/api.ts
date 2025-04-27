@@ -21,7 +21,7 @@ export type Response = {
 
 export type Handler = (context: Context) => Promise<Response>;
 
-function makeHeaders(headers: Record<string, unknown>) {
+function encodeHeaders(headers: Record<string, unknown>) {
   return Object.fromEntries(
     Object.entries(headers).map(([key, value]) => {
       return [key, String(value)];
@@ -48,10 +48,19 @@ export function createApiHandler(handler: Handler) {
         response.status ??= 201;
       }
 
-      return NextResponse.json(response.payload, {
-        status: response.status,
-        headers: makeHeaders(response.headers ?? {}),
-      });
+      if (!response.headers) {
+        response.headers = {};
+      }
+
+      response.headers["Content-Type"] ??= "application/json; charset=utf-8";
+
+      return new NextResponse(
+        response.payload ? JSON.stringify(response.payload) : null,
+        {
+          status: response.status,
+          headers: encodeHeaders(response.headers),
+        }
+      );
     } catch (error) {
       if (isRedirectError(error)) {
         throw error;

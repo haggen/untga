@@ -34,3 +34,12 @@ export class NotFoundError extends HttpError {
     super(404, message ?? "A required record was not found.", options);
   }
 }
+
+export function toJSON(err: Error): Record<string, unknown> {
+  return {
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+    cause: err.cause instanceof Error ? toJSON(err.cause) : err.cause,
+  };
+}

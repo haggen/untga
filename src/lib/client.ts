@@ -44,7 +44,7 @@ export {
 // --
 // --
 
-type ClientReq<T = unknown> = {
+type ClientRequest<T = unknown> = {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers: Record<string, string>;
   payload?: T;
@@ -53,7 +53,7 @@ type ClientReq<T = unknown> = {
   credentials?: RequestCredentials;
 };
 
-export type ClientResp<T = unknown> = {
+export type ClientResponse<T = unknown> = {
   status: number;
   headers: Record<string, string>;
   payload: T;
@@ -61,7 +61,7 @@ export type ClientResp<T = unknown> = {
 
 async function request<T>(
   baseUrl: URL | string,
-  clientReq: Partial<ClientReq> = {}
+  clientReq: Partial<ClientRequest> = {}
 ) {
   if ("payload" in clientReq) {
     clientReq.method ??= "POST";
@@ -95,10 +95,10 @@ async function request<T>(
     signal: clientReq.signal,
   });
 
-  const clientResp: ClientResp<T> = {
+  const clientResp: ClientResponse<T> = {
     status: response.status,
     headers: Object.fromEntries(response.headers),
-    payload: await response.json(),
+    payload: await response.json().catch(() => null),
   };
 
   if (!response.ok) {
@@ -254,6 +254,20 @@ export const client = {
           `/api/v1/characters/${characterId}/location`
         );
       },
+
+      put: async (
+        characterId: number,
+        {
+          locationId,
+        }: {
+          locationId: number;
+        }
+      ) => {
+        return request(`/api/v1/characters/${characterId}/location`, {
+          method: "PUT",
+          payload: { locationId },
+        });
+      },
     },
 
     effects: {
@@ -317,9 +331,9 @@ export const client = {
       return request(`/api/v1/locations`);
     }) as {
       (locationId: number): Promise<
-        ClientResp<Location<WithDestinations & WithRoutes>>
+        ClientResponse<Location<WithDestinations & WithRoutes>>
       >;
-      (): Promise<ClientResp<Location<WithDestinations & WithRoutes>[]>>;
+      (): Promise<ClientResponse<Location<WithDestinations & WithRoutes>[]>>;
     },
 
     characters: {

@@ -1,44 +1,70 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { Ref } from "react";
+import { Alert } from "~/components/simple/Alert";
+import { Dialog, useDialog } from "~/components/simple/Dialog";
 import { Heading } from "~/components/simple/Heading";
 import * as Menu from "~/components/simple/Menu";
 import { client } from "~/lib/client";
 
-type Props = {
+export function LocationMenu({
+  ref,
+  locationId,
+  characterId,
+}: {
+  ref: Ref<HTMLDialogElement>;
   characterId: number;
   locationId: number;
-};
+}) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
-export function LocationMenu({ locationId }: Props) {
   const query = useQuery({
     queryKey: client.locations.queryKey(locationId),
     queryFn: () => client.locations.get(locationId),
   });
 
-  if (query.isLoading) {
-    return <p>Loading...</p>;
-  }
+  const dialog = useDialog(ref);
+
+  const travel = useMutation({
+    mutationFn: () =>
+      client.characters.location.put(characterId, { locationId }),
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: client.characters.location.queryKey(characterId),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: client.characters.logs.queryKey(characterId),
+      });
+      dialog.close();
+      router.push(`/characters/${characterId}/location`);
+    },
+    onError(error) {
+      console.error("Error traveling to location:", error);
+    },
+  });
 
   if (!query.data) {
-    return <p>Location not found.</p>;
+    return null;
   }
 
   const location = query.data.payload;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3">
-        <Heading asChild>
-          <h1>{location.name}</h1>
-        </Heading>
+    <Dialog ref={dialog.ref}>
+      <div className="flex flex-col gap-1.5">
+        <Heading as="h1">{location.name}</Heading>
         <p>{location.description}</p>
       </div>
 
-      <Menu.Menu>
-        <Menu.Item>Travel</Menu.Item>
-        <Menu.Item>Cancel</Menu.Item>
+      <Alert type="negative" dump={travel.error} />
+
+      <Menu.Menu busy={travel.isPending}>
+        <Menu.Item onClick={() => travel.mutate()}>Travel</Menu.Item>
+        <Menu.Item onClick={() => dialog.close()}>Cancel</Menu.Item>
       </Menu.Menu>
-    </div>
+    </Dialog>
   );
 }
