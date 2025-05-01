@@ -39,7 +39,7 @@ function DeleteForm({ characterId }: { characterId: number }) {
       aria-busy={isPending}
     >
       <header className="flex flex-col gap-1.5">
-        <Heading variant="small" asChild>
+        <Heading size="small" asChild>
           <h2>Delete your character</h2>
         </Heading>
         <p>
@@ -104,7 +104,7 @@ export default function Page({ params }: Props) {
   return (
     <main className="flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
-        <Heading asChild>
+        <Heading size="large" asChild>
           <h1>Edit character</h1>
         </Heading>
         <p>

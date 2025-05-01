@@ -53,7 +53,7 @@ function Contents({
 }) {
   return (
     <section key={container.id} className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
+      <Heading size="small" asChild>
         <h2>{container.source?.spec.name}</h2>
       </Heading>
 
@@ -107,7 +107,7 @@ export default function Page({ params }: Props) {
       <ProtagonistHeader characterId={characterId} />
 
       <section className="flex flex-col gap-1.5">
-        <Heading variant="small" asChild>
+        <Heading size="small" asChild>
           <h2>Equipment</h2>
         </Heading>
 

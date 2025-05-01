@@ -19,7 +19,9 @@ export default function Page() {
   return (
     <main className="flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
-        <Heading as="h1">Recovery</Heading>
+        <Heading size="large" asChild>
+          <h1>Recovery</h1>
+        </Heading>
 
         <p>
           Don&apos;t worry, adventurer! We can help you recover your account.

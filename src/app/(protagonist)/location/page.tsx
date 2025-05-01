@@ -24,7 +24,7 @@ function Summary({ characterId }: { characterId: number }) {
 
   return (
     <section className="flex flex-col gap-1.5">
-      <Heading variant="small" asChild>
+      <Heading size="small" asChild>
         <h2>{location?.name ?? "Loading..."}</h2>
       </Heading>
       <p>
@@ -119,8 +119,8 @@ function Route({ locationId }: { locationId: number }) {
 
   return (
     <section className="flex flex-col gap-1.5">
-      <Heading as="h2" variant="small">
-        {route?.name ?? "Loading..."}
+      <Heading asChild size="small">
+        <h2>{route?.name ?? "Loading..."}</h2>
       </Heading>
 
       <p>
@@ -206,7 +206,7 @@ export default function Page({ params }: Props) {
       <Routes characterId={characterId} />
 
       <section className="flex flex-col gap-1.5">
-        <Heading variant="small" asChild>
+        <Heading size="small" asChild>
           <h2>Characters</h2>
         </Heading>
 

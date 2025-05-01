@@ -10,6 +10,6 @@
 //   ? { [K in keyof T]: Serializable<U> }
 //   : never;
 
-export function serializable<T>(value: T): T {
+export function serialize<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
 }

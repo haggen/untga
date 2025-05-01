@@ -7,7 +7,7 @@ import {
 import { ReactNode } from "react";
 import { SessionProvider } from "~/components/SessionProvider";
 import * as Tab from "~/components/simple/Tab";
-import { serializable } from "~/lib/serializable";
+import { serialize } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
@@ -24,7 +24,7 @@ export default async function Layout({ params, children }: Props) {
   });
 
   return (
-    <SessionProvider session={serializable(session)}>
+    <SessionProvider session={serialize(session)}>
       <div className="grow flex flex-col gap-12">
         <div className="grow">{children}</div>
 

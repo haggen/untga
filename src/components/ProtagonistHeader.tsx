@@ -15,8 +15,8 @@ export function ProtagonistHeader({ characterId }: { characterId: number }) {
   return (
     <header className="flex flex-col gap-text">
       <div className="flex items-center justify-between">
-        <Heading as="h1" className="truncate">
-          {isLoading ? "Loading..." : character?.name}
+        <Heading size="large" asChild className="truncate">
+          <h1>{isLoading ? "Loading..." : character?.name}</h1>
         </Heading>
 
         <Link href={`/characters/${characterId}`}>

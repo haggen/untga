@@ -134,7 +134,7 @@ export default function Page({ params }: Props) {
       <ProtagonistHeader characterId={characterId} />
 
       <section className="flex flex-col gap-1.5">
-        <Heading variant="small" asChild>
+        <Heading size="small" asChild>
           <h2>Summary</h2>
         </Heading>
 
@@ -145,7 +145,7 @@ export default function Page({ params }: Props) {
       </section>
 
       <section className="flex flex-col gap-1.5">
-        <Heading variant="small" asChild>
+        <Heading size="small" asChild>
           <h2>Skills</h2>
         </Heading>
 

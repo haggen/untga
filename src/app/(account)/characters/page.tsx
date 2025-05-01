@@ -22,7 +22,9 @@ export default async function Page() {
   return (
     <main className="flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
-        <Heading as="h1">Characters</Heading>
+        <Heading size="large" asChild>
+          <h1>Characters</h1>
+        </Heading>
         <p>Select the character with whom you&apos;d like to play.</p>
       </header>
 

@@ -5,7 +5,7 @@ import { Slot } from "~/components/simple/Slot";
 const styles = tv({
   base: "font-serif",
   variants: {
-    variant: {
+    size: {
       large: "text-5xl",
       small: "text-3xl",
     },
@@ -15,13 +15,12 @@ const styles = tv({
 export function Heading({
   asChild,
   className,
-  variant = "large",
+  size,
   ...props
 }: ComponentPropsWithRef<"h1"> & {
   asChild?: boolean;
-  variant?: keyof typeof styles.variants.variant;
+  size: keyof typeof styles.variants.size;
 }) {
   const Component = asChild ? Slot : "h1";
-
-  return <Component {...props} className={styles({ variant, className })} />;
+  return <Component {...props} className={styles({ size, className })} />;
 }

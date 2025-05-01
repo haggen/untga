@@ -64,7 +64,9 @@ export default function Page({ params }: { params: Promise<unknown> }) {
         height={702}
         className="w-full mix-blend-color-burn"
       />
-      <Heading as="h1">{location.name}</Heading>
+      <Heading size="large" asChild>
+        <h1>{location.name}</h1>
+      </Heading>
       <p>{location.description}</p>
     </div>
 

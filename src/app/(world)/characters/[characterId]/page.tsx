@@ -55,8 +55,8 @@ export default function Page({ params }: { params: Promise<unknown> }) {
           className="w-full mix-blend-color-burn"
         />
 
-        <Heading as="h1" className="truncate">
-          {query.isLoading ? "Loading..." : character?.name}
+        <Heading size="large" asChild className="truncate">
+          <h1>{query.isLoading ? "Loading..." : character?.name}</h1>
         </Heading>
 
         <p>

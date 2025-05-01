@@ -7,12 +7,17 @@ import { Button } from "~/components/simple/Button";
 import { Field } from "~/components/simple/Field";
 import { Input } from "~/components/simple/Input";
 import { Textarea } from "~/components/simple/Textarea";
-import { StatefulAction } from "~/lib/actions";
+import { ActionState, StatefulAction } from "~/lib/actions";
 import { random } from "~/lib/random";
 import { names } from "~/static/names";
 
-export function Form(props: { action: StatefulAction }) {
-  const [state, action, pending] = useActionState(props.action, undefined);
+export function Form<T extends ActionState>(props: {
+  action: StatefulAction<FormData, T>;
+}) {
+  const [state, action, pending] = useActionState(
+    props.action,
+    undefined as Awaited<T>
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
 

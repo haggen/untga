@@ -32,8 +32,8 @@ export default async function Page() {
   return (
     <main className="flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
-        <Heading as="h1" variant="large">
-          New character
+        <Heading size="large" asChild>
+          <h1>New character</h1>
         </Heading>
         <p>
           Enter your character&apos;s details below. This is how you&apos;ll be
