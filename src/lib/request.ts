@@ -1,12 +1,12 @@
 import { BadRequestError } from "~/lib/error";
 
-export function getRemoteAddr(request: Request) {
+export function getRemoteAddr(headers: Headers) {
   // I'm assuming it's behind a proxy that sets this header and that I can trust it.
-  return request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "";
+  return headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "";
 }
 
-export function getUserAgent(request: Request) {
-  return request.headers.get("user-agent") ?? "";
+export function getUserAgent(headers: Headers) {
+  return headers.get("user-agent") ?? "";
 }
 
 const methodsWithPayload = ["POST", "PUT", "PATCH"];

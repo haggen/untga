@@ -1,40 +1,47 @@
 import { ReactNode } from "react";
 import { tv } from "tailwind-variants";
-import { toJSON } from "~/lib/error";
+import { ActionState } from "~/lib/actions";
 
-const variants = tv({
-  base: "p-3 rounded-sm border mix-blend-multiply",
+const styles = tv({
+  base: "p-3 mix-blend-multiply",
   variants: {
     type: {
-      neutral: "bg-sky-100 text-sky-800 border-sky-800/10",
-      positive: "bg-lime-100 text-lime-800 border-lime-800/10",
-      negative: "bg-red-100 text-red-800 border-red-800/10",
+      neutral: "bg-sky-200 text-sky-900 ",
+      positive: "bg-lime-200 text-lime-900 ",
+      negative: "bg-red-200 text-red-900 ",
     },
   },
 });
 
-type Props = {
+/**
+ * Alert box.
+ *
+ * @param state - Automatic alert type and content for given form state.
+ */
+export function Alert({
+  type = "neutral",
+  state,
+  children,
+}: {
+  type?: keyof typeof styles.variants.type;
+  state?: ActionState;
   children?: ReactNode;
-  type?: keyof typeof variants.variants.type;
-  dump?: unknown;
-};
+}) {
+  if (state && "error" in state) {
+    return <Alert type="negative">{state.error}</Alert>;
+  }
 
-export function Alert({ type = "neutral", children, dump }: Props) {
-  if (dump) {
-    return (
-      <div className={variants({ type })}>
-        <pre className="overflow-scroll text-xs">
-          {dump instanceof Error
-            ? JSON.stringify(toJSON(dump), null, 2)
-            : JSON.stringify(dump, null, 2)}
-        </pre>
-      </div>
-    );
+  if (state && "message" in state) {
+    return <Alert type="positive">{state.message}</Alert>;
   }
 
   if (!children) {
     return null;
   }
 
-  return <div className={variants({ type })}>{children}</div>;
+  return (
+    <div className={styles({ type })}>
+      <div className="line-clamp-4 overflow-scroll">{children}</div>
+    </div>
+  );
 }

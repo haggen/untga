@@ -1,19 +1,17 @@
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-export type Payload = FormData | Record<string, unknown>;
+export type ActionPayload = FormData | Record<string, unknown>;
 
-export type State = { error: string } | { message: string } | void;
+export type ActionState = { error: string } | { message: string } | void;
 
-export type StatefulAction<State> = (
-  state: State,
+export type StatefulAction = (
+  state: ActionState,
   payload: FormData
-) => Promise<State>;
+) => Promise<ActionState>;
 
-export type StatelessAction<Payload, Result> = (
-  payload: Payload
-) => Promise<Result>;
+export type StatelessAction = (payload: FormData) => Promise<ActionState>;
 
-export function handleError(err: unknown) {
+export function handleActionError(err: unknown) {
   if (isRedirectError(err)) {
     throw err;
   }
@@ -23,16 +21,14 @@ export function handleError(err: unknown) {
   return { error: JSON.stringify(err) };
 }
 
-export function createStatefulAction(
-  action: (payload: FormData) => Promise<State>
-) {
-  return async (_: State, payload: FormData): Promise<State> => {
+export function createStatefulAction(action: StatelessAction) {
+  return async (_: ActionState, payload: FormData): Promise<ActionState> => {
     "use server";
 
     try {
       return await action(payload);
     } catch (err) {
-      return handleError(err);
+      return handleActionError(err);
     }
   };
 }

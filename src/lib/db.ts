@@ -5,7 +5,6 @@ import type {
 } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
-import { NotFoundError, UnauthorizedError } from "~/lib/error";
 import { tag } from "~/static/tag";
 
 export { Prisma };
@@ -169,28 +168,34 @@ const opts = {
 const ext = Prisma.defineExtension((client) => {
   return client.$extends({
     model: {
-      user: {
-        async authenticate({
+      user: {},
+      session: {
+        async createByCredentials({
           data,
         }: {
-          data: { email: string; password: string };
+          data: {
+            email: string;
+            password: string;
+            userAgent: string;
+            ip: string;
+          };
         }) {
-          const user = await db.user.findUnique({
+          const user = await db.user.findUniqueOrThrow({
             where: { email: data.email },
           });
 
-          if (!user) {
-            throw new NotFoundError("E-mail was not found.");
-          }
-
           if (!(await bcrypt.compare(data.password, user.password))) {
-            throw new UnauthorizedError("Password doesn't match.");
+            throw new Error("Password doesn't match.");
           }
 
-          return user;
+          return db.session.create({
+            data: {
+              user: { connect: { id: user.id } },
+              ip: data.ip,
+              userAgent: data.userAgent,
+            },
+          });
         },
-      },
-      session: {
         valid() {
           return {
             expiresAt: {

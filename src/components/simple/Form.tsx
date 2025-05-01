@@ -6,9 +6,9 @@ import {
   ReactNode,
   useActionState,
 } from "react";
-import { State, StatefulAction } from "~/lib/actions";
+import { ActionState, StatefulAction } from "~/lib/actions";
 
-type Props<T extends State> = Omit<
+type Props<T extends ActionState> = Omit<
   ComponentProps<"form">,
   "action" | "children"
 > & {
@@ -17,11 +17,11 @@ type Props<T extends State> = Omit<
 };
 
 export const Context = createContext({
-  state: undefined as State,
+  state: undefined as ActionState,
   pending: false,
 });
 
-export function Form<T extends State>({ children, ...props }: Props<T>) {
+export function Form<T extends ActionState>({ children, ...props }: Props<T>) {
   const [state, action, pending] = useActionState(
     props.action,
     {} as Awaited<T> // @todo figure it out later
