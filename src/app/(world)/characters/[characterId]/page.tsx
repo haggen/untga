@@ -13,11 +13,11 @@ function ProtagonistMenu({ characterId }: { characterId: number }) {
   const router = useRouter();
 
   return (
-    <Menu.Menu>
+    <Menu.List>
       <Menu.Item href={`/${characterId}/edit`}>Edit</Menu.Item>
       <Menu.Item href="/characters">Switch</Menu.Item>
       <Menu.Item onClick={() => router.back()}>Cancel</Menu.Item>
-    </Menu.Menu>
+    </Menu.List>
   );
 }
 
@@ -25,9 +25,9 @@ function CharacterMenu({}: { characterId: number }) {
   const router = useRouter();
 
   return (
-    <Menu.Menu>
+    <Menu.List>
       <Menu.Item onClick={() => router.back()}>Cancel</Menu.Item>
-    </Menu.Menu>
+    </Menu.List>
   );
 }
 

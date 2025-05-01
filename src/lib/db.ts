@@ -203,6 +203,14 @@ const ext = Prisma.defineExtension((client) => {
             },
           };
         },
+        async invalidate({ where }: { where: Prisma.SessionWhereUniqueInput }) {
+          return await db.session.update({
+            where,
+            data: {
+              expiresAt: new Date(),
+            },
+          });
+        },
       },
       itemSpecification: {
         findByTags(...tags: string[]) {

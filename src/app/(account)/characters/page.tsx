@@ -26,7 +26,7 @@ export default async function Page() {
         <p>Select the character with whom you&apos;d like to play.</p>
       </header>
 
-      <Menu.Menu>
+      <Menu.List>
         {slots.map((character, i) => (
           <Menu.Item
             key={i}
@@ -41,7 +41,7 @@ export default async function Page() {
             )}
           </Menu.Item>
         ))}
-      </Menu.Menu>
+      </Menu.List>
     </main>
   );
 }

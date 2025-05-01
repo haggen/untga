@@ -70,9 +70,9 @@ export default function Page({ params }: { params: Promise<unknown> }) {
 
     <Alert type="negative" dump={travel.error} />
 
-    <Menu.Menu busy={travel.isPending}>
+    <Menu.List busy={travel.isPending}>
       <Menu.Item onClick={() => travel.mutate()}>Travel</Menu.Item>
       <Menu.Item onClick={() => dialog.close()}>Cancel</Menu.Item>
-    </Menu.Menu>
+    </Menu.List>
   );
 }

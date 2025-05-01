@@ -1,3 +1,5 @@
+import { UAParser } from "ua-parser-js";
+
 type LocaleOption = { locale?: string };
 
 type NumberFormatOptions = LocaleOption & Intl.NumberFormatOptions;
@@ -76,8 +78,22 @@ function datetime(
   return new Intl.DateTimeFormat(locale, options).format(new Date(date));
 }
 
+/**
+ * Format user agent string.
+ */
+function userAgent(userAgent: string) {
+  const ua = UAParser(userAgent);
+
+  const browser = ua.browser ?? "unknown browser";
+  const version = ua.browser?.major ? ` ${ua.browser.major}` : "";
+  const os = ua.os?.name ?? "unknown system";
+
+  return `${browser}${version} (${os})`;
+}
+
 export const fmt = {
   number,
   plural,
   datetime,
+  userAgent,
 };

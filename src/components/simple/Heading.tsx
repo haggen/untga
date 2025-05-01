@@ -1,8 +1,8 @@
-import { HTMLAttributes } from "react";
+import { ComponentPropsWithRef } from "react";
 import { tv } from "tailwind-variants";
 import { Slot } from "~/components/simple/Slot";
 
-const variants = tv({
+const styles = tv({
   base: "font-serif",
   variants: {
     variant: {
@@ -12,23 +12,16 @@ const variants = tv({
   },
 });
 
-type Props = HTMLAttributes<HTMLElement> & {
-  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
-  asChild?: boolean;
-  variant?: keyof typeof variants.variants.variant;
-};
-
 export function Heading({
-  as = "h1",
   asChild,
+  className,
   variant = "large",
   ...props
-}: Props) {
-  const Component = asChild ? Slot : as;
-  return (
-    <Component
-      {...props}
-      className={variants({ variant, className: props.className })}
-    />
-  );
+}: ComponentPropsWithRef<"h1"> & {
+  asChild?: boolean;
+  variant?: keyof typeof styles.variants.variant;
+}) {
+  const Component = asChild ? Slot : "h1";
+
+  return <Component {...props} className={styles({ variant, className })} />;
 }

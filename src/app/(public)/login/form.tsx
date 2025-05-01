@@ -18,7 +18,7 @@ export function Form(props: { action: StatefulAction }) {
         <Field name="email" label="E-mail">
           <Input
             type="email"
-            autoComplete="username"
+            autoComplete="email"
             required
             placeholder="e.g. player@example.com"
           />
