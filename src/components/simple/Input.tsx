@@ -1,7 +1,7 @@
-import { ComponentProps } from "react";
+import { ComponentPropsWithRef } from "react";
 import { tv } from "tailwind-variants";
 
-const variants = tv({
+const styles = tv({
   base: "flex h-10 px-2 items-center bg-neutral-100 border border-neutral-500 rounded placeholder:text-neutral-500 mix-blend-hard-light",
   variants: {
     disabled: {
@@ -11,12 +11,14 @@ const variants = tv({
   },
 });
 
-type Props = ComponentProps<"input">;
-
-export function Input({ className, disabled, ...props }: Props) {
+export function Input({
+  className,
+  disabled,
+  ...props
+}: ComponentPropsWithRef<"input">) {
   return (
     <input
-      className={variants({ disabled, className })}
+      className={styles({ disabled, className })}
       disabled={disabled}
       {...props}
     />

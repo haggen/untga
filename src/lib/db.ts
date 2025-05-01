@@ -389,6 +389,28 @@ const ext = Prisma.defineExtension((client) => {
             },
           } satisfies Pick<Prisma.CharacterCreateInput, "logs">;
         },
+
+        /**
+         * Create new player character.
+         */
+        async createPlayer({
+          data,
+        }: {
+          data: { name: string; description?: string; userId: number };
+        }) {
+          return await db.character.create({
+            data: {
+              name: data.name,
+              description: data.description,
+              user: { connect: { id: data.userId } },
+              tags: [tag.Player, tag.Idle],
+              ...(await db.character.startingLogs()),
+              ...(await db.character.startingAttributes()),
+              ...(await db.character.startingLocation()),
+              ...(await db.character.startingSlots()),
+            },
+          });
+        },
       },
     },
     query: {

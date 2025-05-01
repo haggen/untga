@@ -1,8 +1,8 @@
-import { ComponentProps } from "react";
+import { ComponentPropsWithRef } from "react";
 import { tv } from "tailwind-variants";
 
-const variants = tv({
-  base: "p-2 bg-neutral-100 border border-neutral-500 rounded placeholder:text-neutral-500",
+const styles = tv({
+  base: "p-2 bg-neutral-100 border border-neutral-500 rounded placeholder:text-neutral-500 mix-blend-hard-light",
   variants: {
     disabled: {
       true: "cursor-not-allowed opacity-50",
@@ -11,12 +11,14 @@ const variants = tv({
   },
 });
 
-type Props = ComponentProps<"textarea">;
-
-export function Textarea({ className, disabled, ...props }: Props) {
+export function Textarea({
+  className,
+  disabled,
+  ...props
+}: ComponentPropsWithRef<"textarea">) {
   return (
     <textarea
-      className={variants({ disabled, className })}
+      className={styles({ disabled, className })}
       disabled={disabled}
       {...props}
     />

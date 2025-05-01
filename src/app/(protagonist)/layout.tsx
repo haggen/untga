@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 import { SessionProvider } from "~/components/SessionProvider";
 import * as Tab from "~/components/simple/Tab";
 import { serializable } from "~/lib/serializable";
-import { requireActiveSession } from "~/lib/session";
+import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export default async function Layout({ params, children }: Props) {
-  const session = await requireActiveSession(true);
+  const session = await ensureActiveSession(true);
 
   const { characterId } = parse(await params, {
     characterId: schemas.id,

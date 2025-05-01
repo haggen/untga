@@ -3,14 +3,14 @@ import { ReactNode } from "react";
 import { SessionProvider } from "~/components/SessionProvider";
 import { Bar, Tab } from "~/components/simple/Tab";
 import { serializable } from "~/lib/serializable";
-import { requireActiveSession } from "~/lib/session";
+import { ensureActiveSession } from "~/lib/session";
 
 type Props = {
   children: ReactNode;
 };
 
 export default async function Layout({ children }: Props) {
-  const session = await requireActiveSession(true);
+  const session = await ensureActiveSession(true);
 
   return (
     <SessionProvider session={serializable(session)}>

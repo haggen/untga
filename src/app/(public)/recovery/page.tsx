@@ -11,9 +11,6 @@ export default function Page() {
       email: schemas.email,
     });
 
-    // 1. Create a session
-    // 2. Dispatch an email with a link
-
     console.log(data);
 
     throw new Error("Not implemented");

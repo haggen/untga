@@ -1,46 +1,23 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { useSession } from "~/components/SessionProvider";
 import { Heading } from "~/components/simple/Heading";
 import * as Menu from "~/components/simple/Menu";
-import { Character, client } from "~/lib/client";
+import { db } from "~/lib/db";
+import { ensureActiveSession } from "~/lib/session";
 
-function CharacterSlot({
-  loading,
-  character,
-}: {
-  loading: boolean;
-  character: Character | undefined | null;
-}) {
-  return (
-    <Menu.Item
-      href={
-        loading
-          ? undefined
-          : character
-          ? `/characters/${character.id}`
-          : "/characters/create"
-      }
-    >
-      {loading
-        ? "Loading..."
-        : character?.name ?? (
-            <span className="text-stone-600">Empty (create new character)</span>
-          )}
-    </Menu.Item>
-  );
-}
+export default async function Page() {
+  const session = await ensureActiveSession(true);
 
-export default function Page() {
-  const session = useSession();
-
-  const { data, isFetching } = useQuery({
-    queryKey: client.characters.queryKey(),
-    queryFn: () => client.users.characters.get(session.userId),
+  const characters = await db.character.findMany({
+    where: {
+      user: { id: session.user.id },
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
-  const characters = data?.payload ?? [];
+  const slots = Array(5)
+    .fill(undefined)
+    .map((_, i) => characters[i]);
 
   return (
     <main className="flex flex-col gap-12">
@@ -50,15 +27,20 @@ export default function Page() {
       </header>
 
       <Menu.Menu>
-        {Array(5)
-          .fill(null)
-          .map((_, i) => (
-            <CharacterSlot
-              key={i}
-              loading={isFetching}
-              character={characters[i]}
-            />
-          ))}
+        {slots.map((character, i) => (
+          <Menu.Item
+            key={i}
+            href={
+              character ? `/characters/${character.id}` : "/characters/create"
+            }
+          >
+            {character?.name ?? (
+              <span className="text-neutral-600">
+                Empty (create new character)
+              </span>
+            )}
+          </Menu.Item>
+        ))}
       </Menu.Menu>
     </main>
   );

@@ -28,7 +28,12 @@ export async function getActiveSession() {
   });
 }
 
-export async function requireActiveSession(recover = false) {
+/**
+ * Read active session from cookies or throw.
+ *
+ * @param recover - Redirect instead of throwing.
+ */
+export async function ensureActiveSession(recover = false) {
   const session = await getActiveSession();
 
   if (!session) {
