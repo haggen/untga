@@ -1,4 +1,4 @@
-import { ClipboardSignatureIcon, KeyIcon, LogInIcon } from "lucide-react";
+import { ClipboardSignatureIcon, LifeBuoyIcon, LogInIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { Bar, Tab } from "~/components/simple/Tab";
 
@@ -12,14 +12,14 @@ export default async function Layout({ children }: Props) {
       <div className="grow">{children}</div>
 
       <Bar>
-        <Tab href="/register">
+        <Tab href="/registration">
           <ClipboardSignatureIcon /> Register
         </Tab>
         <Tab href="/login">
           <LogInIcon /> Log in
         </Tab>
         <Tab href="/recovery">
-          <KeyIcon /> Recovery
+          <LifeBuoyIcon /> Recovery
         </Tab>
       </Bar>
     </div>

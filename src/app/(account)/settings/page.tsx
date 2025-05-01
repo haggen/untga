@@ -41,7 +41,7 @@ function Sessions() {
     onSuccess: async (_, sessionId) => {
       if (session.id === sessionId) {
         queryClient.clear();
-        router.push("/register");
+        router.push("/registration");
       } else {
         await queryClient.invalidateQueries({
           queryKey: client.users.sessions.queryKey(session.userId),
@@ -219,7 +219,7 @@ function DeleteAccount() {
     mutationFn: () => client.users.delete(session.userId),
     onSuccess: () => {
       queryClient.clear();
-      router.push("/register");
+      router.push("/registration");
     },
   });
 

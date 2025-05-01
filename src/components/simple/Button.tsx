@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { Slot } from "~/components/simple/Slot";
 
 const variants = tv({
-  base: "inline-flex gap-1 items-center font-bold rounded-sm",
+  base: "inline-flex gap-1 items-center font-bold rounded mix-blend-hard-light",
   variants: {
     size: {
       default: "h-10 px-6",
@@ -11,10 +11,9 @@ const variants = tv({
     },
     variant: {
       primary:
-        "bg-orange-700 text-stone-100 hover:bg-orange-600 border border-orange-800",
+        "bg-orange-800 text-neutral-100 hover:bg-orange-700 border border-orange-900",
       secondary:
-        "text-orange-700 bg-orange-700/10 hover:text-orange-600 border-2 border-current",
-      nested: "text-orange-700 hover:text-orange-600",
+        "text-orange-800 bg-orange-800/10 hover:text-orange-700 border-2 border-current",
     },
     disabled: {
       true: "cursor-not-allowed filter-grayscale",

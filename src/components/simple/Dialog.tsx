@@ -63,12 +63,12 @@ export function Dialog({
     <dialog
       ref={ref}
       className={twMerge(
-        "w-full h-dvh max-w-md max-h-full mx-auto bg-transparent px-2 pt-9 modal:max-height-auto",
+        "w-full min-h-dvh max-w-md mx-auto bg-transparent px-2 pt-9 modal:max-height-auto",
         className
       )}
       {...props}
     >
-      <div className="rounded h-full px-3 py-12 flex flex-col gap-12 bg-orange-200 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply">
+      <div className="rounded h-auto px-3 py-12 flex justify-center flex-col gap-12 bg-orange-100 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply">
         {children}
       </div>
     </dialog>

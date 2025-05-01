@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+@theme inline {
+  --color-text: var(--neutral-800);
+  --color-background: var(--slate-200);
+  --color-sepia-background: var(--orange-100);
+  --color-inverted-text: var(--neutral-100);
+  --color-inverted-background: var(--neutral-800);
+  --color-placeholder-text: var(--neutral-500);
+  --color-border: var(--neutral-500);
+
+  --spacing-section: var(--spacing-12);
+  --spacing-block: var(--spacing-9);
+  --spacing-item: var(--spacing-6);
+  --spacing-text: var(--spacing-2);
+}
+
 @layer base {
   button {
     cursor: pointer;
@@ -33,9 +48,9 @@
 }
 
 @utility inner-glow-* {
-  --alpha: --modifier(integer)%;
+  --alpha: --modifier(integer) %;
 
-  --tw-inner-glow-color: --alpha(--value(--color-*) / var(--alpha, 100%));
+  --tw-inner-glow-color: --alpha(--value(--color- *) / var(--alpha, 100%));
   --tw-inner-glow-color: --value([color]);
 
   --tw-inner-glow-size: --spacing(--value(integer));

@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Header } from "~/components/CharacterCard";
+import { ProtagonistHeader } from "~/components/ProtagonistHeader";
 import { Alert } from "~/components/simple/Alert";
 import * as Definition from "~/components/simple/Definition";
 import { Heading } from "~/components/simple/Heading";
@@ -104,7 +104,7 @@ export default function Page({ params }: Props) {
 
   return (
     <main className="flex flex-col gap-12">
-      <Header characterId={characterId} />
+      <ProtagonistHeader characterId={characterId} />
 
       <section className="flex flex-col gap-1.5">
         <Heading variant="small" asChild>

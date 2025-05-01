@@ -3,8 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, use } from "react";
 import { createPortal } from "react-dom";
-import { Header } from "~/components/CharacterCard";
 import { LocationMenu } from "~/components/LocationMenu";
+import { ProtagonistHeader } from "~/components/ProtagonistHeader";
 import { Alert } from "~/components/simple/Alert";
 import * as Definition from "~/components/simple/Definition";
 import { useDialog } from "~/components/simple/Dialog";
@@ -199,7 +199,7 @@ export default function Page({ params }: Props) {
 
   return (
     <main className="flex flex-col gap-12">
-      <Header characterId={characterId} />
+      <ProtagonistHeader characterId={characterId} />
 
       <Summary characterId={characterId} />
 

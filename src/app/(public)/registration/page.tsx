@@ -14,7 +14,6 @@ export default function Page() {
   const router = useRouter();
 
   const { mutate, data, error, isPending } = useMutation({
-    mutationKey: client.users.queryKey(),
     mutationFn: (payload: FormData) => client.users.post(payload),
     onSuccess: () => {
       router.push("/characters/create");

@@ -10,5 +10,5 @@ export async function GET() {
   }
 
   setClientId();
-  redirect("/register");
+  redirect("/registration");
 }

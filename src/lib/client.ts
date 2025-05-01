@@ -214,6 +214,21 @@ export const client = {
       });
     },
 
+    protagonist: {
+      queryKey: () => [...client.characters.queryKey(), "protagonist"] as const,
+
+      get: async () => {
+        return request<Character>(`/api/v1/characters/protagonist`);
+      },
+
+      put: async (payload: FormData) => {
+        return request<Character>(`/api/v1/characters/protagonist`, {
+          method: "PUT",
+          payload,
+        });
+      },
+    },
+
     slots: {
       queryKey: (characterId: number) =>
         [...client.characters.queryKey(characterId), "slots"] as const,

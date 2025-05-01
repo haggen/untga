@@ -7,10 +7,10 @@ import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
-  base: "flex flex-col items-center gap-1 px-3 text-sm text-center truncate",
+  base: "flex flex-col items-center gap-1 px-3 text-sm text-center truncate mix-blend-hard-light",
   variants: {
     active: {
-      true: "text-orange-700",
+      true: "text-orange-800",
     },
   },
 });

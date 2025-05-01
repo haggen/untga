@@ -5,10 +5,10 @@ import { tv } from "tailwind-variants";
 import { Slot } from "~/components/simple/Slot";
 
 const styles = tv({
-  base: "flex flex-col gap-px rounded-sm border border-stone-900/10 overflow-hidden",
+  base: "flex flex-col gap-px rounded border border-neutral-500 overflow-hidden  mix-blend-hard-light",
   variants: {
     busy: {
-      true: "cursor-wait pointer-events-none opacity-50",
+      true: "cursor-wait pointer-events-none",
     },
   },
 });
@@ -49,7 +49,7 @@ export function Item({
         href={href as never} // Appease TypeScript.
         onClick={onClick}
         className={twMerge(
-          "flex items-center bg-gray-300/30 hover:bg-stone-100/30 min-h-12 p-3 w-full focus-visible:outline-0 focus-visible:bg-stone-100/30 w-",
+          "flex items-center bg-neutral-400 min-h-12 p-3 w-full focus-visible:outline-0 hover:bg-neutral-300 focus-visible:bg-neutral-300",
           className
         )}
         {...props}
