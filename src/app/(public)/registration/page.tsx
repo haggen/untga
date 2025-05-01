@@ -17,16 +17,14 @@ export default function Page() {
       password: schemas.password,
     });
 
-    const user = await db.user.create({
-      data: {
-        email: data.email,
-        password: data.password,
-      },
-    });
-
     const session = await db.session.create({
       data: {
-        user: { connect: { id: user.id } },
+        user: {
+          create: {
+            email: data.email,
+            password: data.password,
+          },
+        },
         userAgent: getUserAgent(await headers()),
         ip: getRemoteAddr(await headers()),
       },
