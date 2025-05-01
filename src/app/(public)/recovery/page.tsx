@@ -1,37 +1,23 @@
-"use client";
-
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { FormEvent } from "react";
-import { Alert } from "~/components/simple/Alert";
-import { Button } from "~/components/simple/Button";
-import { Field } from "~/components/simple/Field";
 import { Heading } from "~/components/simple/Heading";
-import { Input } from "~/components/simple/Input";
-import { client } from "~/lib/client";
-import { Session } from "~/lib/db";
+import { createStatefulAction } from "~/lib/actions";
+import { parse, schemas } from "~/lib/validation";
+import { Form } from "./form";
 
 export default function Page() {
-  const router = useRouter();
+  const action = createStatefulAction(async (payload: FormData) => {
+    "use server";
 
-  const { mutate, data, error, isPending } = useMutation({
-    mutationKey: ["sessions"],
-    mutationFn: (payload: FormData) =>
-      client.request<{ data: Session }>("/api/sessions", {
-        payload,
-      }),
-    onSuccess: () => {
-      router.push("/characters");
-    },
+    const data = parse(payload, {
+      email: schemas.email,
+    });
+
+    // 1. Create a session
+    // 2. Dispatch an email with a link
+
+    console.log(data);
+
+    throw new Error("Not implemented");
   });
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const payload = new FormData(form);
-
-    mutate(payload);
-  };
 
   return (
     <main className="flex flex-col gap-12">
@@ -45,31 +31,7 @@ export default function Page() {
         </p>
       </header>
 
-      <form
-        className="flex flex-col gap-9"
-        onSubmit={onSubmit}
-        aria-busy={isPending}
-      >
-        <Alert type="negative" dump={error} />
-
-        <Alert type="positive" dump={data} />
-
-        <fieldset className="flex flex-col gap-6">
-          <Field name="email" label="Registration e-mail">
-            <Input
-              type="email"
-              required
-              placeholder="e.g. player@example.com"
-            />
-          </Field>
-        </fieldset>
-
-        <footer className="flex justify-end">
-          <Button type="submit" disabled={isPending}>
-            Recover account
-          </Button>
-        </footer>
-      </form>
+      <Form action={action} />
     </main>
   );
 }
