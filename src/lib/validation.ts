@@ -1,13 +1,18 @@
 import { z } from "zod";
 
+function squeeze(text: string) {
+  return text.replaceAll(/\s+/g, " ").trim();
+}
+
 /**
  * Common validation schemas.
  */
 export const schemas = {
   id: z.coerce.number().positive(),
-  name: z.string().trim().max(32),
+  name: z.string().max(24).transform(squeeze),
   email: z.email(),
-  password: z.string().trim().min(12),
+  password: z.string().min(12).transform(squeeze),
+  description: z.string().max(256).transform(squeeze),
 };
 
 /**

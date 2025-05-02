@@ -13,7 +13,7 @@ export function ProtagonistHeader({ characterId }: { characterId: number }) {
   const character = data?.payload;
 
   return (
-    <header className="flex flex-col gap-text">
+    <header className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
         <Heading size="large" asChild className="truncate">
           <h1>{isLoading ? "Loading..." : character?.name}</h1>

@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { ActionState } from "~/lib/actions";
 
 const styles = tv({
-  base: "p-3 mix-blend-multiply",
+  base: "p-3 rounded mix-blend-multiply",
   variants: {
     type: {
       neutral: "bg-sky-200 text-sky-900 ",
@@ -41,7 +41,7 @@ export function Alert({
 
   return (
     <div className={styles({ type })}>
-      <div className="line-clamp-4 overflow-scroll">{children}</div>
+      <div className="overflow-scroll line-clamp-4">{children}</div>
     </div>
   );
 }
