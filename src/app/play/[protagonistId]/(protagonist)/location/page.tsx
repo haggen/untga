@@ -1,197 +1,81 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { Fragment, use } from "react";
-import { Alert } from "~/components/Alert";
+import Link from "next/link";
 import * as Definition from "~/components/Definition";
-import { useDialog } from "~/components/Dialog";
 import { Heading } from "~/components/Heading";
-import { client } from "~/lib/client";
-import { fmt } from "~/lib/fmt";
+import { ProtagonistHeader } from "~/components/ProtagonistHeader";
+import { db } from "~/lib/db";
+import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
-function Summary({ characterId }: { characterId: number }) {
-  const query = useQuery({
-    queryKey: client.characters.location.queryKey(characterId),
-    queryFn: () => client.characters.location.get(characterId),
+export default async function Page({
+  params,
+}: Readonly<{ params: Promise<unknown> }>) {
+  const { protagonistId } = parse(await params, {
+    protagonistId: schemas.id,
   });
 
-  const location = query.data?.payload;
+  const session = await ensureActiveSession(true);
+
+  const protagonist = await db.character.findUniqueOrThrow({
+    where: { id: protagonistId, user: { id: session.user.id } },
+    include: {
+      location: {
+        include: {
+          routes: { include: { destinations: true } },
+          characters: true,
+        },
+      },
+    },
+  });
+
+  const { location } = protagonist;
+  const { routes, characters } = location;
 
   return (
-    <section className="flex flex-col gap-1.5">
-      <Heading size="small" asChild>
-        <h2>{location?.name ?? "Loading..."}</h2>
-      </Heading>
-      <p>
-        {query.isLoading
-          ? "Loading..."
-          : location?.description ?? "No description available."}
-      </p>
-    </section>
-  );
-}
-
-function Destination({ locationId }: { locationId: number }) {
-  const dialog = useDialog();
-
-  const query = useQuery({
-    queryKey: client.locations.queryKey(locationId),
-    queryFn: () => client.locations.get(locationId),
-  });
-
-  if (query.isLoading) {
-    return <Definition.Item label="Loading...">Loading...</Definition.Item>;
-  }
-
-  if (!query.data) {
-    return null;
-  }
-
-  const location = query.data.payload;
-
-  return (
-    <Fragment>
-      <Definition.Item
-        key={location.id}
-        label={location.name}
-        onClick={() => dialog.open()}
-      >
-        {fmt.plural(location.area, { one: "# mile" })}
-      </Definition.Item>
-    </Fragment>
-  );
-}
-
-function Destinations({ routeId }: { routeId: number }) {
-  const query = useQuery({
-    queryKey: client.locations.queryKey(routeId),
-    queryFn: () => client.locations.get(routeId),
-  });
-
-  if (query.isLoading) {
-    return (
-      <Definition.List>
-        <Definition.Item label="Loading...">Loading...</Definition.Item>
-      </Definition.List>
-    );
-  }
-
-  if (!query.data) {
-    return null;
-  }
-
-  const { destinations } = query.data.payload;
-
-  return (
-    <Definition.List>
-      {destinations.map((destination) => (
-        <Destination key={destination.id} locationId={destination.id} />
-      ))}
-    </Definition.List>
-  );
-}
-
-function Route({ locationId }: { locationId: number }) {
-  const query = useQuery({
-    queryKey: client.locations.queryKey(locationId),
-    queryFn: () => client.locations.get(locationId),
-  });
-
-  const route = query.data?.payload;
-
-  return (
-    <section className="flex flex-col gap-1.5">
-      <Heading asChild size="small">
-        <h2>{route?.name ?? "Loading..."}</h2>
-      </Heading>
-
-      <p>
-        {query.isLoading
-          ? "Loading..."
-          : route?.description ?? "No description given."}
-      </p>
-
-      <Destinations routeId={locationId} />
-    </section>
-  );
-}
-
-function Routes({ characterId }: { characterId: number }) {
-  const query = useQuery({
-    queryKey: client.characters.location.queryKey(characterId),
-    queryFn: () => client.characters.location.get(characterId),
-  });
-
-  if (query.isLoading) {
-    return (
-      <Alert>
-        <p>Loading...</p>
-      </Alert>
-    );
-  }
-
-  if (!query.data) {
-    return null;
-  }
-
-  const { routes } = query.data.payload;
-
-  return routes.map((route) => <Route key={route.id} locationId={route.id} />);
-}
-
-function Characters({ characterId }: { characterId: number }) {
-  const query = useQuery({
-    queryKey: client.characters.location.queryKey(characterId),
-    queryFn: () => client.characters.location.get(characterId),
-  });
-
-  if (query.isLoading) {
-    return (
-      <Definition.List>
-        <Definition.Item label="Loading...">Loading...</Definition.Item>
-      </Definition.List>
-    );
-  }
-
-  if (!query.data) {
-    return null;
-  }
-
-  const { characters } = query.data.payload;
-
-  return (
-    <Definition.List>
-      {characters.map((character) => (
-        <Definition.Item key={character.id} label={character.name}>
-          {character.status}
-        </Definition.Item>
-      ))}
-    </Definition.List>
-  );
-}
-
-type Props = {
-  params: Promise<{ characterId: string }>;
-};
-
-export default function Page({ params }: Props) {
-  const { characterId } = parse(use(params), {
-    characterId: schemas.id,
-  });
-
-  return (
-    <div className="flex flex-col gap-12">
-      <Summary characterId={characterId} />
-
-      <Routes characterId={characterId} />
+    <div className="grow flex flex-col gap-12">
+      <ProtagonistHeader character={protagonist} />
 
       <section className="flex flex-col gap-1.5">
         <Heading size="small" asChild>
-          <h2>Characters</h2>
+          <h1>{location.name}</h1>
+        </Heading>
+        <p>{location.description || "No description available."}</p>
+      </section>
+
+      {routes.map((route) => (
+        <section key={route.id} className="flex flex-col gap-1.5">
+          <Heading size="small" asChild>
+            <h1>{route.name}</h1>
+          </Heading>
+
+          <p>{route.description || "No description available."}</p>
+
+          <Definition.List>
+            {route.destinations.map((destination) => (
+              <Link
+                href={`/play/${protagonistId}/locations/${destination.id}`}
+                key={destination.id}
+              >
+                <Definition.Item label={destination.name}>
+                  <p>{destination.area}</p>
+                </Definition.Item>
+              </Link>
+            ))}
+          </Definition.List>
+        </section>
+      ))}
+
+      <section className="flex flex-col gap-1.5">
+        <Heading size="small" asChild>
+          <h1>Characters</h1>
         </Heading>
 
-        <Characters characterId={characterId} />
+        <Definition.List>
+          {characters.map((character) => (
+            <Definition.Item key={character.id} label={character.name}>
+              <p>{character.status}</p>
+            </Definition.Item>
+          ))}
+        </Definition.List>
       </section>
     </div>
   );

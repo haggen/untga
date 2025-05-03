@@ -5,6 +5,6 @@ const styles = tv({
   base: "flex flex-col",
 });
 
-export function List({ className, ...props }: ComponentPropsWithRef<"dl">) {
-  return <dl className={styles({ className })} {...props} />;
+export function List({ className, ...props }: ComponentPropsWithRef<"div">) {
+  return <div className={styles({ className })} {...props} />;
 }

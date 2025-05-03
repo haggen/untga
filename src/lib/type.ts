@@ -1,2 +1,5 @@
-export type Intersection<T, U> = T & U;
-export type Union<T, U> = T | U;
+import { HTMLAttributes, Ref } from "react";
+
+export type ElementProps = HTMLAttributes<HTMLElement> & {
+  ref?: Ref<HTMLElement>;
+};

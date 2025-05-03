@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode } from "react";
+import { ComponentPropsWithRef, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
@@ -10,14 +10,14 @@ export function Item({
   children,
   className,
   ...props
-}: HTMLAttributes<HTMLElement> & {
+}: ComponentPropsWithRef<"div"> & {
   label: ReactNode;
 }) {
   return (
     <div className={styles({ className })} {...props}>
-      <dt>{label}</dt>
+      <div>{label}</div>
       <div className="grow border-b-2 border-dotted mix-blend-overlay" />
-      <dd>{children}</dd>
+      <div>{children}</div>
     </div>
   );
 }

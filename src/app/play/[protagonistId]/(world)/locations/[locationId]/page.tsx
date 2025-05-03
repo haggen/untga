@@ -1,81 +1,84 @@
-"use client";
-
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { use } from "react";
-import { Alert } from "~/components/Alert";
+import { redirect } from "next/navigation";
 import { Heading } from "~/components/Heading";
 import * as Menu from "~/components/Menu";
-import { client } from "~/lib/client";
+import { db } from "~/lib/db";
+import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
-export default function Page({ params }: { params: Promise<unknown> }) {
-  const { locationId } = parse(use(params), {
+export default async function Page({ params }: { params: Promise<unknown> }) {
+  const { protagonistId, locationId } = parse(await params, {
+    protagonistId: schemas.id,
     locationId: schemas.id,
   });
 
-  const protagonistQuery = useQuery({
-    queryKey: client.characters.protagonist.queryKey(),
-    queryFn: () => client.characters.protagonist.get(),
-    throwOnError: true,
+  // const session = await ensureActiveSession(true);
+
+  // const protagonist = await db.character.findUniqueOrThrow({
+  //   where: { id: protagonistId, user: { id: session.user.id } },
+  // });
+
+  const location = await db.location.findUniqueOrThrow({
+    where: { id: locationId },
   });
 
-  const protagonist = protagonistQuery.data!.payload;
+  const travel = async ({
+    characterId,
+    locationId,
+  }: {
+    characterId: number;
+    locationId: number;
+  }) => {
+    "use server";
 
-  const router = useRouter();
-  const queryClient = useQueryClient();
+    const session = await ensureActiveSession();
 
-  const query = useQuery({
-    queryKey: client.locations.queryKey(locationId),
-    queryFn: () => client.locations.get(locationId),
-  });
+    await db.character.update({
+      where: { id: characterId, user: { id: session.user.id } },
+      data: {
+        location: {
+          connect: { id: locationId },
+        },
+      },
+    });
 
-  const travel = useMutation({
-    mutationFn: () =>
-      client.characters.location.put(protagonist.id, { locationId }),
-    async onSuccess() {
-      await queryClient.invalidateQueries({
-        queryKey: client.characters.location.queryKey(protagonist.id),
-      });
-      await queryClient.invalidateQueries({
-        queryKey: client.characters.logs.queryKey(protagonist.id),
-      });
-      router.push(`/characters/${protagonist.id}/location`);
-    },
-    onError(error) {
-      console.error("Error traveling to location:", error);
-    },
-  });
-
-  if (!query.data) {
-    return null;
-  }
-
-  const location = query.data.payload;
+    revalidatePath(`/play/${characterId}/location`);
+    redirect(`/play/${characterId}/location`);
+  };
 
   return (
-    <div>
-      <div className="flex flex-col gap-1.5">
+    <div className="grow flex flex-col gap-12">
+      <header>
         <Image
           src="/signpost.png"
-          alt="Non descript signpost."
+          alt="Nondescript signpost."
           width={702}
           height={702}
           className="w-full mix-blend-color-burn"
         />
-        <Heading size="large" asChild>
-          <h1>{location.name}</h1>
-        </Heading>
-        <p>{location.description}</p>
-      </div>
 
-      <Alert type="negative" />
+        <div className="flex flex-col gap-1.5">
+          <Heading size="large" asChild>
+            <h1>{location.name}</h1>
+          </Heading>
 
-      <Menu.List busy={travel.isPending}>
-        <Menu.Item onClick={() => travel.mutate()}>Travel</Menu.Item>
-        <Menu.Item>Cancel</Menu.Item>
-      </Menu.List>
+          <p>{location.description}</p>
+        </div>
+      </header>
+
+      <form>
+        <Menu.List>
+          <Menu.Item
+            action={travel.bind(null, {
+              characterId: protagonistId,
+              locationId,
+            })}
+          >
+            Travel
+          </Menu.Item>
+        </Menu.List>
+      </form>
     </div>
   );
 }
