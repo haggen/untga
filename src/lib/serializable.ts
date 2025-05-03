@@ -1,15 +1,25 @@
-// type Value = string | number | boolean | null | undefined;
+// type JSON =
+//   | string
+//   | number
+//   | boolean
+//   | null
+//   | undefined
+//   | JSON[]
+//   | { [key: string]: JSON };
 
-// type Serializable<T> = T extends Value
-//   ? T
-//   : T extends Date
-//   ? string
-//   : T extends Array<infer U>
-//   ? Array<Serializable<U>>
-//   : T extends Record<string, infer U>
-//   ? { [K in keyof T]: Serializable<U> }
-//   : never;
+type Serialized<T> = T extends string | number | boolean | null
+  ? T
+  : T extends { toJSON(): infer U }
+  ? U
+  : T extends Array<infer U>
+  ? Serialized<U>[]
+  : T extends object
+  ? { [K in keyof T]: Serialized<T[K]> }
+  : never;
 
-export function serialize<T>(value: T): T {
+/**
+ * Produce a JSON valid type of given value.
+ */
+export function serialize<T>(value: T): Serialized<T> {
   return JSON.parse(JSON.stringify(value));
 }

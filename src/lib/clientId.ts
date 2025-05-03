@@ -1,5 +1,4 @@
-import { randomUUID } from "crypto";
-import { cookies } from "next/headers";
+import { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
 
 const cookieId = "client";
 
@@ -11,23 +10,24 @@ export function createCookie(value: string) {
     name: cookieId,
     value,
     maxAge,
-    httpOnly: true, // Only the server can write this cookie.
+    httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     path: "/",
   } as const;
 }
 
-export async function getClientId() {
-  const store = await cookies();
-  const cookie = store.get(cookieId);
+export async function getClientId(cookies: Pick<RequestCookies, "get">) {
+  const cookie = cookies.get(cookieId);
 
   if (cookie) {
     return cookie.value;
   }
 }
 
-export async function setClientId(clientId: string = randomUUID()) {
-  const store = await cookies();
-  store.set(createCookie(clientId));
+export async function setClientId(
+  cookies: Pick<RequestCookies, "set">,
+  clientId: string = crypto.randomUUID()
+) {
+  cookies.set(createCookie(clientId));
 }

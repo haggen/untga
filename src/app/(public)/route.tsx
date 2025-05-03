@@ -1,14 +1,12 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getClientId, setClientId } from "~/lib/clientId";
+import { getClientId } from "~/lib/clientId";
 
 export async function GET() {
-  const clientId = await getClientId();
+  const clientId = await getClientId(await cookies());
 
   if (clientId) {
-    setClientId(clientId);
     redirect("/login");
   }
-
-  setClientId();
   redirect("/registration");
 }
