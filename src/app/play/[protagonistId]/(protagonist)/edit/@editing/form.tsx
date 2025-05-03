@@ -9,7 +9,7 @@ import { Textarea } from "~/components/simple/Textarea";
 import { ActionState, StatefulAction } from "~/lib/actions";
 
 export function Form<T extends ActionState>(props: {
-  value: { name: string; description: string | null };
+  value: { id: number; name: string; description: string | null };
   action: StatefulAction<FormData, T>;
 }) {
   const [state, action, pending] = useActionState(
@@ -22,6 +22,8 @@ export function Form<T extends ActionState>(props: {
       <Alert state={state} />
 
       <fieldset className="flex flex-col gap-6">
+        <input type="hidden" name="characterId" value={props.value.id} />
+
         <Field label="Name" hint="You can't change the character's name.">
           <Input type="text" disabled value={props.value.name} />
         </Field>

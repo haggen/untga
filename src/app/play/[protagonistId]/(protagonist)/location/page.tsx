@@ -2,16 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, use } from "react";
-import { createPortal } from "react-dom";
-import { LocationMenu } from "~/components/LocationMenu";
-import { ProtagonistHeader } from "~/components/ProtagonistHeader";
 import { Alert } from "~/components/simple/Alert";
 import * as Definition from "~/components/simple/Definition";
 import { useDialog } from "~/components/simple/Dialog";
 import { Heading } from "~/components/simple/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
-import { useTypedParams } from "~/lib/useTypedParams";
 import { parse, schemas } from "~/lib/validation";
 
 function Summary({ characterId }: { characterId: number }) {
@@ -37,10 +33,6 @@ function Summary({ characterId }: { characterId: number }) {
 }
 
 function Destination({ locationId }: { locationId: number }) {
-  const { characterId } = useTypedParams({
-    characterId: schemas.id,
-  });
-
   const dialog = useDialog();
 
   const query = useQuery({
@@ -60,15 +52,6 @@ function Destination({ locationId }: { locationId: number }) {
 
   return (
     <Fragment>
-      {createPortal(
-        <LocationMenu
-          ref={dialog.ref}
-          locationId={location.id}
-          characterId={characterId}
-        />,
-        document.body
-      )}
-
       <Definition.Item
         key={location.id}
         label={location.name}
@@ -198,9 +181,7 @@ export default function Page({ params }: Props) {
   });
 
   return (
-    <main className="flex flex-col gap-12">
-      <ProtagonistHeader characterId={characterId} />
-
+    <div className="flex flex-col gap-12">
       <Summary characterId={characterId} />
 
       <Routes characterId={characterId} />
@@ -212,6 +193,6 @@ export default function Page({ params }: Props) {
 
         <Characters characterId={characterId} />
       </section>
-    </main>
+    </div>
   );
 }

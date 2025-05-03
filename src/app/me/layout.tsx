@@ -8,11 +8,11 @@ export default async function Layout({ children }: { children: ReactNode }) {
       {children}
 
       <Bar>
-        <Tab href="/characters" exact={false}>
+        <Tab href="/me/characters" exact={false}>
           <UsersIcon />
           Characters
         </Tab>
-        <Tab href="/settings">
+        <Tab href="/me/account">
           <CogIcon />
           Settings
         </Tab>

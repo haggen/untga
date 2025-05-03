@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HTMLAttributes } from "react";
+import { ComponentProps, HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
@@ -12,7 +12,7 @@ export function Item({
   className,
   ...props
 }: HTMLAttributes<HTMLElement> & {
-  href?: string;
+  href?: ComponentProps<typeof Link>["href"];
 }) {
   const content = href ? (
     <Link href={href} className={styles({ className })} {...props} />

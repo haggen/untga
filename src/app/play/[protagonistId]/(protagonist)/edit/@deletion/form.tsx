@@ -6,6 +6,7 @@ import { Button } from "~/components/simple/Button";
 import { ActionState, StatefulAction } from "~/lib/actions";
 
 export function Form<T extends ActionState>(props: {
+  value: { id: number };
   action: StatefulAction<FormData, T>;
 }) {
   const [state, action, pending] = useActionState(
@@ -16,6 +17,8 @@ export function Form<T extends ActionState>(props: {
   return (
     <form className="flex flex-col gap-9" action={action} aria-busy={pending}>
       <Alert state={state} />
+
+      <input type="hidden" name="characterId" value={props.value.id} />
 
       <footer className="flex justify-end">
         <Button type="submit" disabled={pending}>

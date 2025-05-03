@@ -1,11 +1,24 @@
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { Heading } from "~/components/simple/Heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
+import { serialize } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
-export default async function Page() {
+export default async function Page({ params }: { params: Promise<unknown> }) {
+  const { protagonistId } = parse(await params, {
+    protagonistId: schemas.id,
+  });
+
+  const session = await ensureActiveSession(true);
+
+  const protagonist = await db.character.findUniqueOrThrow({
+    where: { id: protagonistId, userId: session.userId },
+  });
+
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
@@ -20,7 +33,8 @@ export default async function Page() {
       data: { deletedAt: new Date() },
     });
 
-    return { message: "Character deleted." };
+    revalidatePath("/me/characters");
+    redirect("/me/characters");
   });
 
   return (
@@ -36,7 +50,7 @@ export default async function Page() {
         </p>
       </header>
 
-      <Form action={action} />
+      <Form value={serialize(protagonist)} action={action} />
     </section>
   );
 }

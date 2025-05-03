@@ -26,11 +26,11 @@ export default async function Page() {
       },
     });
 
-    redirect(`/characters/${character.id}`);
+    redirect(`/play/${character.id}/stats`);
   });
 
   return (
-    <main className="grow flex flex-col gap-12">
+    <div className="grow flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
         <Heading size="large" asChild>
           <h1>New character</h1>
@@ -42,6 +42,6 @@ export default async function Page() {
       </header>
 
       <Form action={action} />
-    </main>
+    </div>
   );
 }

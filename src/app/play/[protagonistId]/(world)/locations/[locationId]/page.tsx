@@ -4,11 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { use } from "react";
+import { Alert } from "~/components/simple/Alert";
 import { Heading } from "~/components/simple/Heading";
 import * as Menu from "~/components/simple/Menu";
 import { client } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
-
 
 export default function Page({ params }: { params: Promise<unknown> }) {
   const { locationId } = parse(use(params), {
@@ -41,7 +41,6 @@ export default function Page({ params }: { params: Promise<unknown> }) {
       await queryClient.invalidateQueries({
         queryKey: client.characters.logs.queryKey(protagonist.id),
       });
-      dialog.close();
       router.push(`/characters/${protagonist.id}/location`);
     },
     onError(error) {
@@ -56,25 +55,27 @@ export default function Page({ params }: { params: Promise<unknown> }) {
   const location = query.data.payload;
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <Image
-        src="/signpost.png"
-        alt="Non descript signpost."
-        width={702}
-        height={702}
-        className="w-full mix-blend-color-burn"
-      />
-      <Heading size="large" asChild>
-        <h1>{location.name}</h1>
-      </Heading>
-      <p>{location.description}</p>
+    <div>
+      <div className="flex flex-col gap-1.5">
+        <Image
+          src="/signpost.png"
+          alt="Non descript signpost."
+          width={702}
+          height={702}
+          className="w-full mix-blend-color-burn"
+        />
+        <Heading size="large" asChild>
+          <h1>{location.name}</h1>
+        </Heading>
+        <p>{location.description}</p>
+      </div>
+
+      <Alert type="negative" />
+
+      <Menu.List busy={travel.isPending}>
+        <Menu.Item onClick={() => travel.mutate()}>Travel</Menu.Item>
+        <Menu.Item>Cancel</Menu.Item>
+      </Menu.List>
     </div>
-
-    <Alert type="negative" dump={travel.error} />
-
-    <Menu.List busy={travel.isPending}>
-      <Menu.Item onClick={() => travel.mutate()}>Travel</Menu.Item>
-      <Menu.Item onClick={() => dialog.close()}>Cancel</Menu.Item>
-    </Menu.List>
   );
 }

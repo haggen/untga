@@ -1,7 +1,17 @@
+import { Metadata, ResolvingMetadata } from "next";
 import { Heading } from "~/components/simple/Heading";
 import * as Menu from "~/components/simple/Menu";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
+
+export async function generateMetadata(
+  _: unknown,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { title } = await parent;
+
+  return { title: `Characters at ${title}` };
+}
 
 export default async function Page() {
   const session = await ensureActiveSession(true);
@@ -20,7 +30,7 @@ export default async function Page() {
     .map((_, i) => characters[i]);
 
   return (
-    <main className="grow flex flex-col gap-12">
+    <div className="grow flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
         <Heading size="large" asChild>
           <h1>Characters</h1>
@@ -33,7 +43,9 @@ export default async function Page() {
           <Menu.Item
             key={i}
             href={
-              character ? `/characters/${character.id}` : "/characters/create"
+              character
+                ? `/play/${character.id}/stats`
+                : "/me/characters/create"
             }
           >
             {character?.name ?? (
@@ -44,6 +56,6 @@ export default async function Page() {
           </Menu.Item>
         ))}
       </Menu.List>
-    </main>
+    </div>
   );
 }

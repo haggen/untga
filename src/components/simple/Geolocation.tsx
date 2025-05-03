@@ -1,30 +1,40 @@
-import { useQuery } from "@tanstack/react-query";
+import { use } from "react";
+import z from "zod";
 
-type Props = {
-  ip: string;
+type Data = {
+  country: string;
+  regionName: string;
+  city: string;
 };
 
-export function Geolocation({ ip }: Props) {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["geolocation", ip],
-    queryFn: async () => {
-      const response = await fetch(`https://ipapi.co/${ip}/json/`);
+export function useGeolocation(value: string) {
+  const ip = z.ipv4().parse(value);
 
+  return fetch(`http://ip-api.com/json/${ip}?fields=city,regionName,country`)
+    .then((response) => {
       if (!response.ok) {
-        throw new Error(`Not 2xx: ${response.status}`);
+        throw new Error("Failed to fetch geolocation data", {
+          cause: response,
+        });
       }
+      return response.json() as Promise<Data>;
+    })
+    .catch((err) => {
+      console.error(err);
+      return null;
+    });
+}
 
-      return await response.json();
-    },
-  });
+export function Geolocation(
+  props: Readonly<{
+    data: Promise<Data | null>;
+  }>
+) {
+  const data = use(props.data);
 
-  if (isLoading) {
-    return "Loading...";
+  if (!data) {
+    return "unknown location";
   }
 
-  if (error || data.error) {
-    return "unknown country";
-  }
-
-  return `${data.city}, ${data.region}, ${data.country_code}`;
+  return `${data.city || data.regionName} (${data.country})`;
 }

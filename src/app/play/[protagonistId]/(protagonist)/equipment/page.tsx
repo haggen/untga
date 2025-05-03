@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { ProtagonistHeader } from "~/components/ProtagonistHeader";
 import { Alert } from "~/components/simple/Alert";
 import * as Definition from "~/components/simple/Definition";
 import { Heading } from "~/components/simple/Heading";
@@ -103,9 +102,7 @@ export default function Page({ params }: Props) {
   });
 
   return (
-    <main className="flex flex-col gap-12">
-      <ProtagonistHeader characterId={characterId} />
-
+    <div className="flex flex-col gap-12">
       <section className="flex flex-col gap-1.5">
         <Heading size="small" asChild>
           <h2>Equipment</h2>
@@ -115,6 +112,6 @@ export default function Page({ params }: Props) {
       </section>
 
       <Storage characterId={characterId} />
-    </main>
+    </div>
   );
 }

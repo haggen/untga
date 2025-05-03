@@ -1,34 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { Heading } from "~/components/simple/Heading";
-import { client } from "~/lib/client";
+import { Character } from "~/lib/db";
 
-export function ProtagonistHeader({ characterId }: { characterId: number }) {
-  const { data, isLoading } = useQuery({
-    queryKey: client.characters.queryKey(characterId),
-    queryFn: () => client.characters.get(characterId),
-  });
-
-  const character = data?.payload;
-
+export function ProtagonistHeader({
+  character,
+}: Readonly<{ character: Character }>) {
   return (
     <header className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
         <Heading size="large" asChild className="truncate">
-          <h1>{isLoading ? "Loading..." : character?.name}</h1>
+          <h1>{character.name}</h1>
         </Heading>
 
-        <Link href={`/characters/${characterId}`}>
+        <Link href={`/play/${character.id}/characters/${character.id}`}>
           <EllipsisIcon />
         </Link>
       </div>
 
-      <p>
-        {isLoading
-          ? "Loading..."
-          : character?.description || "No description available."}
-      </p>
+      <p>{character.description || "No description available."}</p>
     </header>
   );
 }

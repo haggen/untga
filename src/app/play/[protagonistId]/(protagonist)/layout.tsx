@@ -24,16 +24,16 @@ export default async function Layout({
       {children}
 
       <Tab.Bar>
-        <Tab.Tab href={`/characters/${protagonistId}/stats`}>
+        <Tab.Tab href={`/play/${protagonistId}/stats`}>
           <UserCircleIcon /> Stats
         </Tab.Tab>
-        <Tab.Tab href={`/characters/${protagonistId}/equipment`}>
+        <Tab.Tab href={`/play/${protagonistId}/equipment`}>
           <PackageOpenIcon /> Equipment
         </Tab.Tab>
-        <Tab.Tab href={`/characters/${protagonistId}/location`}>
+        <Tab.Tab href={`/play/${protagonistId}/location`}>
           <SignpostIcon /> Location
         </Tab.Tab>
-        <Tab.Tab href={`/characters/${protagonistId}/journal`}>
+        <Tab.Tab href={`/play/${protagonistId}/journal`}>
           <BookOpenTextIcon /> Journal
         </Tab.Tab>
       </Tab.Bar>

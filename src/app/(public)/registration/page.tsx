@@ -32,11 +32,11 @@ export default function Page() {
 
     await setActiveSession(session);
 
-    redirect("/characters");
+    redirect("/me/characters");
   });
 
   return (
-    <main className="flex flex-col gap-12">
+    <div className="flex flex-col gap-12">
       <header className="flex flex-col gap-1.5">
         <Heading size="large" asChild>
           <h1>Registration</h1>
@@ -49,6 +49,6 @@ export default function Page() {
       </header>
 
       <Form action={action} />
-    </main>
+    </div>
   );
 }

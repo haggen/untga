@@ -1,21 +1,21 @@
+import { revalidatePath } from "next/cache";
 import { Heading } from "~/components/simple/Heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
+import { serialize } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ protagonistId: string }>;
-}) {
+export default async function Page({ params }: { params: Promise<unknown> }) {
   const { protagonistId } = parse(await params, {
     protagonistId: schemas.id,
   });
 
+  const session = await ensureActiveSession(true);
+
   const protagonist = await db.character.findUniqueOrThrow({
-    where: { id: protagonistId },
+    where: { id: protagonistId, userId: session.userId },
   });
 
   const action = createStatefulAction(async (payload: FormData) => {
@@ -33,6 +33,8 @@ export default async function Page({
       data: { description: data.description },
     });
 
+    revalidatePath("/play/[protagonistId]/(protagonist)/edit/@editing");
+
     return { message: "Character updated successfully." };
   });
 
@@ -48,7 +50,7 @@ export default async function Page({
         </p>
       </header>
 
-      <Form action={action} value={protagonist} />
+      <Form action={action} value={serialize(protagonist)} />
     </section>
   );
 }

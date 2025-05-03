@@ -1,17 +1,35 @@
+import { Metadata, ResolvingMetadata } from "next";
 import { ReactNode } from "react";
+import { Heading } from "~/components/simple/Heading";
+
+export async function generateMetadata(
+  _: unknown,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { title } = await parent;
+
+  return { title: `Account at ${title}` };
+}
 
 export default function Layout(props: {
   sessions: ReactNode;
-  changeEmail: ReactNode;
-  changePassword: ReactNode;
+  email: ReactNode;
+  password: ReactNode;
   quit: ReactNode;
 }) {
   return (
-    <main className="grow flex flex-col gap-12">
+    <div className="grow flex flex-col gap-12">
+      <header className="flex flex-col gap-1.5">
+        <Heading size="large" asChild>
+          <h1>Account</h1>
+        </Heading>
+        <p>Manage your account.</p>
+      </header>
+
       {props.sessions}
-      {props.changeEmail}
-      {props.changePassword}
+      {props.email}
+      {props.password}
       {props.quit}
-    </main>
+    </div>
   );
 }

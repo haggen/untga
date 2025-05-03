@@ -5,9 +5,9 @@ export default function Layout(props: {
   deletion: ReactNode;
 }) {
   return (
-    <main className="grow flex flex-col gap-12">
+    <div className="grow flex flex-col gap-12">
       {props.editing}
       {props.deletion}
-    </main>
+    </div>
   );
 }
