@@ -1,6 +1,6 @@
 import { HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
-import { Slot } from "~/components/simple/Slot";
+import { Slot } from "~/components/Slot";
 
 const styles = tv({
   base: "px-3 py-0.5 inline-flex rounded-full bg-stone-600 text-stone-100",

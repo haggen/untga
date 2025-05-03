@@ -2,7 +2,7 @@
 
 import { ComponentProps } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "~/components/simple/Button";
+import { Button } from "~/components/Button";
 
 export function Submit({ children, ...props }: ComponentProps<typeof Button>) {
   const { pending } = useFormStatus();

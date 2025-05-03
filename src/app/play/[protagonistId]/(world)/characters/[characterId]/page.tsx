@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Heading } from "~/components/simple/Heading";
-import * as Menu from "~/components/simple/Menu";
+import { Heading } from "~/components/Heading";
+import * as Menu from "~/components/Menu";
 import { db } from "~/lib/db";
 import { parse, schemas } from "~/lib/validation";
 

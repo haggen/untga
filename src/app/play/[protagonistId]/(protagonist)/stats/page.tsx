@@ -1,6 +1,6 @@
+import * as Definition from "~/components/Definition";
+import { Heading } from "~/components/Heading";
 import { ProtagonistHeader } from "~/components/ProtagonistHeader";
-import * as Definition from "~/components/simple/Definition";
-import { Heading } from "~/components/simple/Heading";
 import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";

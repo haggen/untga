@@ -4,9 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { use } from "react";
-import { Alert } from "~/components/simple/Alert";
-import { Heading } from "~/components/simple/Heading";
-import * as Menu from "~/components/simple/Menu";
+import { Alert } from "~/components/Alert";
+import { Heading } from "~/components/Heading";
+import * as Menu from "~/components/Menu";
 import { client } from "~/lib/client";
 import { parse, schemas } from "~/lib/validation";
 

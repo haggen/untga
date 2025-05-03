@@ -1,4 +1,4 @@
-import { Heading } from "~/components/simple/Heading";
+import { Heading } from "~/components/Heading";
 import { createStatefulAction } from "~/lib/actions";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";

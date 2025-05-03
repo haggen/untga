@@ -5,7 +5,7 @@ import {
   UserCircleIcon,
 } from "lucide-react";
 import { ReactNode } from "react";
-import * as Tab from "~/components/simple/Tab";
+import * as Tab from "~/components/Tab";
 import { parse, schemas } from "~/lib/validation";
 
 export default async function Layout({

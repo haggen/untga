@@ -1,117 +1,99 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { use } from "react";
-import { Alert } from "~/components/simple/Alert";
-import * as Definition from "~/components/simple/Definition";
-import { Heading } from "~/components/simple/Heading";
-import { client, Container, WithItems, WithSource } from "~/lib/client";
+import * as Definition from "~/components/Definition";
+import { Heading } from "~/components/Heading";
+import { ProtagonistHeader } from "~/components/ProtagonistHeader";
+import { db } from "~/lib/db";
+import { ensure } from "~/lib/ensure";
+import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
+import { tag } from "~/static/tag";
 
-function Slots({ characterId }: { characterId: number }) {
-  const query = useQuery({
-    queryKey: client.characters.slots.queryKey(characterId),
-    queryFn: () => client.characters.slots.get(characterId),
+export default async function Page({
+  params,
+}: Readonly<{ params: Promise<unknown> }>) {
+  const { protagonistId } = parse(await params, {
+    protagonistId: schemas.id,
   });
 
-  if (query.isLoading) {
-    return (
-      <Definition.List>
-        {Array(7)
-          .fill(undefined)
-          .map((_, index) => (
-            <Definition.Item key={index} label="Loading...">
-              Loading...
-            </Definition.Item>
-          ))}
-      </Definition.List>
+  const session = await ensureActiveSession(true);
+
+  const protagonist = await db.character.findUniqueOrThrow({
+    where: { id: protagonistId, userId: session.userId },
+  });
+
+  const containers = await db.container.findMany({
+    where: {
+      character: { id: protagonistId, user: { id: session.userId } },
+    },
+    include: {
+      items: {
+        include: {
+          spec: true,
+          storage: {
+            include: {
+              items: {
+                include: {
+                  spec: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const slots = [
+    tag.Head,
+    tag.Overgarment,
+    tag.Torso,
+    tag.Waist,
+    tag.Hands,
+    tag.Legs,
+    tag.Pack,
+  ].map((tag) => {
+    return ensure(
+      containers.find((container) => container.tags.includes(tag)),
+      `Could not find slot: ${tag}.`
     );
-  }
+  });
 
-  if (!query.data) {
-    return null;
-  }
-
-  const slots = query.data.payload;
-
-  return (
-    <Definition.List>
-      {slots.map((slot) => (
-        <Definition.Item key={slot.id} label={slot.slot}>
-          {slot.items[0]?.spec.name ?? "Empty"}
-        </Definition.Item>
-      ))}
-    </Definition.List>
+  const storage = containers.filter((container) =>
+    container.items.some((item) => item.spec.tags.includes(tag.Storage))
   );
-}
 
-function Contents({
-  container,
-}: {
-  container: Container<WithSource & WithItems>;
-}) {
   return (
-    <section key={container.id} className="flex flex-col gap-1.5">
-      <Heading size="small" asChild>
-        <h2>{container.source?.spec.name}</h2>
-      </Heading>
+    <div className="grow flex flex-col gap-12">
+      <ProtagonistHeader character={protagonist} />
 
-      {container.items.length ? (
+      <section className="flex flex-col gap-1.5">
+        <Heading size="small" asChild>
+          <h1>Equipment</h1>
+        </Heading>
+
         <Definition.List>
-          {container.items.map((item) => (
-            <Definition.Item key={item.id} label={item.spec.name}>
-              &times;{item.amount}
+          {slots.map((slot) => (
+            <Definition.Item key={slot.id} label={slot.slot}>
+              {slot.items[0]?.spec.name ?? "Empty"}
             </Definition.Item>
           ))}
         </Definition.List>
-      ) : (
-        <Alert>Empty.</Alert>
-      )}
-    </section>
-  );
-}
-
-function Storage({ characterId }: { characterId: number }) {
-  const query = useQuery({
-    queryKey: client.characters.storage.queryKey(characterId),
-    queryFn: () => client.characters.storage.get(characterId),
-  });
-
-  if (query.isLoading) {
-    return <Alert type="neutral">Loading...</Alert>;
-  }
-
-  if (!query.data) {
-    return null;
-  }
-
-  const storage = query.data.payload;
-
-  return storage.map((container) => (
-    <Contents key={container.id} container={container} />
-  ));
-}
-
-type Props = {
-  params: Promise<{ characterId: string }>;
-};
-
-export default function Page({ params }: Props) {
-  const { characterId } = parse(use(params), {
-    characterId: schemas.id,
-  });
-
-  return (
-    <div className="flex flex-col gap-12">
-      <section className="flex flex-col gap-1.5">
-        <Heading size="small" asChild>
-          <h2>Equipment</h2>
-        </Heading>
-
-        <Slots characterId={characterId} />
       </section>
 
-      <Storage characterId={characterId} />
+      {storage.map((container) => (
+        <section key={container.id} className="flex flex-col gap-1.5">
+          <Heading size="small" asChild>
+            <h1>{container.items[0]?.spec.name}</h1>
+          </Heading>
+
+          <Definition.List>
+            {container.items[0]?.storage?.items.map((item) => (
+              <Definition.Item key={item.id} label={item.spec.name}>
+                &times;{item.amount}
+              </Definition.Item>
+            ))}
+          </Definition.List>
+        </section>
+      ))}
     </div>
   );
 }

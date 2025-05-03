@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
-import { Heading } from "~/components/simple/Heading";
-import * as Menu from "~/components/simple/Menu";
+import { Heading } from "~/components/Heading";
+import * as Menu from "~/components/Menu";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 

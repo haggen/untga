@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import z from "zod";
-import { Heading } from "~/components/simple/Heading";
+import { Heading } from "~/components/Heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";

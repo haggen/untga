@@ -1,6 +1,6 @@
 import { ComponentPropsWithRef } from "react";
 import { tv } from "tailwind-variants";
-import { Slot } from "~/components/simple/Slot";
+import { Slot } from "~/components/Slot";
 
 const styles = tv({
   base: "font-serif",

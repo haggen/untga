@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, use } from "react";
-import { Alert } from "~/components/simple/Alert";
-import * as Definition from "~/components/simple/Definition";
-import { useDialog } from "~/components/simple/Dialog";
-import { Heading } from "~/components/simple/Heading";
+import { Alert } from "~/components/Alert";
+import * as Definition from "~/components/Definition";
+import { useDialog } from "~/components/Dialog";
+import { Heading } from "~/components/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";

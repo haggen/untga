@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { ReactNode } from "react";
-import { Heading } from "~/components/simple/Heading";
+import { Heading } from "~/components/Heading";
 
 export async function generateMetadata(
   _: unknown,

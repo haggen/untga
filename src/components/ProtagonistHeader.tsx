@@ -1,6 +1,6 @@
 import { EllipsisIcon } from "lucide-react";
 import Link from "next/link";
-import { Heading } from "~/components/simple/Heading";
+import { Heading } from "~/components/Heading";
 import { Character } from "~/lib/db";
 
 export function ProtagonistHeader({

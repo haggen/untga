@@ -1,6 +1,6 @@
 import { CogIcon, UsersIcon } from "lucide-react";
 import { ReactNode } from "react";
-import { Bar, Tab } from "~/components/simple/Tab";
+import { Bar, Tab } from "~/components/Tab";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   return (

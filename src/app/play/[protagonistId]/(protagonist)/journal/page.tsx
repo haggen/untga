@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { Alert } from "~/components/simple/Alert";
-import { Heading } from "~/components/simple/Heading";
+import { Alert } from "~/components/Alert";
+import { Heading } from "~/components/Heading";
 import { client } from "~/lib/client";
 import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";

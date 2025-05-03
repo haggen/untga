@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { Heading } from "~/components/simple/Heading";
+import { Heading } from "~/components/Heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { serialize } from "~/lib/serializable";
