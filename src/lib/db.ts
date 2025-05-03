@@ -5,7 +5,7 @@ import type {
 } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
-import { tag } from "~/static/tag";
+import { tag } from "~/lib/tag";
 
 export { Prisma };
 

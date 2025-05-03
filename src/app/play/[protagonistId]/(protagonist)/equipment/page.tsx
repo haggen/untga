@@ -1,11 +1,11 @@
 import * as Definition from "~/components/Definition";
 import { Heading } from "~/components/Heading";
-import { ProtagonistHeader } from "~/components/ProtagonistHeader";
+import { Header } from "~/components/Protagonist/Header";
 import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { ensureActiveSession } from "~/lib/session";
+import { tag } from "~/lib/tag";
 import { parse, schemas } from "~/lib/validation";
-import { tag } from "~/static/tag";
 
 export default async function Page({
   params,
@@ -63,7 +63,7 @@ export default async function Page({
 
   return (
     <div className="grow flex flex-col gap-12">
-      <ProtagonistHeader character={protagonist} />
+      <Header character={protagonist} />
 
       <section className="flex flex-col gap-1.5">
         <Heading size="small" asChild>

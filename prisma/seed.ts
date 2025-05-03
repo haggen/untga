@@ -1,5 +1,5 @@
 import { db } from "~/lib/db";
-import { tag } from "~/static/tag";
+import { tag } from "~/lib/tag";
 
 const seed = {
   locations: [

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import * as Definition from "~/components/Definition";
 import { Heading } from "~/components/Heading";
-import { ProtagonistHeader } from "~/components/ProtagonistHeader";
+import { Header } from "~/components/Protagonist/Header";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
@@ -32,7 +32,7 @@ export default async function Page({
 
   return (
     <div className="grow flex flex-col gap-12">
-      <ProtagonistHeader character={protagonist} />
+      <Header character={protagonist} />
 
       <section className="flex flex-col gap-1.5">
         <Heading size="small" asChild>

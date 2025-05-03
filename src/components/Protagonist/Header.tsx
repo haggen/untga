@@ -3,9 +3,7 @@ import Link from "next/link";
 import { Heading } from "~/components/Heading";
 import { Character } from "~/lib/db";
 
-export function ProtagonistHeader({
-  character,
-}: Readonly<{ character: Character }>) {
+export function Header({ character }: Readonly<{ character: Character }>) {
   return (
     <header className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">

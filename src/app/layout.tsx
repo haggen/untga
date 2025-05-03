@@ -41,15 +41,13 @@ export default function Layout({
               <Link href="/">✠ Untga</Link>
             </h1>
             <p className="text-sm">
-              &copy; 2025 Untga contributors.
-              <a href="https://github.com/haggen/untga" className="font-bold">
-                Source
-              </a>{" "}
-              &middot;
-              <a href="https://github.com/haggen/untga" className="font-bold">
-                Help
+              &copy; 2025 Untga contributors.{" "}
+              <a
+                href="https://github.com/haggen/untga/discussions"
+                className="font-bold"
+              >
+                Need help?
               </a>
-              .
             </p>
           </header>
 

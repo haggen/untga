@@ -8,8 +8,8 @@ import { Field } from "~/components/Field";
 import { Input } from "~/components/Input";
 import { Textarea } from "~/components/Textarea";
 import { ActionState, StatefulAction } from "~/lib/actions";
+import { names } from "~/lib/names";
 import { random } from "~/lib/random";
-import { names } from "~/static/names";
 
 export function Form<T extends ActionState>(props: {
   action: StatefulAction<FormData, T>;

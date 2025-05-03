@@ -7,22 +7,21 @@ type Data = {
   city: string;
 };
 
-export function useGeolocation(value: string) {
+export async function useGeolocation(value: string) {
   const ip = z.ipv4().parse(value);
 
-  return fetch(`http://ip-api.com/json/${ip}?fields=city,regionName,country`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to fetch geolocation data", {
-          cause: response,
-        });
-      }
-      return response.json() as Promise<Data>;
-    })
-    .catch((err) => {
-      console.error(err);
-      return null;
-    });
+  try {
+    const response = await fetch(`/api/geolocation/${ip}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch geolocation data", {
+        cause: response,
+      });
+    }
+    return await (response.json() as Promise<Data>);
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
 }
 
 export function Geolocation(
