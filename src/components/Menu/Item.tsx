@@ -1,6 +1,7 @@
 import { HTMLAttributes, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 import { Command } from "~/components/Command";
+import { StatelessAction } from "~/lib/actions";
 
 const styles = tv({
   base: "flex items-center bg-neutral-400 min-h-12 p-3 w-full focus-visible:outline-0 hover:bg-neutral-300 focus-visible:bg-neutral-300",
@@ -8,7 +9,7 @@ const styles = tv({
 
 type Props = HTMLAttributes<HTMLElement> & {
   href?: string;
-  action?: () => Promise<void>;
+  action?: StatelessAction<unknown, void>;
 };
 
 export function Item(props: Omit<Props, "href">): ReactNode;

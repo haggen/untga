@@ -20,7 +20,10 @@ const fontSans = Cabin({
 });
 
 export const metadata: Metadata = {
-  title: "Untga",
+  title: {
+    template: "%s at Untga",
+    default: "Untga",
+  },
   description: "An open-source text-based browser MMORPG.",
 };
 

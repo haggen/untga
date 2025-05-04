@@ -1,8 +1,26 @@
+import { Metadata } from "next";
 import Image from "next/image";
 import { Heading } from "~/components/Heading";
 import * as Menu from "~/components/Menu";
 import { db } from "~/lib/db";
 import { parse, schemas } from "~/lib/validation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<unknown>;
+}): Promise<Metadata> {
+  const { characterId } = parse(await params, {
+    characterId: schemas.id,
+  });
+
+  const character = await db.character.findUniqueOrThrow({
+    where: { id: characterId },
+    select: { name: true },
+  });
+
+  return { title: character.name };
+}
 
 function Actions({
   characterId,

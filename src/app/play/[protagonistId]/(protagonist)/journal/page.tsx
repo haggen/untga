@@ -1,9 +1,14 @@
+import { Metadata } from "next";
 import { Heading } from "~/components/Heading";
 import { Header } from "~/components/Protagonist";
 import { db } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
+
+export const metadata: Metadata = {
+  title: "Character's journal",
+};
 
 export default async function Page({
   params,

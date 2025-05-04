@@ -1,17 +1,12 @@
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import { Heading } from "~/components/Heading";
 import * as Menu from "~/components/Menu";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 
-export async function generateMetadata(
-  _: unknown,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const { title } = await parent;
-
-  return { title: `Characters at ${title}` };
-}
+export const metadata: Metadata = {
+  title: "Characters at Untga",
+};
 
 export default async function Page() {
   const session = await ensureActiveSession(true);

@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import z from "zod";
 import { Heading } from "~/components/Heading";
@@ -6,6 +7,10 @@ import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
+
+export const metadata: Metadata = {
+  title: "Create new character",
+};
 
 export default async function Page() {
   const action = createStatefulAction(async (payload: FormData) => {

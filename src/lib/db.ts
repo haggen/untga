@@ -5,7 +5,8 @@ import type {
 } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
-import { tag } from "~/lib/tag";
+import { ensure } from "~/lib/ensure";
+import { tags } from "~/lib/tags";
 
 export { Prisma };
 
@@ -213,7 +214,7 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
       itemSpecification: {
-        findByTags(...tags: string[]) {
+        findOneByTags(...tags: string[]) {
           return db.itemSpecification.findFirstOrThrow({
             where: { tags: { hasEvery: tags } },
           });
@@ -224,66 +225,66 @@ const ext = Prisma.defineExtension((client) => {
          * Equipment slots and initial gear for new characters.
          */
         async startingSlots() {
-          const tunic = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Equipment,
-            tag.Torso
+          const tunic = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Equipment,
+            tags.Torso
           );
 
-          const trousers = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Equipment,
-            tag.Legs
+          const trousers = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Equipment,
+            tags.Legs
           );
 
-          const shoes = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Equipment,
-            tag.Feet
+          const shoes = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Equipment,
+            tags.Feet
           );
 
-          const pack = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Equipment,
-            tag.Pack,
-            tag.Storage
+          const pack = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Equipment,
+            tags.Pack,
+            tags.Storage
           );
 
-          const gold = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Currency
+          const gold = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Currency
           );
 
-          const dagger = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Weapon
+          const dagger = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Weapon
           );
 
-          const food = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Food
+          const food = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Food
           );
 
-          const wine = await db.itemSpecification.findByTags(
-            tag.Starting,
-            tag.Drink
+          const wine = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Drink
           );
 
           return {
             slots: {
               create: [
-                { tags: [tag.Slot, tag.Head] },
-                { tags: [tag.Slot, tag.Overgarment] },
+                { tags: [tags.Slot, tags.Head] },
+                { tags: [tags.Slot, tags.Overgarment] },
                 {
-                  tags: [tag.Slot, tag.Torso],
+                  tags: [tags.Slot, tags.Torso],
                   items: {
                     create: { amount: 1, spec: { connect: { id: tunic.id } } },
                   },
                 },
-                { tags: [tag.Slot, tag.Waist] },
-                { tags: [tag.Slot, tag.Hands] },
+                { tags: [tags.Slot, tags.Waist] },
+                { tags: [tags.Slot, tags.Hands] },
                 {
-                  tags: [tag.Slot, tag.Legs],
+                  tags: [tags.Slot, tags.Legs],
                   items: {
                     create: {
                       amount: 1,
@@ -292,13 +293,13 @@ const ext = Prisma.defineExtension((client) => {
                   },
                 },
                 {
-                  tags: [tag.Slot, tag.Feet],
+                  tags: [tags.Slot, tags.Feet],
                   items: {
                     create: { amount: 1, spec: { connect: { id: shoes.id } } },
                   },
                 },
                 {
-                  tags: [tag.Slot, tag.Pack],
+                  tags: [tags.Slot, tags.Pack],
                   items: {
                     create: {
                       spec: {
@@ -360,7 +361,7 @@ const ext = Prisma.defineExtension((client) => {
         async startingAttributes() {
           const attributes = await db.attributeSpecification.findMany({
             where: {
-              tags: { has: tag.Starting },
+              tags: { has: tags.Starting },
             },
           });
 
@@ -378,7 +379,7 @@ const ext = Prisma.defineExtension((client) => {
          */
         async startingLocation() {
           const location = await db.location.findFirstOrThrow({
-            where: { tags: { has: tag.Starting } },
+            where: { tags: { has: tags.Starting } },
           });
 
           return {
@@ -411,13 +412,87 @@ const ext = Prisma.defineExtension((client) => {
               name: data.name,
               description: data.description,
               user: { connect: { id: data.userId } },
-              tags: [tag.Player, tag.Idle],
+              tags: [tags.Player, tags.Idle],
               ...(await db.character.startingLogs()),
               ...(await db.character.startingAttributes()),
               ...(await db.character.startingLocation()),
               ...(await db.character.startingSlots()),
             },
           });
+        },
+
+        async travel({
+          data,
+        }: {
+          data: { userId: number; characterId: number; destinationId: number };
+        }) {
+          const destination = await db.location.findFirstOrThrow({
+            where: { id: data.destinationId },
+          });
+
+          const character = await db.character.findFirstOrThrow({
+            where: { id: data.characterId, user: { id: data.userId } },
+            include: {
+              attributes: { include: { spec: true } },
+              location: {
+                include: { routes: { include: { destinations: true } } },
+              },
+            },
+          });
+
+          if (
+            !character.location.routes.some((route) =>
+              route.destinations.some(
+                (location) => location.id === destination.id
+              )
+            )
+          ) {
+            throw new Error(
+              `Destination ${destination.name} is not reachable from ${character.location.name}.`
+            );
+          }
+
+          if (character.status !== tags.Idle) {
+            throw new Error("A character must be idle to travel.");
+          }
+
+          const stamina = ensure(
+            character.attributes.find((attribute) =>
+              attribute.spec.tags.includes(tags.Stamina)
+            ),
+            "Stamina attribute not found."
+          );
+
+          if (stamina.level < 1) {
+            throw new Error("Not enough stamina to travel.");
+          }
+
+          await db.$transaction([
+            db.character.update({
+              where: { id: data.characterId, user: { id: data.userId } },
+              data: {
+                location: {
+                  connect: { id: data.destinationId },
+                },
+              },
+            }),
+
+            db.attribute.update({
+              where: { id: stamina.id },
+              data: {
+                level: {
+                  decrement: 1,
+                },
+              },
+            }),
+
+            db.log.create({
+              data: {
+                character: { connect: { id: data.characterId } },
+                message: `I have travelled from ${character.location.name} to ${destination.name}.`,
+              },
+            }),
+          ]);
         },
       },
     },
@@ -504,24 +579,20 @@ const ext = Prisma.defineExtension((client) => {
         status: {
           needs: { tags: true },
           compute(character) {
-            if (character.tags.includes(tag.Idle)) {
-              return "Idle";
-            }
+            const status = character.tags.find((tag) =>
+              [
+                tags.Idle,
+                tags.Travelling,
+                tags.Healing,
+                tags.Resting,
+                tags.Crafting,
+                tags.Foraging,
+                tags.Dead,
+              ].includes(tag)
+            );
 
-            if (character.tags.includes(tag.Travelling)) {
-              return "Travelling";
-            }
-
-            if (character.tags.includes(tag.Healing)) {
-              return "Healing";
-            }
-
-            if (character.tags.includes(tag.Crafting)) {
-              return "Crafting";
-            }
-
-            if (character.tags.includes(tag.Foraging)) {
-              return "Foraging";
+            if (status) {
+              return status;
             }
 
             return "Unknown";
@@ -546,43 +617,28 @@ const ext = Prisma.defineExtension((client) => {
         slot: {
           needs: { tags: true },
           compute(container) {
-            if (!container.tags.includes(tag.Slot)) {
+            if (!container.tags.includes(tags.Slot)) {
               return null;
             }
 
-            if (container.tags.includes(tag.Head)) {
-              return "Head";
+            const slot = container.tags.find((tag) =>
+              [
+                tags.Head,
+                tags.Overgarment,
+                tags.Torso,
+                tags.Waist,
+                tags.Hands,
+                tags.Legs,
+                tags.Feet,
+                tags.Pack,
+              ].includes(tag)
+            );
+
+            if (slot) {
+              return slot;
             }
 
-            if (container.tags.includes(tag.Overgarment)) {
-              return "Overgarment";
-            }
-
-            if (container.tags.includes(tag.Torso)) {
-              return "Chest";
-            }
-
-            if (container.tags.includes(tag.Waist)) {
-              return "Waist";
-            }
-
-            if (container.tags.includes(tag.Hands)) {
-              return "Hands";
-            }
-
-            if (container.tags.includes(tag.Legs)) {
-              return "Legs";
-            }
-
-            if (container.tags.includes(tag.Feet)) {
-              return "Feet";
-            }
-
-            if (container.tags.includes(tag.Pack)) {
-              return "Pack";
-            }
-
-            return "Unknown";
+            return tags.Unknown;
           },
         },
       },

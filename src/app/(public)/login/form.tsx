@@ -1,19 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
 import { Alert } from "~/components/Alert";
 import { Button } from "~/components/Button";
 import { Field } from "~/components/Field";
 import { Input } from "~/components/Input";
 import { ActionState, StatefulAction } from "~/lib/actions";
+import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 
-export function Form<T extends ActionState>(props: {
-  action: StatefulAction<FormData, T>;
-}) {
-  const [state, action, pending] = useActionState(
-    props.action,
-    undefined as Awaited<T>
-  );
+export function Form(props: { action: StatefulAction<FormData, ActionState> }) {
+  const { state, action, pending } = useStatefulActionState(props.action);
 
   return (
     <form className="flex flex-col gap-9" action={action}>

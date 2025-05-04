@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import * as Definition from "~/components/Definition";
 import { Heading } from "~/components/Heading";
 import { Header } from "~/components/Protagonist/Header";
@@ -5,8 +6,12 @@ import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
-import { tag } from "~/lib/tag";
+import { tags } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
+
+export const metadata: Metadata = {
+  title: "Character's stats",
+};
 
 export default async function Page({
   params,
@@ -34,20 +39,20 @@ export default async function Page({
 
   const health = ensure(
     protagonist.attributes.find((attribute) =>
-      attribute.spec.tags.includes(tag.Health)
+      attribute.spec.tags.includes(tags.Health)
     ),
     "Could not find an attribute tagged as health."
   );
 
   const stamina = ensure(
     protagonist.attributes.find((attribute) =>
-      attribute.spec.tags.includes(tag.Stamina)
+      attribute.spec.tags.includes(tags.Stamina)
     ),
     "Could not find an attribute tagged as stamina."
   );
 
   const skills = protagonist.attributes.filter((attribute) =>
-    attribute.spec.tags.includes(tag.Skill)
+    attribute.spec.tags.includes(tags.Skill)
   );
 
   return (

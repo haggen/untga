@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useActionState } from "react";
+import { Fragment, Suspense, useActionState } from "react";
 import { Alert } from "~/components/Alert";
 import { Button } from "~/components/Button";
 import { Geolocation, useGeolocation } from "~/components/Geolocation";
@@ -8,13 +8,14 @@ import * as Menu from "~/components/Menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Session } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
+import { Serialized } from "~/lib/serializable";
 
 function Item({
   session,
   pending,
   invalidate,
 }: {
-  session: Session;
+  session: Serialized<Session>;
   pending: boolean;
   invalidate: () => void;
 }) {
@@ -61,7 +62,7 @@ export function List<T extends ActionState>({
   sessions,
   ...props
 }: {
-  sessions: Session[];
+  sessions: Serialized<Session[]>;
   invalidate: StatefulAction<{ id: number }, T>;
 }) {
   const [state, invalidate, pending] = useActionState(
@@ -70,7 +71,7 @@ export function List<T extends ActionState>({
   );
 
   return (
-    <>
+    <Fragment>
       <Alert state={state} />
 
       <Menu.List>
@@ -83,6 +84,6 @@ export function List<T extends ActionState>({
           />
         ))}
       </Menu.List>
-    </>
+    </Fragment>
   );
 }

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { HTMLAttributes, ReactNode } from "react";
+import { StatelessAction } from "~/lib/actions";
 
 export function Command(
   props: HTMLAttributes<HTMLElement> & {
-    action: () => Promise<void>;
+    action: StatelessAction<unknown, void>;
   }
 ): ReactNode;
 export function Command(
@@ -16,7 +17,7 @@ export function Command({
   href,
   ...props
 }: HTMLAttributes<HTMLElement> & {
-  action?: () => void;
+  action?: StatelessAction<unknown, void>;
   href?: string;
 }) {
   if (href) {

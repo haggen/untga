@@ -1,4 +1,7 @@
-import { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
+import {
+  RequestCookies,
+  ResponseCookies,
+} from "next/dist/compiled/@edge-runtime/cookies";
 
 const cookieId = "client";
 
@@ -26,7 +29,7 @@ export async function getClientId(cookies: Pick<RequestCookies, "get">) {
 }
 
 export async function setClientId(
-  cookies: Pick<RequestCookies, "set">,
+  cookies: Pick<ResponseCookies, "set">,
   clientId: string = crypto.randomUUID()
 ) {
   cookies.set(createCookie(clientId));

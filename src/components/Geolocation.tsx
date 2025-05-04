@@ -11,7 +11,14 @@ export async function useGeolocation(value: string) {
   const ip = z.ipv4().parse(value);
 
   try {
-    const response = await fetch(`/api/geolocation/${ip}`);
+    const response = await fetch(
+      new URL(
+        `/api/geolocation/${ip}`,
+        typeof location === "undefined"
+          ? "http://localhost:3000"
+          : location.origin
+      )
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch geolocation data", {
         cause: response,

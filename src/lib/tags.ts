@@ -1,4 +1,4 @@
-export const tag = {
+export const tags = {
   /** Items that can be consumed/used up. */
   Consumable: "consumable",
   /** The Crafting skill. */
@@ -7,6 +7,8 @@ export const tag = {
   Currency: "currency",
   /** Items that can be drank. Should be applied with tag.Consumable. */
   Drink: "drink",
+  /** Dead character. */
+  Dead: "dead",
   /** The Endurance skill. */
   Endurance: "endurance",
   /** Items that can be equipped. */
@@ -71,7 +73,9 @@ export const tag = {
   Waist: "waist",
   /** Items that can be used for combat. */
   Weapon: "weapon",
-} as const;
+  /** Unknown trait. */
+  Unknown: "unknown",
+};
 
 export function replace(
   tags: string[],

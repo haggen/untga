@@ -1,15 +1,10 @@
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import { ReactNode } from "react";
 import { Heading } from "~/components/Heading";
 
-export async function generateMetadata(
-  _: unknown,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const { title } = await parent;
-
-  return { title: `Account at ${title}` };
-}
+export const metadata: Metadata = {
+  title: "Account",
+};
 
 export default function Layout(props: {
   sessions: ReactNode;

@@ -1,11 +1,30 @@
+import { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { Form } from "~/app/play/[protagonistId]/(world)/locations/[locationId]/form";
 import { Heading } from "~/components/Heading";
-import * as Menu from "~/components/Menu";
+import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<unknown>;
+}): Promise<Metadata> {
+  const { locationId } = parse(await params, {
+    locationId: schemas.id,
+  });
+
+  const location = await db.location.findUniqueOrThrow({
+    where: { id: locationId },
+    select: { name: true },
+  });
+
+  return { title: location.name };
+}
 
 export default async function Page({ params }: { params: Promise<unknown> }) {
   const { protagonistId, locationId } = parse(await params, {
@@ -23,29 +42,30 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     where: { id: locationId },
   });
 
-  const travel = async ({
-    characterId,
-    locationId,
-  }: {
-    characterId: number;
-    locationId: number;
-  }) => {
-    "use server";
+  const travel = createStatefulAction(
+    async ({
+      characterId,
+      destinationId,
+    }: {
+      characterId: number;
+      destinationId: number;
+    }) => {
+      "use server";
 
-    const session = await ensureActiveSession();
+      const session = await ensureActiveSession();
 
-    await db.character.update({
-      where: { id: characterId, user: { id: session.user.id } },
-      data: {
-        location: {
-          connect: { id: locationId },
+      await db.character.travel({
+        data: {
+          characterId,
+          destinationId,
+          userId: session.user.id,
         },
-      },
-    });
+      });
 
-    revalidatePath(`/play/${characterId}/location`);
-    redirect(`/play/${characterId}/location`);
-  };
+      revalidatePath(`/play/${characterId}/location`);
+      redirect(`/play/${characterId}/location`);
+    }
+  );
 
   return (
     <div className="grow flex flex-col gap-12">
@@ -67,18 +87,12 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         </div>
       </header>
 
-      <form>
-        <Menu.List>
-          <Menu.Item
-            action={travel.bind(null, {
-              characterId: protagonistId,
-              locationId,
-            })}
-          >
-            Travel
-          </Menu.Item>
-        </Menu.List>
-      </form>
+      <Form
+        travel={travel.bind(null, undefined, {
+          characterId: protagonistId,
+          destinationId: locationId,
+        })}
+      />
     </div>
   );
 }

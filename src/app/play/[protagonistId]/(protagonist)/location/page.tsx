@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import * as Definition from "~/components/Definition";
 import { Heading } from "~/components/Heading";
@@ -5,6 +6,10 @@ import { Header } from "~/components/Protagonist/Header";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
+
+export const metadata: Metadata = {
+  title: "Character's location",
+};
 
 export default async function Page({
   params,
