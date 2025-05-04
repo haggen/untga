@@ -53,7 +53,7 @@ export function createCookie(session: Session) {
     expires: session.expiresAt,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     path: "/",
   } as const;
 }
