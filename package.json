@@ -7,6 +7,7 @@
     "prestart:development": "test -d node_modules || npm ci; test -d prisma/client || prisma generate",
     "start": "npm run start:${NODE_ENV:-development}",
     "start:development": "next dev --turbo",
+    "prestart:production": "prisma migrate deploy",
     "start:production": "next start",
     "prebuild": "prisma generate",
     "build": "next build",
