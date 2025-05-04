@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-function squeeze(text: string) {
-  return text.replaceAll(/\s+/g, " ").trim();
+function squish(value: string) {
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 /**
@@ -9,10 +9,10 @@ function squeeze(text: string) {
  */
 export const schemas = {
   id: z.coerce.number().positive(),
-  name: z.string().max(24).transform(squeeze),
+  name: z.string().max(24).transform(squish),
   email: z.email(),
-  password: z.string().min(12).transform(squeeze),
-  description: z.string().max(256).transform(squeeze),
+  password: z.string().min(12).transform(squish),
+  description: z.string().max(256).transform(squish),
 };
 
 /**
