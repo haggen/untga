@@ -356,19 +356,20 @@ const ext = Prisma.defineExtension((client) => {
         },
 
         /**
-         * Set of default resources and skills for new characters.
+         * Set of default attributes for new characters.
          */
         async startingAttributes() {
           const attributes = await db.attributeSpecification.findMany({
             where: {
-              tags: { has: tags.Starting },
+              tags: { hasEvery: [tags.Starting] },
             },
           });
 
           return {
             attributes: {
-              create: attributes.map(({ id }) => ({
-                specId: id,
+              create: attributes.map((spec) => ({
+                spec: { connect: { id: spec.id } },
+                level: spec.tags.includes(tags.Resource) ? 100 : 0,
               })),
             },
           } satisfies Pick<Prisma.CharacterCreateInput, "attributes">;
