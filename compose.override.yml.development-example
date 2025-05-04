@@ -10,6 +10,7 @@ services:
           ignore:
             - node_modules
             - .next
+            - .git
     environment:
       NODE_ENV: development
     networks:

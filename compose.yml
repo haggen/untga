@@ -11,3 +11,7 @@ services:
       POSTGRES_DB: app
       POSTGRES_USER: app
       POSTGRES_PASSWORD: 0123456789abcdef
+    volumes:
+      - ./config/postgresql.conf:/etc/postgresql.conf
+    command: 
+      -c config_file=/etc/postgresql.conf

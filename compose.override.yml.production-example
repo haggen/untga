@@ -5,7 +5,7 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.untga.rule=Host(`example.com`)"
+      - "traefik.http.routers.untga.rule=Host(`untga.crz.li`)"
 
 networks:
   traefik:
