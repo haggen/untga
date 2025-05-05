@@ -1,9 +1,9 @@
 "use client";
 
-import { Alert } from "~/components/Alert";
-import { Button } from "~/components/Button";
-import { Field } from "~/components/Field";
-import { Input } from "~/components/Input";
+import { Alert } from "~/components/alert";
+import { Button } from "~/components/button";
+import { Field } from "~/components/field";
+import { Input } from "~/components/input";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 

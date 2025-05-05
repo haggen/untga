@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getClientId } from "~/lib/clientId";
+import { getClientId } from "~/lib/client-id";
 import { getActiveSession } from "~/lib/session";
 
 export async function GET() {

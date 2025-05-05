@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import * as Definition from "~/components/Definition";
-import { Heading } from "~/components/Heading";
-import { Header } from "~/components/Protagonist/Header";
+import * as Definition from "~/components/definition";
+import { Heading } from "~/components/heading";
+import { Header } from "~/components/protagonist/header";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";

@@ -1,6 +1,6 @@
 import { EllipsisIcon } from "lucide-react";
 import Link from "next/link";
-import { Heading } from "~/components/Heading";
+import { Heading } from "~/components/heading";
 import { Character } from "~/lib/db";
 
 export function Header({ character }: Readonly<{ character: Character }>) {

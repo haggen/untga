@@ -1,7 +1,7 @@
 "use client";
 
-import { Alert } from "~/components/Alert";
-import * as Menu from "~/components/Menu";
+import { Alert } from "~/components/alert";
+import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 

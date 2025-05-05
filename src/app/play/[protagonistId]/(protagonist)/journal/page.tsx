@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import { Heading } from "~/components/Heading";
-import { Header } from "~/components/Protagonist";
+import { Heading } from "~/components/heading";
+import { Header } from "~/components/protagonist";
 import { db } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";

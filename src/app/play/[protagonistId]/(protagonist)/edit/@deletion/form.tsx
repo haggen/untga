@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { Alert } from "~/components/Alert";
-import { Button } from "~/components/Button";
+import { Alert } from "~/components/alert";
+import { Button } from "~/components/button";
 import { ActionState, StatefulAction } from "~/lib/actions";
 
 export function Form<T extends ActionState>(props: {

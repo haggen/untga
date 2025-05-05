@@ -1,6 +1,6 @@
 import { ClipboardSignatureIcon, LifeBuoyIcon, LogInIcon } from "lucide-react";
 import { ReactNode } from "react";
-import { Bar, Tab } from "~/components/Tab";
+import { Bar, Tab } from "~/components/tab";
 
 type Props = {
   children: ReactNode;

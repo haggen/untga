@@ -1,6 +1,6 @@
 import { ComponentProps, ReactNode } from "react";
 import { tv } from "tailwind-variants";
-import { Slot } from "~/components/Slot";
+import { Slot } from "~/components/slot";
 
 const variants = tv({
   base: "inline-flex gap-1 items-center font-bold rounded mix-blend-hard-light",

@@ -1,8 +1,8 @@
 "use client";
 
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/button";
 
 export function Submit({ children, ...props }: ComponentProps<typeof Button>) {
   const { pending } = useFormStatus();

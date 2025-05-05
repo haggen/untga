@@ -1,4 +1,4 @@
-import { Heading } from "~/components/Heading";
+import { Heading } from "~/components/heading";
 
 export default async function Page() {
   return (

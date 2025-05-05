@@ -1,6 +1,6 @@
 import { HTMLAttributes, ReactNode } from "react";
 import { tv } from "tailwind-variants";
-import { Command } from "~/components/Command";
+import { Command } from "~/components/command";
 import { StatelessAction } from "~/lib/actions";
 
 const styles = tv({

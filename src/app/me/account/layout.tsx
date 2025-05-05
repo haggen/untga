@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { ReactNode } from "react";
-import { Heading } from "~/components/Heading";
+import { Heading } from "~/components/heading";
 
 export const metadata: Metadata = {
   title: "Account",

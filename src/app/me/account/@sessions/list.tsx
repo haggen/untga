@@ -1,10 +1,10 @@
 "use client";
 
 import { Fragment, Suspense, useActionState } from "react";
-import { Alert } from "~/components/Alert";
-import { Button } from "~/components/Button";
-import { Geolocation, useGeolocation } from "~/components/Geolocation";
-import * as Menu from "~/components/Menu";
+import { Alert } from "~/components/alert";
+import { Button } from "~/components/button";
+import { Geolocation, useGeolocation } from "~/components/geolocation";
+import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Session } from "~/lib/db";
 import { fmt } from "~/lib/fmt";

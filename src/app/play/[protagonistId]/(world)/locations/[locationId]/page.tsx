@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Form } from "~/app/play/[protagonistId]/(world)/locations/[locationId]/form";
-import { Heading } from "~/components/Heading";
+import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
