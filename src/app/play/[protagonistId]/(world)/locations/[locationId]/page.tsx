@@ -2,12 +2,12 @@ import { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Form } from "~/app/play/[protagonistId]/(world)/locations/[locationId]/form";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
+import { Form } from "./form";
 
 export async function generateMetadata({
   params,
@@ -54,18 +54,24 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
       const session = await ensureActiveSession();
 
+      await db.character.findUniqueOrThrow({
+        where: { id: characterId, user: { id: session.user.id } },
+      });
+
       await db.character.travel({
         data: {
           characterId,
           destinationId,
-          userId: session.user.id,
         },
       });
 
       revalidatePath(`/play/${characterId}/location`);
       redirect(`/play/${characterId}/location`);
     }
-  );
+  ).bind(null, undefined, {
+    characterId: protagonistId,
+    destinationId: locationId,
+  });
 
   return (
     <div className="grow flex flex-col gap-12">
@@ -87,12 +93,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         </div>
       </header>
 
-      <Form
-        travel={travel.bind(null, undefined, {
-          characterId: protagonistId,
-          destinationId: locationId,
-        })}
-      />
+      <Form travel={travel} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import type {
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
 import { ensure } from "~/lib/ensure";
-import { tags } from "~/lib/tags";
+import { getSlotType, tags } from "~/lib/tags";
 
 export { Prisma };
 
@@ -100,8 +100,8 @@ export type WithEffects = {
   include: { effects: WithSpec };
 };
 
-export type WithSlots = {
-  include: { slots: WithItems };
+export type WithSlots<T = WithItems> = {
+  include: { slots: T };
 };
 
 export type WithItems = {
@@ -270,6 +270,12 @@ const ext = Prisma.defineExtension((client) => {
             tags.Drink
           );
 
+          const bedroll = await db.itemSpecification.findOneByTags(
+            tags.Starting,
+            tags.Utility,
+            tags.Resting
+          );
+
           return {
             slots: {
               create: [
@@ -340,6 +346,14 @@ const ext = Prisma.defineExtension((client) => {
                                 spec: {
                                   connect: {
                                     id: wine.id,
+                                  },
+                                },
+                              },
+                              {
+                                amount: 1,
+                                spec: {
+                                  connect: {
+                                    id: bedroll.id,
                                   },
                                 },
                               },
@@ -425,14 +439,14 @@ const ext = Prisma.defineExtension((client) => {
         async travel({
           data,
         }: {
-          data: { userId: number; characterId: number; destinationId: number };
+          data: { characterId: number; destinationId: number };
         }) {
           const destination = await db.location.findFirstOrThrow({
             where: { id: data.destinationId },
           });
 
           const character = await db.character.findFirstOrThrow({
-            where: { id: data.characterId, user: { id: data.userId } },
+            where: { id: data.characterId },
             include: {
               attributes: { include: { spec: true } },
               location: {
@@ -470,7 +484,7 @@ const ext = Prisma.defineExtension((client) => {
 
           await db.$transaction([
             db.character.update({
-              where: { id: data.characterId, user: { id: data.userId } },
+              where: { id: data.characterId },
               data: {
                 location: {
                   connect: { id: data.destinationId },
@@ -494,6 +508,72 @@ const ext = Prisma.defineExtension((client) => {
               },
             }),
           ]);
+        },
+
+        async equip({
+          data,
+        }: {
+          data: { characterId: number; itemId: number };
+        }) {
+          const item = await db.item.findFirstOrThrow({
+            where: { id: data.itemId, spec: { tags: { has: tags.Equipment } } },
+            include: { spec: true },
+          });
+
+          const slot = await db.container.findFirstOrThrow({
+            where: {
+              character: { id: data.characterId },
+              tags: { has: getSlotType(item.spec) },
+            },
+            include: {
+              items: { include: { spec: true } },
+            },
+          });
+
+          if (slot.items.length > 0) {
+            await db.character.unequip({
+              data: {
+                characterId: data.characterId,
+                itemId: slot.items[0].id,
+              },
+            });
+          }
+
+          await db.item.update({
+            where: { id: data.itemId },
+            data: {
+              container: {
+                connect: { id: slot.id },
+              },
+            },
+          });
+        },
+
+        async unequip({
+          data,
+        }: {
+          data: { characterId: number; itemId: number };
+        }) {
+          const storage = await db.container.findFirstOrThrow({
+            where: {
+              source: {
+                NOT: { id: data.itemId },
+                container: {
+                  character: { id: data.characterId },
+                  tags: { hasEvery: [tags.Slot, tags.Pack] },
+                },
+              },
+            },
+          });
+
+          await db.item.update({
+            where: { id: data.itemId },
+            data: {
+              container: {
+                connect: { id: storage.id },
+              },
+            },
+          });
         },
       },
     },

@@ -389,6 +389,11 @@ const seed = {
       description: "A gold coin. Used as currency.",
       tags: [tags.Currency, tags.Starting],
     },
+    {
+      name: "Bedroll",
+      description: "A rolled bundle of blankets for sleeping outdoors.",
+      tags: [tags.Utility, tags.Starting, tags.Resting],
+    },
   ],
   attributes: [
     {

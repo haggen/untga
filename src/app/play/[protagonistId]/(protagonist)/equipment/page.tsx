@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
 import { Header } from "~/components/protagonist/header";
@@ -54,6 +55,7 @@ export default async function Page({
     tags.Waist,
     tags.Hands,
     tags.Legs,
+    tags.Feet,
     tags.Pack,
   ].map((tag) => {
     return ensure(
@@ -77,9 +79,18 @@ export default async function Page({
 
         <Definition.List>
           {slots.map((slot) => (
-            <Definition.Item key={slot.id} label={slot.slot}>
-              {slot.items[0]?.spec.name ?? "Empty"}
-            </Definition.Item>
+            <Link
+              key={slot.id}
+              href={
+                slot.items[0]
+                  ? `/play/${protagonistId}/items/${slot.items[0].id}`
+                  : ""
+              }
+            >
+              <Definition.Item label={slot.slot}>
+                {slot.items[0]?.spec.name ?? "Empty"}
+              </Definition.Item>
+            </Link>
           ))}
         </Definition.List>
       </section>
@@ -92,9 +103,14 @@ export default async function Page({
 
           <Definition.List>
             {container.items[0]?.storage?.items.map((item) => (
-              <Definition.Item key={item.id} label={item.spec.name}>
-                &times;{item.amount}
-              </Definition.Item>
+              <Link
+                key={item.id}
+                href={`/play/${protagonistId}/items/${item.id}`}
+              >
+                <Definition.Item label={item.spec.name}>
+                  &times;{item.amount}
+                </Definition.Item>
+              </Link>
             ))}
           </Definition.List>
         </section>

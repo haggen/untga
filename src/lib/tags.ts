@@ -59,6 +59,8 @@ export const tags = {
   Slot: "slot",
   /** The Stamina attribute. */
   Stamina: "stamina",
+  /** Items that can be utilized in some way. */
+  Utility: "utility",
   /** Locations, slots, attributes and items that start with the character when it's created. */
   Starting: "starting",
   /** Items that provide storage. */
@@ -83,4 +85,18 @@ export function replace(
   replacement: string[]
 ) {
   return tags.filter((tag) => !target.includes(tag)).concat(replacement);
+}
+
+export function getSlotType(thing: { tags: string[] }) {
+  return (
+    [
+      tags.Head,
+      tags.Overgarment,
+      tags.Torso,
+      tags.Waist,
+      tags.Hands,
+      tags.Legs,
+      tags.Feet,
+    ].find((tag) => thing.tags.includes(tag)) ?? tags.Unknown
+  );
 }
