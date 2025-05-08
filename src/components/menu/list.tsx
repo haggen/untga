@@ -2,7 +2,7 @@ import { HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
-  base: "flex flex-col gap-px rounded border border-neutral-500 overflow-hidden  mix-blend-hard-light",
+  base: "flex flex-col gap-px rounded border border-neutral-400 overflow-hidden",
   variants: {
     busy: {
       true: "cursor-wait pointer-events-none",

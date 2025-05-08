@@ -2,7 +2,7 @@ import { ComponentPropsWithRef } from "react";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
-  base: "p-2 bg-neutral-100 border border-neutral-500 rounded placeholder:text-neutral-500 mix-blend-hard-light",
+  base: "p-2 bg-neutral-100 border border-neutral-400 rounded placeholder:text-neutral-500",
   variants: {
     disabled: {
       true: "cursor-not-allowed opacity-50",

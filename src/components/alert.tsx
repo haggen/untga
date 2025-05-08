@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { ActionState } from "~/lib/actions";
 
 const styles = tv({
-  base: "p-3 rounded mix-blend-multiply",
+  base: "p-3 rounded",
   variants: {
     type: {
       neutral: "bg-sky-200 text-sky-900 ",

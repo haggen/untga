@@ -59,7 +59,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           alt="Nondescript silhouette of a person."
           width={702}
           height={702}
-          className="w-full mix-blend-color-burn"
+          className="w-full mix-blend-multiply"
         />
 
         <Heading size="large" asChild className="truncate">

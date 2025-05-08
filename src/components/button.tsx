@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { Slot } from "~/components/slot";
 
 const variants = tv({
-  base: "inline-flex gap-1 items-center font-bold rounded mix-blend-hard-light",
+  base: "inline-flex gap-1 items-center font-bold rounded",
   variants: {
     size: {
       default: "h-10 px-6",

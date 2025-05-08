@@ -12,11 +12,9 @@ function isEquipped(
   character: Serialized<Character<WithSlots>>,
   itemId: number
 ) {
-  return character.slots.some((slot) => {
-    return slot.items.some((item) => {
-      return item.id === itemId;
-    });
-  });
+  return character.slots.some((slot) =>
+    slot.items.some((item) => item.id === itemId)
+  );
 }
 
 export function Form(
@@ -37,7 +35,7 @@ export function Form(
 
       <Menu.List>
         {isEquipped(props.protagonist, props.item.id) ? (
-          <Menu.Item action={unequip.action}>Unequip</Menu.Item>
+          <Menu.Item action={unequip.action}>Take off</Menu.Item>
         ) : props.item.spec.tags.includes(tags.Equipment) ? (
           <Menu.Item action={equip.action}>Equip</Menu.Item>
         ) : null}

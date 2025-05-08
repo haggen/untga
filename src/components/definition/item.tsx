@@ -16,7 +16,7 @@ export function Item({
   return (
     <div className={styles({ className })} {...props}>
       <div>{label}</div>
-      <div className="grow border-b-2 border-dotted mix-blend-overlay" />
+      <div className="grow border-b-2 border-dotted border-current/30" />
       <div>{children}</div>
     </div>
   );

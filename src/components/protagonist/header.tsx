@@ -6,7 +6,7 @@ import { Character } from "~/lib/db";
 export function Header({ character }: Readonly<{ character: Character }>) {
   return (
     <header className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-6">
         <Heading size="large" asChild className="truncate">
           <h1>{character.name}</h1>
         </Heading>

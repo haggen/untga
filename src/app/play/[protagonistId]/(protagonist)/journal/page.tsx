@@ -43,7 +43,7 @@ export default async function Page({
 
         <ul className="flex flex-col gap-1.5">
           {logs.map((log) => (
-            <li key={log.id} className="flex gap-1.5 before:content-['⬥']">
+            <li key={log.id} className="flex gap-1.5">
               <article>
                 <h1 className="text-sm text-stone-600">
                   {fmt.datetime(log.createdAt, {

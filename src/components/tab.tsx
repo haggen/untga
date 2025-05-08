@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
-  base: "flex flex-col items-center gap-1 px-3 text-sm text-center truncate mix-blend-hard-light",
+  base: "flex flex-col items-center gap-1 px-3 font-bold text-sm text-center truncate",
   variants: {
     active: {
       true: "text-orange-800",
@@ -42,7 +42,7 @@ export function Bar({ className, ...props }: BarProps) {
   return (
     <ul
       className={twMerge(
-        "grid auto-cols-fr grid-flow-col sticky bottom-5",
+        "grid auto-cols-fr grid-flow-col sticky bottom-3",
         className
       )}
       {...props}

@@ -81,7 +81,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           alt="Nondescript signpost."
           width={702}
           height={702}
-          className="w-full mix-blend-color-burn"
+          className="w-full mix-blend-multiply"
         />
 
         <div className="flex flex-col gap-1.5">

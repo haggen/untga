@@ -171,6 +171,9 @@ const ext = Prisma.defineExtension((client) => {
     model: {
       user: {},
       session: {
+        /**
+         * Create new session by validating given credentials.
+         */
         async createByCredentials({
           data,
         }: {
@@ -181,9 +184,13 @@ const ext = Prisma.defineExtension((client) => {
             ip: string;
           };
         }) {
-          const user = await db.user.findUniqueOrThrow({
-            where: { email: data.email },
-          });
+          const user = await db.user
+            .findUniqueOrThrow({
+              where: { email: data.email },
+            })
+            .catch((cause) => {
+              throw new Error("E-mail not found.", { cause });
+            });
 
           if (!(await bcrypt.compare(data.password, user.password))) {
             throw new Error("Password doesn't match.");
@@ -197,13 +204,10 @@ const ext = Prisma.defineExtension((client) => {
             },
           });
         },
-        valid() {
-          return {
-            expiresAt: {
-              gt: new Date(),
-            },
-          };
-        },
+
+        /**
+         * Invalidate sessions.
+         */
         async invalidate({ where }: { where: Prisma.SessionWhereUniqueInput }) {
           return await db.session.update({
             where,
@@ -214,206 +218,50 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
       itemSpecification: {
+        async idByTag(...tags: string[]) {
+          return (
+            await db.itemSpecification.findFirstOrThrow({
+              select: { id: true },
+              where: { tags: { hasEvery: tags } },
+            })
+          ).id;
+        },
         findOneByTags(...tags: string[]) {
           return db.itemSpecification.findFirstOrThrow({
             where: { tags: { hasEvery: tags } },
           });
         },
+        findManyByTags(...tags: string[]) {
+          return db.itemSpecification.findMany({
+            where: { tags: { hasEvery: tags } },
+          });
+        },
+      },
+      attributeSpecification: {
+        findOneByTags(...tags: string[]) {
+          return db.attributeSpecification.findFirstOrThrow({
+            where: { tags: { hasEvery: tags } },
+          });
+        },
+        findManyByTags(...tags: string[]) {
+          return db.attributeSpecification.findMany({
+            where: { tags: { hasEvery: tags } },
+          });
+        },
+      },
+      location: {
+        findOneByTags(...tags: string[]) {
+          return db.location.findFirstOrThrow({
+            where: { tags: { hasEvery: tags } },
+          });
+        },
+        findManyByTags(...tags: string[]) {
+          return db.location.findMany({
+            where: { tags: { hasEvery: tags } },
+          });
+        },
       },
       character: {
-        /**
-         * Equipment slots and initial gear for new characters.
-         */
-        async startingSlots() {
-          const tunic = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Equipment,
-            tags.Torso
-          );
-
-          const trousers = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Equipment,
-            tags.Legs
-          );
-
-          const shoes = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Equipment,
-            tags.Feet
-          );
-
-          const pack = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Equipment,
-            tags.Pack,
-            tags.Storage
-          );
-
-          const gold = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Currency
-          );
-
-          const dagger = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Weapon
-          );
-
-          const food = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Food
-          );
-
-          const wine = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Drink
-          );
-
-          const bedroll = await db.itemSpecification.findOneByTags(
-            tags.Starting,
-            tags.Utility,
-            tags.Resting
-          );
-
-          return {
-            slots: {
-              create: [
-                { tags: [tags.Slot, tags.Head] },
-                { tags: [tags.Slot, tags.Overgarment] },
-                {
-                  tags: [tags.Slot, tags.Torso],
-                  items: {
-                    create: { amount: 1, spec: { connect: { id: tunic.id } } },
-                  },
-                },
-                { tags: [tags.Slot, tags.Waist] },
-                { tags: [tags.Slot, tags.Hands] },
-                {
-                  tags: [tags.Slot, tags.Legs],
-                  items: {
-                    create: {
-                      amount: 1,
-                      spec: { connect: { id: trousers.id } },
-                    },
-                  },
-                },
-                {
-                  tags: [tags.Slot, tags.Feet],
-                  items: {
-                    create: { amount: 1, spec: { connect: { id: shoes.id } } },
-                  },
-                },
-                {
-                  tags: [tags.Slot, tags.Pack],
-                  items: {
-                    create: {
-                      spec: {
-                        connect: {
-                          id: pack.id,
-                        },
-                      },
-                      storage: {
-                        create: {
-                          items: {
-                            create: [
-                              {
-                                amount: 100,
-                                spec: {
-                                  connect: {
-                                    id: gold.id,
-                                  },
-                                },
-                              },
-                              {
-                                amount: 1,
-                                spec: {
-                                  connect: {
-                                    id: dagger.id,
-                                  },
-                                },
-                              },
-                              {
-                                amount: 1,
-                                spec: {
-                                  connect: {
-                                    id: food.id,
-                                  },
-                                },
-                              },
-                              {
-                                amount: 1,
-                                spec: {
-                                  connect: {
-                                    id: wine.id,
-                                  },
-                                },
-                              },
-                              {
-                                amount: 1,
-                                spec: {
-                                  connect: {
-                                    id: bedroll.id,
-                                  },
-                                },
-                              },
-                            ],
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-          } satisfies Pick<Prisma.CharacterCreateInput, "slots">;
-        },
-
-        /**
-         * Set of default attributes for new characters.
-         */
-        async startingAttributes() {
-          const attributes = await db.attributeSpecification.findMany({
-            where: {
-              tags: { hasEvery: [tags.Starting] },
-            },
-          });
-
-          return {
-            attributes: {
-              create: attributes.map((spec) => ({
-                spec: { connect: { id: spec.id } },
-                level: spec.tags.includes(tags.Resource) ? 100 : 0,
-              })),
-            },
-          } satisfies Pick<Prisma.CharacterCreateInput, "attributes">;
-        },
-
-        /**
-         * Get character creation input data for initial location.
-         */
-        async startingLocation() {
-          const location = await db.location.findFirstOrThrow({
-            where: { tags: { has: tags.Starting } },
-          });
-
-          return {
-            location: { connect: { id: location.id } },
-          } satisfies Pick<Prisma.CharacterCreateInput, "location">;
-        },
-
-        async startingLogs() {
-          return {
-            logs: {
-              create: [
-                {
-                  message: "I'm an adult now and I'm on my own.",
-                },
-              ],
-            },
-          } satisfies Pick<Prisma.CharacterCreateInput, "logs">;
-        },
-
         /**
          * Create new player character.
          */
@@ -422,18 +270,222 @@ const ext = Prisma.defineExtension((client) => {
         }: {
           data: { name: string; description?: string; userId: number };
         }) {
-          return await db.character.create({
+          const location = await db.location.findFirstOrThrow({
+            where: { tags: { has: tags.Starting } },
+          });
+
+          const character = await db.character.create({
             data: {
               name: data.name,
               description: data.description,
               user: { connect: { id: data.userId } },
               tags: [tags.Player, tags.Idle],
-              ...(await db.character.startingLogs()),
-              ...(await db.character.startingAttributes()),
-              ...(await db.character.startingLocation()),
-              ...(await db.character.startingSlots()),
+              location: { connect: { id: location.id } },
             },
           });
+
+          await db.log.create({
+            data: {
+              character: { connect: { id: character.id } },
+              message: "I'm an adult now and I'm on my own.",
+            },
+          });
+
+          const attributes = await db.attributeSpecification.findMany({
+            where: {
+              tags: { has: tags.Starting },
+            },
+          });
+
+          for await (const spec of attributes) {
+            await db.attribute.create({
+              data: {
+                character: { connect: { id: character.id } },
+                spec: { connect: { id: spec.id } },
+                level: spec.tags.includes(tags.Resource) ? 100 : 0,
+              },
+            });
+          }
+
+          const slots = {
+            [tags.Head]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Head],
+              },
+            }),
+            [tags.Overgarment]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Overgarment],
+              },
+            }),
+            [tags.Torso]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Torso],
+              },
+            }),
+            [tags.Waist]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Waist],
+              },
+            }),
+            [tags.Hands]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Hands],
+              },
+            }),
+            [tags.Legs]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Legs],
+              },
+            }),
+            [tags.Feet]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Feet],
+              },
+            }),
+            [tags.Pack]: await db.container.create({
+              data: {
+                character: { connect: { id: character.id } },
+                tags: [tags.Slot, tags.Pack],
+              },
+            }),
+          };
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: slots[tags.Torso].id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Equipment,
+                    tags.Torso
+                  ),
+                },
+              },
+            },
+          });
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: slots[tags.Legs].id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Equipment,
+                    tags.Legs
+                  ),
+                },
+              },
+            },
+          });
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: slots[tags.Feet].id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Equipment,
+                    tags.Feet
+                  ),
+                },
+              },
+            },
+          });
+
+          const pack = await db.item.create({
+            data: {
+              container: { connect: { id: slots[tags.Pack].id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Equipment,
+                    tags.Pack
+                  ),
+                },
+              },
+            },
+          });
+
+          const storage = await db.container.create({
+            data: {
+              // character: { connect: { id: character.id } },
+              source: { connect: { id: pack.id } },
+              tags: [tags.Storage],
+            },
+          });
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: storage.id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Currency
+                  ),
+                },
+              },
+              amount: 100,
+            },
+          });
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: storage.id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Utility,
+                    tags.Resting
+                  ),
+                },
+              },
+            },
+          });
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: storage.id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Food
+                  ),
+                },
+              },
+              amount: 5,
+            },
+          });
+
+          await db.item.create({
+            data: {
+              container: { connect: { id: storage.id } },
+              spec: {
+                connect: {
+                  id: await db.itemSpecification.idByTag(
+                    tags.Starting,
+                    tags.Weapon
+                  ),
+                },
+              },
+            },
+          });
+
+          return character;
         },
 
         async travel({
@@ -441,34 +493,47 @@ const ext = Prisma.defineExtension((client) => {
         }: {
           data: { characterId: number; destinationId: number };
         }) {
-          const destination = await db.location.findFirstOrThrow({
-            where: { id: data.destinationId },
-          });
+          const destination = await db.location
+            .findFirstOrThrow({
+              where: { id: data.destinationId },
+            })
+            .catch((cause) => {
+              throw new Error(
+                `Couldn't find destination (${data.destinationId}).`,
+                { cause }
+              );
+            });
 
-          const character = await db.character.findFirstOrThrow({
-            where: { id: data.characterId },
-            include: {
-              attributes: { include: { spec: true } },
-              location: {
-                include: { routes: { include: { destinations: true } } },
+          const character = await db.character
+            .findFirstOrThrow({
+              where: { id: data.characterId },
+              include: {
+                attributes: { include: { spec: true } },
+                location: {
+                  include: { routes: { include: { destinations: true } } },
+                },
               },
-            },
-          });
+            })
+            .catch((cause) => {
+              throw new Error(
+                `Couldn't find character (${data.characterId}).`,
+                {
+                  cause,
+                }
+              );
+            });
 
-          if (
-            !character.location.routes.some((route) =>
+          ensure(
+            character.location.routes.some((route) =>
               route.destinations.some(
                 (location) => location.id === destination.id
               )
-            )
-          ) {
-            throw new Error(
-              `Destination ${destination.name} is not reachable from ${character.location.name}.`
-            );
-          }
+            ),
+            `Destination ${destination.name} is not reachable from ${character.location.name}.`
+          );
 
           if (character.status !== tags.Idle) {
-            throw new Error("A character must be idle to travel.");
+            throw new Error(`The character is busy (${character.status}).`);
           }
 
           const stamina = ensure(
@@ -515,20 +580,35 @@ const ext = Prisma.defineExtension((client) => {
         }: {
           data: { characterId: number; itemId: number };
         }) {
-          const item = await db.item.findFirstOrThrow({
-            where: { id: data.itemId, spec: { tags: { has: tags.Equipment } } },
-            include: { spec: true },
-          });
+          const item = await db.item
+            .findFirstOrThrow({
+              where: {
+                id: data.itemId,
+                spec: { tags: { has: tags.Equipment } },
+              },
+              include: { spec: true },
+            })
+            .catch((cause) => {
+              throw new Error(`Couldn't find the item (${data.itemId}).`, {
+                cause,
+              });
+            });
 
-          const slot = await db.container.findFirstOrThrow({
-            where: {
-              character: { id: data.characterId },
-              tags: { has: getSlotType(item.spec) },
-            },
-            include: {
-              items: { include: { spec: true } },
-            },
-          });
+          const slot = await db.container
+            .findFirstOrThrow({
+              where: {
+                character: { id: data.characterId },
+                tags: { has: getSlotType(item.spec) },
+              },
+              include: {
+                items: { include: { spec: true } },
+              },
+            })
+            .catch((cause) => {
+              throw new Error(`Couldn't find the slot for ${item.spec.name}.`, {
+                cause,
+              });
+            });
 
           if (slot.items.length > 0) {
             await db.character.unequip({
@@ -554,17 +634,27 @@ const ext = Prisma.defineExtension((client) => {
         }: {
           data: { characterId: number; itemId: number };
         }) {
-          const storage = await db.container.findFirstOrThrow({
-            where: {
-              source: {
-                NOT: { id: data.itemId },
-                container: {
-                  character: { id: data.characterId },
-                  tags: { hasEvery: [tags.Slot, tags.Pack] },
+          const storage = await db.container
+            .findFirstOrThrow({
+              where: {
+                source: {
+                  container: {
+                    character: { id: data.characterId },
+                    tags: { hasEvery: [tags.Slot, tags.Pack] },
+                  },
                 },
               },
-            },
-          });
+            })
+            .catch((cause) => {
+              throw new Error(
+                `Couldn't find the character's storage container.`,
+                { cause }
+              );
+            });
+
+          if (storage.sourceId === data.itemId) {
+            throw new Error(`You wouldn't have where to put it.`);
+          }
 
           await db.item.update({
             where: { id: data.itemId },

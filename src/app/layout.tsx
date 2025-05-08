@@ -38,8 +38,8 @@ export default function Layout({
       className={`${fontSerif.variable} ${fontSans.variable} antialiased text-neutral-100 bg-neutral-900`}
     >
       <body>
-        <div className="flex flex-col max-w-md px-2 pb-2 mx-auto min-h-dvh">
-          <header className="flex items-center justify-between px-3 h-9">
+        <div className="flex flex-col max-w-md mx-auto min-h-dvh">
+          <header className="flex items-center justify-between px-2 h-9">
             <h1 className="font-bold">
               <Link href="/">✠ Untga</Link>
             </h1>
