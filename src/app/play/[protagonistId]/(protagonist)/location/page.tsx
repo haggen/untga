@@ -4,6 +4,7 @@ import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
 import { Header } from "~/components/protagonist/header";
 import { db } from "~/lib/db";
+import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
@@ -61,7 +62,12 @@ export default async function Page({
                 key={destination.id}
               >
                 <Definition.Item label={destination.name}>
-                  <p>{destination.area}</p>
+                  <p>
+                    {fmt.number(destination.area, {
+                      unit: "mile",
+                      style: "unit",
+                    })}
+                  </p>
                 </Definition.Item>
               </Link>
             ))}
