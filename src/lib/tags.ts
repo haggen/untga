@@ -87,6 +87,14 @@ export function replace(
   return tags.filter((tag) => !target.includes(tag)).concat(replacement);
 }
 
+export function getCharacterStatus(character: { tags: string[] }) {
+  return (
+    [tags.Dead, tags.Idle, tags.Resting, tags.Travelling, tags.Healing].find(
+      (tag) => character.tags.includes(tag)
+    ) ?? tags.Unknown
+  );
+}
+
 export function getSlotType(thing: { tags: string[] }) {
   return (
     [
