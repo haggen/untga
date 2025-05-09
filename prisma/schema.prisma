@@ -56,7 +56,7 @@ model Session {
   /// User to whom the session belongs.
   user   User @relation(fields: [userId], references: [id], onDelete: Restrict)
 
-  @@index([expiresAt])
+  @@index(expiresAt)
 }
 
 /// Characters in the world, player controlled or otherwise.
@@ -90,11 +90,11 @@ model Character {
   attributes Attribute[]
   /// The character's log entries.
   logs       Log[]
-  /// The character's active effects.
-  effects    Effect[]
+  // The character's actions.
+  actions    Action[]
 
-  @@index([tags])
-  @@index([deletedAt])
+  @@index(tags)
+  @@index(deletedAt)
 }
 
 /// Static information of attributes.
@@ -115,7 +115,7 @@ model AttributeSpecification {
   /// Attributes specified by this specification.
   attributes Attribute[]
 
-  @@index([tags])
+  @@index(tags)
 }
 
 /// Attributes are outcome modifiers.
@@ -129,7 +129,7 @@ model Attribute {
   /// Attribute's current level in a range of 0-1.
   level     Float    @default(0)
   /// Attribute's maximum level.
-  cap       Float    @default(100)
+  cap       Float    @default(1)
 
   /// Attribute's specification.
   specId      Int
@@ -141,14 +141,33 @@ model Attribute {
   character   Character              @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
-/// Log are events involving a character.
+/// Actions performed by characters, such as traveling, crafting, etc.
+model Action {
+  /// The primary key.
+  id          Int      @id @default(autoincrement())
+  /// When it was created.
+  createdAt   DateTime @default(now())
+  /// When the action completes.
+  completesAt DateTime
+  /// Action tags.
+  tags        String[]
+  /// Action parameters.
+  params      Json
+
+  /// The character performing the action.
+  characterId Int
+  /// The character performing the action.
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
+
+  @@index(tags)
+}
+
+/// Logs are events involving a character.
 model Log {
   /// The primary key.
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   /// When it was created.
-  createdAt DateTime  @default(now())
-  /// When, if ever, it was read by the player.
-  readAt    DateTime?
+  createdAt DateTime @default(now())
   /// The entry's message.
   message   String
 
@@ -158,7 +177,7 @@ model Log {
   character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
-/// Containers hold multiple items, like bags.
+/// Containers are item holders, such as bags, chests, character slots, etc.
 model Container {
   /// The primary key.
   id        Int      @id @default(autoincrement())
@@ -180,7 +199,7 @@ model Container {
   /// Contents of the container.
   items       Item[]
 
-  @@index([tags])
+  @@index(tags)
 }
 
 /// Specifies item's properties and behavior.
@@ -203,7 +222,7 @@ model ItemSpecification {
   /// Items it specifies.
   items Item[]
 
-  @@index([tags])
+  @@index(tags)
 }
 
 /// Items in the world.
@@ -217,7 +236,9 @@ model Item {
   /// The item's current amount.
   amount     Int      @default(1)
   /// The item's current durability.
-  durability Int      @default(100)
+  durability Float    @default(1)
+  /// The item's quality.
+  quality    Float    @default(1)
 
   /// Item's specification.
   specId      Int
@@ -229,49 +250,6 @@ model Item {
   container   Container?        @relation(fields: [containerId], references: [id], onDelete: Restrict)
   /// The storage provided by the item.
   storage     Container?        @relation("storage")
-}
-
-/// Effect's specification.
-model EffectSpecification {
-  /// The primary key.
-  id          Int      @id @default(autoincrement())
-  /// When it was created.
-  createdAt   DateTime @default(now())
-  /// When it was last updated.
-  updatedAt   DateTime @updatedAt
-  /// Name of the effect.
-  name        String   @unique
-  /// Human-readable description.
-  description String?
-  /// Specification tags.
-  tags        String[]
-
-  /// Effects 
-  effects Effect[]
-
-  @@index([tags])
-}
-
-/// Effects are modifiers for character outcomes.
-model Effect {
-  /// Primary key.
-  id        Int       @id @default(autoincrement())
-  /// When it was created.
-  startedAt DateTime  @default(now())
-  /// When it expires.
-  expiresAt DateTime?
-
-  /// Effect's specification.
-  specId      Int
-  /// Effect's specification.
-  spec        EffectSpecification @relation(fields: [specId], references: [id], onDelete: Restrict)
-  /// The character being affected.
-  characterId Int
-  /// The character being affected.
-  character   Character           @relation(fields: [characterId], references: [id], onDelete: Restrict)
-
-  @@index([startedAt])
-  @@index([expiresAt])
 }
 
 /// Locations in the world.
@@ -289,7 +267,7 @@ model Location {
   /// Area of the location.
   area        Int
   /// Location difficulty.
-  difficulty  Decimal
+  difficulty  Float
   /// Location tags.
   tags        String[]
 
@@ -300,5 +278,5 @@ model Location {
   /// Locations connected to this route.
   destinations Location[]  @relation("route")
 
-  @@index([tags])
+  @@index(tags)
 }

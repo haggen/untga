@@ -6,7 +6,8 @@ import type {
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
 import { ensure } from "~/lib/ensure";
-import { getSlotType, tags } from "~/lib/tags";
+import { isIndexable } from "~/lib/is-indexable";
+import { getCharacterStatus, getSlotType, tags } from "~/lib/tags";
 
 export { Prisma };
 
@@ -28,6 +29,12 @@ export type Character<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
+export type Action<T = unknown> = Prisma.Result<
+  typeof db.action,
+  T,
+  "findFirstOrThrow"
+>;
+
 export type AttributeSpecification<T = unknown> = Prisma.Result<
   typeof db.attributeSpecification,
   T,
@@ -36,18 +43,6 @@ export type AttributeSpecification<T = unknown> = Prisma.Result<
 
 export type Attribute<T = unknown> = Prisma.Result<
   typeof db.attribute,
-  T,
-  "findFirstOrThrow"
->;
-
-export type EffectSpecification<T = unknown> = Prisma.Result<
-  typeof db.effectSpecification,
-  T,
-  "findFirstOrThrow"
->;
-
-export type Effect<T = unknown> = Prisma.Result<
-  typeof db.effect,
   T,
   "findFirstOrThrow"
 >;
@@ -161,6 +156,8 @@ async function applyDataMod<T, O extends Operation>(
     }
   }
 }
+
+const defaultSessionDuration = { day: 1 };
 
 const opts = {
   log: ["query", "info", "warn"],
@@ -420,7 +417,6 @@ const ext = Prisma.defineExtension((client) => {
 
           const storage = await db.container.create({
             data: {
-              // character: { connect: { id: character.id } },
               source: { connect: { id: pack.id } },
               tags: [tags.Storage],
             },
@@ -678,7 +674,9 @@ const ext = Prisma.defineExtension((client) => {
             case "findMany":
               args.where = {
                 ...args.where,
-                deletedAt: args.where?.deletedAt ?? null,
+                deletedAt: isIndexable(args.where, "deletedAt")
+                  ? args.where.deletedAt
+                  : null,
               };
               break;
             case "create":
@@ -708,7 +706,9 @@ const ext = Prisma.defineExtension((client) => {
             case "findMany":
               args.where = {
                 ...args.where,
-                deletedAt: args.where?.deletedAt ?? null,
+                deletedAt: isIndexable(args.where, "deletedAt")
+                  ? args.where.deletedAt
+                  : null,
               };
               break;
           }
@@ -728,7 +728,9 @@ const ext = Prisma.defineExtension((client) => {
               await applyDataMod(
                 args,
                 async (data: Prisma.SessionUpdateInput) => {
-                  data.expiresAt ??= DateTime.now().plus({ day: 1 }).toJSDate();
+                  data.expiresAt ??= DateTime.now()
+                    .plus(defaultSessionDuration)
+                    .toJSDate();
                 }
               );
               break;
@@ -750,23 +752,7 @@ const ext = Prisma.defineExtension((client) => {
         status: {
           needs: { tags: true },
           compute(character) {
-            const status = character.tags.find((tag) =>
-              [
-                tags.Idle,
-                tags.Travelling,
-                tags.Healing,
-                tags.Resting,
-                tags.Crafting,
-                tags.Foraging,
-                tags.Dead,
-              ].includes(tag)
-            );
-
-            if (status) {
-              return status;
-            }
-
-            return "Unknown";
+            return getCharacterStatus(character);
           },
         },
         deleted: {
@@ -791,25 +777,7 @@ const ext = Prisma.defineExtension((client) => {
             if (!container.tags.includes(tags.Slot)) {
               return null;
             }
-
-            const slot = container.tags.find((tag) =>
-              [
-                tags.Head,
-                tags.Overgarment,
-                tags.Torso,
-                tags.Waist,
-                tags.Hands,
-                tags.Legs,
-                tags.Feet,
-                tags.Pack,
-              ].includes(tag)
-            );
-
-            if (slot) {
-              return slot;
-            }
-
-            return tags.Unknown;
+            return getSlotType(container);
           },
         },
       },
