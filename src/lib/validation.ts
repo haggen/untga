@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isIndexable } from "~/lib/is-indexable";
 
 function squish(value: string) {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -14,16 +15,6 @@ export const schemas = {
   password: z.string().min(12).transform(squish),
   description: z.string().max(256).transform(squish),
 };
-
-/**
- * Guard that the value is an object and is indexable by the given key.
- */
-function isIndexable<T extends string>(
-  key: T,
-  value: unknown
-): value is { [key in T]: unknown } {
-  return typeof value === "object" && value !== null && key in value;
-}
 
 /**
  * Parse some payload using a given schema.
@@ -42,7 +33,7 @@ export function parse<Shape extends z.ZodRawShape>(
             ? payload.get(key) ?? undefined
             : payload instanceof URLSearchParams
             ? payload.get(key) ?? undefined
-            : isIndexable(key, payload)
+            : isIndexable(payload, key)
             ? payload[key]
             : undefined,
         ])
