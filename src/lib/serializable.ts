@@ -8,7 +8,7 @@
 //   | { [key: string]: JSON };
 
 /**
- * The serializable equivalence of a type.
+ * The serialized equivalence of a type.
  * @see https://react.dev/reference/rsc/use-server#serializable-parameters-and-return-values
  */
 export type Serialized<T> = T extends string | number | boolean | null
@@ -24,7 +24,7 @@ export type Serialized<T> = T extends string | number | boolean | null
   : never;
 
 /**
- * Produce the serializable equivalence of a value.
+ * Produce the serialize equivalence of a value.
  * @see https://react.dev/reference/rsc/use-server#serializable-parameters-and-return-values
  */
 export function serialize<T>(value: T): Serialized<T> {

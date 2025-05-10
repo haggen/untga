@@ -214,9 +214,11 @@ model ItemSpecification {
   name        String   @unique
   /// Human-readable description.
   description String?
-  /// The item's base price.
-  price       Int      @default(0)
-  /// Specification tags.
+  /// The item's base value.
+  value       Int      @default(0)
+  /// The item's quality.
+  quality     Float    @default(1)
+  /// Item tags.
   tags        String[]
 
   /// Items it specifies.
@@ -237,8 +239,6 @@ model Item {
   amount     Int      @default(1)
   /// The item's current durability.
   durability Float    @default(1)
-  /// The item's quality.
-  quality    Float    @default(1)
 
   /// Item's specification.
   specId      Int

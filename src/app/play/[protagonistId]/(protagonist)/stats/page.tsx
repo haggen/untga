@@ -77,10 +77,16 @@ export default async function Page({
           </Definition.Item>
           <Definition.Item label="Status">{protagonist.status}</Definition.Item>
           <Definition.Item label="Health">
-            {health.level}/{health.cap}
+            {fmt.number(health.level, {
+              style: "percent",
+              maximumFractionDigits: 0,
+            })}
           </Definition.Item>
           <Definition.Item label="Stamina">
-            {stamina.level}/{stamina.cap}
+            {fmt.number(stamina.level, {
+              style: "percent",
+              maximumFractionDigits: 0,
+            })}
           </Definition.Item>
         </Definition.List>
       </section>

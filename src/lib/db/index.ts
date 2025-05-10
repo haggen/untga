@@ -1,10 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import type {
-  Operation,
-  PrismaClientOptions,
-} from "@prisma/client/runtime/library";
+import type { PrismaClientOptions } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
+import { applyDataMod } from "~/lib/db/apply-data-mod";
 import { ensure } from "~/lib/ensure";
 import { isIndexable } from "~/lib/is-indexable";
 import { getCharacterStatus, getSlotType, tags } from "~/lib/tags";
@@ -131,32 +129,6 @@ export type WithStorage = {
   include: { items: WithSpec & { include: { storage: WithItems } } };
 };
 
-/**
- * Isolate data from the query args and pass it to a handler.
- */
-async function applyDataMod<T, O extends Operation>(
-  args: Prisma.Args<T, O>,
-  modify: (data: T) => Promise<void>
-) {
-  if ("create" in args) {
-    await modify(args.create);
-  }
-
-  if ("update" in args) {
-    await modify(args.update);
-  }
-
-  if ("data" in args) {
-    if (Array.isArray(args.data)) {
-      for (const data of args.data) {
-        await modify(data);
-      }
-    } else {
-      await modify(args.data);
-    }
-  }
-}
-
 const defaultSessionDuration = { day: 1 };
 
 const opts = {
@@ -189,7 +161,11 @@ const ext = Prisma.defineExtension((client) => {
               throw new Error("E-mail not found.", { cause });
             });
 
-          if (!(await bcrypt.compare(data.password, user.password))) {
+          if (
+            await bcrypt
+              .compare(data.password, user.password)
+              .then((match) => !match)
+          ) {
             throw new Error("Password doesn't match.");
           }
 
@@ -299,7 +275,7 @@ const ext = Prisma.defineExtension((client) => {
               data: {
                 character: { connect: { id: character.id } },
                 spec: { connect: { id: spec.id } },
-                level: spec.tags.includes(tags.Resource) ? 100 : 0,
+                level: spec.tags.includes(tags.Resource) ? 1 : 0,
               },
             });
           }
@@ -360,11 +336,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: slots[tags.Torso].id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Equipment,
-                    tags.Torso
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Equipment, tags.Torso)
+                    .then(({ id }) => id),
                 },
               },
             },
@@ -375,11 +349,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: slots[tags.Legs].id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Equipment,
-                    tags.Legs
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Equipment, tags.Legs)
+                    .then(({ id }) => id),
                 },
               },
             },
@@ -390,11 +362,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: slots[tags.Feet].id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Equipment,
-                    tags.Feet
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Equipment, tags.Feet)
+                    .then(({ id }) => id),
                 },
               },
             },
@@ -405,11 +375,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: slots[tags.Pack].id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Equipment,
-                    tags.Pack
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Equipment, tags.Pack)
+                    .then(({ id }) => id),
                 },
               },
             },
@@ -427,10 +395,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: storage.id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Currency
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Currency)
+                    .then(({ id }) => id),
                 },
               },
               amount: 100,
@@ -442,11 +409,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: storage.id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Utility,
-                    tags.Resting
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Utility, tags.Resting)
+                    .then(({ id }) => id),
                 },
               },
             },
@@ -457,10 +422,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: storage.id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Food
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Food)
+                    .then(({ id }) => id),
                 },
               },
               amount: 5,
@@ -472,10 +436,9 @@ const ext = Prisma.defineExtension((client) => {
               container: { connect: { id: storage.id } },
               spec: {
                 connect: {
-                  id: await db.itemSpecification.idByTag(
-                    tags.Starting,
-                    tags.Weapon
-                  ),
+                  id: await db.itemSpecification
+                    .findOneByTags(tags.Starting, tags.Weapon)
+                    .then(({ id }) => id),
                 },
               },
             },
@@ -484,6 +447,97 @@ const ext = Prisma.defineExtension((client) => {
           return character;
         },
 
+        /**
+         * Check if an item is owned by a character.
+         */
+        async owns({
+          data,
+        }: {
+          data: { characterId: number; itemId: number };
+        }) {
+          return await db.item
+            .findFirst({
+              select: { id: true },
+              where: {
+                id: data.itemId,
+                container: {
+                  OR: [
+                    {
+                      character: { id: data.characterId },
+                    },
+                    {
+                      source: {
+                        container: {
+                          character: { id: data.characterId },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            })
+            .then((item) => !!item);
+        },
+
+        /**
+         * Go to sleep and recover stamina.
+         */
+        async rest({
+          data,
+        }: {
+          data: { characterId: number; itemId: number };
+        }) {
+          const character = await db.character
+            .findFirstOrThrow({
+              where: { id: data.characterId },
+            })
+            .catch((cause) => {
+              throw new Error(
+                `Couldn't find character (${data.characterId}).`,
+                {
+                  cause,
+                }
+              );
+            });
+
+          if (character.status !== tags.Idle) {
+            throw new Error(`The character is busy (${character.status}).`);
+          }
+
+          const item = await db.item
+            .findFirstOrThrow({
+              where: { id: data.itemId },
+              include: { spec: true },
+            })
+            .catch((cause) => {
+              throw new Error(`Couldn't find the item (${data.itemId}).`, {
+                cause,
+              });
+            });
+
+          if (!item.spec.tags.includes(tags.Resting)) {
+            throw new Error(`You can only rest with resting items.`);
+          }
+
+          await db.attribute.updateMany({
+            where: {
+              character: { id: data.characterId },
+              spec: { tags: { has: tags.Stamina } },
+            },
+            data: { level: 1 },
+          });
+
+          await db.log.create({
+            data: {
+              character: { connect: { id: data.characterId } },
+              message: `I have rested.`,
+            },
+          });
+        },
+
+        /**
+         * Change character location.
+         */
         async travel({
           data,
         }: {
@@ -539,7 +593,9 @@ const ext = Prisma.defineExtension((client) => {
             "Stamina attribute not found."
           );
 
-          if (stamina.level < 1) {
+          const cost = 0.1;
+
+          if (stamina.level < cost) {
             throw new Error("Not enough stamina to travel.");
           }
 
@@ -557,7 +613,7 @@ const ext = Prisma.defineExtension((client) => {
               where: { id: stamina.id },
               data: {
                 level: {
-                  decrement: 1,
+                  decrement: cost,
                 },
               },
             }),
@@ -571,6 +627,9 @@ const ext = Prisma.defineExtension((client) => {
           ]);
         },
 
+        /**
+         * Equip item on its corresponding slot on a character.
+         */
         async equip({
           data,
         }: {
@@ -580,7 +639,6 @@ const ext = Prisma.defineExtension((client) => {
             .findFirstOrThrow({
               where: {
                 id: data.itemId,
-                spec: { tags: { has: tags.Equipment } },
               },
               include: { spec: true },
             })
@@ -589,6 +647,10 @@ const ext = Prisma.defineExtension((client) => {
                 cause,
               });
             });
+
+          if (!item.spec.tags.includes(tags.Equipment)) {
+            throw new Error(`You can only equip equipment items.`);
+          }
 
           const slot = await db.container
             .findFirstOrThrow({
@@ -625,6 +687,9 @@ const ext = Prisma.defineExtension((client) => {
           });
         },
 
+        /**
+         * Take off an item from its slot on a character.
+         */
         async unequip({
           data,
         }: {
@@ -659,6 +724,59 @@ const ext = Prisma.defineExtension((client) => {
                 connect: { id: storage.id },
               },
             },
+          });
+        },
+      },
+      item: {
+        /**
+         * Use an item.
+         */
+        async use({ data }: { data: { itemId: number; characterId: number } }) {
+          const item = await db.item
+            .findFirstOrThrow({
+              where: { id: data.itemId },
+              include: { spec: true, container: true },
+            })
+            .catch((cause) => {
+              throw new Error(`Couldn't find the item (${data.itemId}).`, {
+                cause,
+              });
+            });
+
+          if (!item.spec.tags.includes(tags.Utility)) {
+            throw new Error(`You can only use utility items.`);
+          }
+
+          switch (true) {
+            case item.spec.tags.includes(tags.Resting):
+              await db.character.rest({ data });
+              break;
+            default:
+              throw new Error(`Don't know how to use this item.`);
+          }
+        },
+
+        /**
+         * Discard an item.
+         */
+        async discard({ data }: { data: { itemId: number } }) {
+          const item = await db.item
+            .findFirstOrThrow({
+              where: { id: data.itemId },
+              include: { spec: true, container: true },
+            })
+            .catch((cause) => {
+              throw new Error(`Couldn't find the item (${data.itemId}).`, {
+                cause,
+              });
+            });
+
+          if (item.container?.tags.includes(tags.Slot)) {
+            throw new Error(`You can't discard an equipped item.`);
+          }
+
+          await db.item.delete({
+            where: { id: data.itemId },
           });
         },
       },

@@ -19,17 +19,23 @@ function isEquipped(
 
 export function Form(
   props: Readonly<{
+    use: StatefulAction<unknown, ActionState>;
+    discard: StatefulAction<unknown, ActionState>;
     equip: StatefulAction<unknown, ActionState>;
     unequip: StatefulAction<unknown, ActionState>;
     item: Serialized<Item<WithSpec>>;
     protagonist: Serialized<Character<WithSlots<WithStorage>>>;
   }>
 ) {
+  const use = useStatefulActionState(props.use);
+  const discard = useStatefulActionState(props.discard);
   const equip = useStatefulActionState(props.equip);
   const unequip = useStatefulActionState(props.unequip);
 
   return (
     <form className="flex flex-col gap-6">
+      <Alert state={use.state} />
+      <Alert state={discard.state} />
       <Alert state={equip.state} />
       <Alert state={unequip.state} />
 
@@ -39,6 +45,10 @@ export function Form(
         ) : props.item.spec.tags.includes(tags.Equipment) ? (
           <Menu.Item action={equip.action}>Equip</Menu.Item>
         ) : null}
+        {props.item.spec.tags.includes(tags.Utility) ? (
+          <Menu.Item action={use.action}>Use</Menu.Item>
+        ) : null}
+        <Menu.Item action={discard.action}>Discard</Menu.Item>
       </Menu.List>
     </form>
   );
