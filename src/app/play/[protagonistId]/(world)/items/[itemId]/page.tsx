@@ -226,8 +226,8 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     <div className="grow flex flex-col gap-12">
       <header>
         <Image
-          src="/bag.png"
-          alt="A bag with a question mark on the side."
+          src="/sack.png"
+          alt="A sack with a question mark on the side."
           width={702}
           height={702}
           className="w-full mix-blend-multiply"
