@@ -29,10 +29,10 @@ export default async function Page() {
   });
 
   return (
-    <section className="flex flex-col gap-9">
-      <header className="flex flex-col gap-1.5">
+    <section className="flex flex-col gap-6 p-section">
+      <header className="flex flex-col gap-2">
         <Heading size="small" asChild>
-          <h2>Sessions</h2>
+          <h1>Sessions</h1>
         </Heading>
         <p>
           Check out your session history and invalidate your active sessions.

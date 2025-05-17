@@ -1,12 +1,14 @@
 import { Metadata } from "next";
 import { revalidatePath } from "next/cache";
-import Image from "next/image";
 import { redirect } from "next/navigation";
+import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
+import { fmt } from "~/lib/fmt";
 import { serialize } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
+import { tags } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
@@ -223,24 +225,32 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
   });
 
   return (
-    <div className="grow flex flex-col gap-12">
-      <header>
-        <Image
-          src="/sack.png"
-          alt="A sack with a question mark on the side."
-          width={702}
-          height={702}
-          className="w-full mix-blend-multiply"
-        />
+    <div className="flex flex-col grow">
+      <div className="flex flex-col gap-text p-section">
+        <Heading size="large" asChild>
+          <h1>{item.spec.name}</h1>
+        </Heading>
 
-        <div className="flex flex-col gap-1.5">
-          <Heading size="large" asChild>
-            <h1>{item.spec.name}</h1>
-          </Heading>
+        <p>{item.spec.description}</p>
 
-          <p>{item.spec.description}</p>
-        </div>
-      </header>
+        <Definition.List>
+          {item.spec.tags.includes(tags.Craftable) ? (
+            <Definition.Item label="Quality">
+              {fmt.item.quality(item.spec.quality)}
+            </Definition.Item>
+          ) : null}
+          {item.spec.tags.includes(tags.Breakable) ? (
+            <Definition.Item label="Durability">
+              {fmt.item.durability(item.durability)}
+            </Definition.Item>
+          ) : null}
+          {item.spec.tags.includes(tags.Stackable) ? (
+            <Definition.Item label="Amount">
+              {fmt.item.amount(item.amount)}
+            </Definition.Item>
+          ) : null}
+        </Definition.List>
+      </div>
 
       <Form
         use={use}

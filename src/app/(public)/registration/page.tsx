@@ -42,8 +42,8 @@ export default function Page() {
   });
 
   return (
-    <div className="flex flex-col gap-12">
-      <header className="flex flex-col gap-1.5">
+    <div className="flex flex-col">
+      <header className="flex flex-col gap-2 p-section">
         <Heading size="large" asChild>
           <h1>Registration</h1>
         </Heading>

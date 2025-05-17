@@ -55,8 +55,8 @@ CREATE TABLE "Attribute" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "level" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "cap" DOUBLE PRECISION NOT NULL DEFAULT 1,
+    "level" INTEGER NOT NULL DEFAULT 0,
+    "cap" INTEGER NOT NULL DEFAULT 100,
     "specId" INTEGER NOT NULL,
     "characterId" INTEGER NOT NULL,
 
@@ -93,6 +93,7 @@ CREATE TABLE "Container" (
     "tags" TEXT[],
     "sourceId" INTEGER,
     "characterId" INTEGER,
+    "locationId" INTEGER,
 
     CONSTRAINT "Container_pkey" PRIMARY KEY ("id")
 );
@@ -105,7 +106,7 @@ CREATE TABLE "ItemSpecification" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "value" INTEGER NOT NULL DEFAULT 0,
-    "quality" DOUBLE PRECISION NOT NULL DEFAULT 1,
+    "quality" INTEGER NOT NULL DEFAULT 100,
     "tags" TEXT[],
 
     CONSTRAINT "ItemSpecification_pkey" PRIMARY KEY ("id")
@@ -117,7 +118,7 @@ CREATE TABLE "Item" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "amount" INTEGER NOT NULL DEFAULT 1,
-    "durability" DOUBLE PRECISION NOT NULL DEFAULT 1,
+    "durability" INTEGER NOT NULL DEFAULT 100,
     "specId" INTEGER NOT NULL,
     "containerId" INTEGER,
 
@@ -132,7 +133,7 @@ CREATE TABLE "Location" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "area" INTEGER NOT NULL,
-    "difficulty" DOUBLE PRECISION NOT NULL,
+    "security" INTEGER NOT NULL,
     "tags" TEXT[],
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
@@ -220,6 +221,9 @@ ALTER TABLE "Container" ADD CONSTRAINT "Container_sourceId_fkey" FOREIGN KEY ("s
 
 -- AddForeignKey
 ALTER TABLE "Container" ADD CONSTRAINT "Container_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Container" ADD CONSTRAINT "Container_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Item" ADD CONSTRAINT "Item_specId_fkey" FOREIGN KEY ("specId") REFERENCES "ItemSpecification"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

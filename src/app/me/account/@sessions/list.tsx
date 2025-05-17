@@ -4,7 +4,6 @@ import { Fragment, Suspense, useActionState } from "react";
 import { Alert } from "~/components/alert";
 import { Button } from "~/components/button";
 import { Geolocation, useGeolocation } from "~/components/geolocation";
-import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Session } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
@@ -22,9 +21,9 @@ function Item({
   const geolocation = useGeolocation(session.ip);
 
   return (
-    <Menu.Item key={session.id} className="gap-1.5">
+    <li>
       <p>
-        Created at{" "}
+        Created on{" "}
         {fmt.datetime(session.createdAt, {
           dateStyle: "short",
           timeStyle: "short",
@@ -33,20 +32,21 @@ function Item({
         <Suspense fallback="···">
           <Geolocation data={geolocation} />
         </Suspense>
-        , on {fmt.userAgent(session.userAgent)}.{" "}
-        {session.expired ? "Expired" : "Expires"} on{" "}
-        {fmt.datetime(session.expiresAt, {
-          dateStyle: "short",
-          timeStyle: "short",
-        })}
-        .
+        , on {fmt.userAgent(session.userAgent)}.
       </p>
-
       {session.expired ? null : (
-        <aside>
+        <aside className="flex items-center justify-between">
+          <p className="text-xs">
+            Expires on{" "}
+            {fmt.datetime(session.expiresAt, {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}
+            .
+          </p>
           <Button
             size="small"
-            variant="secondary"
+            variant="alternate"
             disabled={pending}
             onClick={() => invalidate()}
           >
@@ -54,7 +54,7 @@ function Item({
           </Button>
         </aside>
       )}
-    </Menu.Item>
+    </li>
   );
 }
 
@@ -74,7 +74,7 @@ export function List<T extends ActionState>({
     <Fragment>
       <Alert state={state} />
 
-      <Menu.List>
+      <ul className="flex flex-col gap-3">
         {sessions.map((session) => (
           <Item
             key={session.id}
@@ -83,7 +83,7 @@ export function List<T extends ActionState>({
             invalidate={invalidate.bind(null, { id: session.id })}
           />
         ))}
-      </Menu.List>
+      </ul>
     </Fragment>
   );
 }

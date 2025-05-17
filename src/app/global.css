@@ -1,19 +1,24 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-text: var(--neutral-800);
-  --color-muted: var(--neutral-500);
-  --color-background: var(--slate-200);
-  --color-sepia-background: var(--orange-100);
-  --color-inverted-text: var(--neutral-100);
-  --color-inverted-background: var(--neutral-800);
-  --color-placeholder-text: var(--neutral-500);
-  --color-border: var(--neutral-500);
+  --color-foreground: var(--color-neutral-800);
+  --color-foreground-inverted: var(--color-neutral-100);
+  --color-foreground-muted: var(--color-neutral-600);
+  --color-foreground-placeholder: var(--color-neutral-400);
+  --color-outline: var(--color-neutral-400);
+  --color-background: var(--color-neutral-900);
 
-  --spacing-section: var(--spacing-12);
-  --spacing-block: var(--spacing-9);
-  --spacing-item: var(--spacing-6);
-  --spacing-text: var(--spacing-1\.5);
+  --gap-section: --spacing(12);
+  --gap-cluster: --spacing(9);
+  --gap-block: --spacing(6);
+  --gap-item: --spacing(3);
+  --gap-text: --spacing(2);
+}
+
+@layer utilities {
+  .p-section {
+    padding: --spacing(6) --spacing(3);
+  }
 }
 
 @layer base {
@@ -21,42 +26,6 @@
     cursor: pointer;
   }
 }
-
-/* @property --tw-inner-glow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-
-@property --tw-inner-glow-size {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0;
-}
-
-@property --tw-inner-glow-color {
-  syntax: "*";
-  inherits: false;
-  initial-value: currentColor;
-}
-
-@utility inner-glow {
-  --tw-inner-glow: inset 0 0 var(--tw-inner-glow-size, 0)
-    var(--tw-inner-glow-color, currentColor);
-  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
-    var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-inner-glow),
-    var(--tw-shadow);
-}
-
-@utility inner-glow-* {
-  --alpha: --modifier(integer)%;
-
-  --tw-inner-glow-color: --alpha(--value(--color-*) / var(--alpha, 100%));
-  --tw-inner-glow-color: --value([color]);
-
-  --tw-inner-glow-size: --spacing(--value(integer));
-  --tw-inner-glow-size: --value([length]);
-} */
 
 @utility scrollbar-hidden {
   scrollbar-width: none;

@@ -56,10 +56,10 @@ export default async function Page({
   );
 
   return (
-    <div className="grow flex flex-col gap-12">
+    <div className="flex flex-col grow">
       <Header character={protagonist} />
 
-      <section className="flex flex-col gap-1.5">
+      <section className="flex flex-col gap-2 p-section">
         <Heading size="small" asChild>
           <h2>Summary</h2>
         </Heading>
@@ -69,29 +69,24 @@ export default async function Page({
           <Definition.Item label="Birth">
             {fmt.datetime(protagonist.createdAt, {
               dateStyle: "short",
-              timeStyle: "short",
             })}
           </Definition.Item>
           <Definition.Item label="Location">
             {protagonist.location.name}
           </Definition.Item>
-          <Definition.Item label="Status">{protagonist.status}</Definition.Item>
+          <Definition.Item label="Status">
+            {fmt.string(protagonist.status, { title: true })}
+          </Definition.Item>
           <Definition.Item label="Health">
-            {fmt.number(health.level, {
-              style: "percent",
-              maximumFractionDigits: 0,
-            })}
+            {fmt.character.health(health.level)}
           </Definition.Item>
           <Definition.Item label="Stamina">
-            {fmt.number(stamina.level, {
-              style: "percent",
-              maximumFractionDigits: 0,
-            })}
+            {fmt.character.stamina(stamina.level)}
           </Definition.Item>
         </Definition.List>
       </section>
 
-      <section className="flex flex-col gap-1.5">
+      <section className="flex flex-col gap-2 p-section">
         <Heading size="small" asChild>
           <h2>Skills</h2>
         </Heading>
@@ -99,10 +94,7 @@ export default async function Page({
         <Definition.List>
           {skills.map((skill) => (
             <Definition.Item label={skill.spec.name} key={skill.id}>
-              {fmt.number(skill.level, {
-                style: "percent",
-                maximumFractionDigits: 0,
-              })}
+              {fmt.character.skill(skill.level)}
             </Definition.Item>
           ))}
         </Definition.List>

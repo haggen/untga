@@ -23,6 +23,7 @@ export default async function Page({
 
   const protagonist = await db.character.findUniqueOrThrow({
     where: { id: protagonistId, user: { id: session.userId } },
+    include: { attributes: { include: { spec: true } }, location: true },
   });
 
   const logs = await db.log.findMany({
@@ -33,27 +34,33 @@ export default async function Page({
   });
 
   return (
-    <div className="grow flex flex-col gap-12">
+    <div className="flex flex-col grow">
       <Header character={protagonist} />
 
-      <section className="flex flex-col gap-3">
-        <Heading size="small" asChild>
-          <h1>Journal</h1>
-        </Heading>
+      <section className="flex flex-col gap-text p-section">
+        <header className="flex items-center gap-6">
+          <Heading size="small" asChild>
+            <h1>Journal</h1>
+          </Heading>
 
-        <ul className="flex flex-col gap-1.5">
+          {/* <Button variant="alternate" size="small">
+            Write entry
+          </Button> */}
+        </header>
+
+        <ul className="flex flex-col gap-item">
           {logs.map((log) => (
-            <li key={log.id} className="flex gap-1.5">
-              <article>
-                <h1 className="text-sm text-stone-600">
-                  {fmt.datetime(log.createdAt, {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
-                </h1>
+            <li key={log.id} className="flex flex-col">
+              <p>{log.message}</p>
 
-                <p>{log.message}</p>
-              </article>
+              <p className="text-xs">
+                Written on{" "}
+                {fmt.datetime(log.createdAt, {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+                .
+              </p>
             </li>
           ))}
         </ul>

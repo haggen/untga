@@ -1,4 +1,8 @@
 export const tags = {
+  Craftable: "craftable",
+  Breakable: "breakable",
+  /** Combat skill. */
+  Combat: "combat",
   /** Items that can be consumed/used up. */
   Consumable: "consumable",
   /** The Crafting skill. */
@@ -65,6 +69,8 @@ export const tags = {
   Starting: "starting",
   /** Items that provide storage. */
   Storage: "storage",
+  /** Items that can be stacked. */
+  Stackable: "stackable",
   /** Type of slot, applied on both items and containers. Items also need tag.Equipment. */
   Torso: "torso",
   /** A character state. */
@@ -105,6 +111,7 @@ export function getSlotType(thing: { tags: string[] }) {
       tags.Hands,
       tags.Legs,
       tags.Feet,
+      tags.Pack,
     ].find((tag) => thing.tags.includes(tag)) ?? tags.Unknown
   );
 }

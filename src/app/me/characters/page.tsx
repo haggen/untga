@@ -25,32 +25,34 @@ export default async function Page() {
     .map((_, i) => characters[i]);
 
   return (
-    <div className="grow flex flex-col gap-12">
-      <header className="flex flex-col gap-1.5">
+    <div className="grow flex flex-col">
+      <header className="flex flex-col gap-2 p-section">
         <Heading size="large" asChild>
           <h1>Characters</h1>
         </Heading>
         <p>Select the character with whom you&apos;d like to play.</p>
       </header>
 
-      <Menu.List>
-        {slots.map((character, i) => (
-          <Menu.Item
-            key={i}
-            href={
-              character
-                ? `/play/${character.id}/stats`
-                : "/me/characters/create"
-            }
-          >
-            {character?.name ?? (
-              <span className="text-neutral-600">
-                Empty (create new character)
-              </span>
-            )}
-          </Menu.Item>
-        ))}
-      </Menu.List>
+      <div className="p-section">
+        <Menu.List>
+          {slots.map((character, i) => (
+            <Menu.Item
+              key={i}
+              href={
+                character
+                  ? `/play/${character.id}/stats`
+                  : "/me/characters/create"
+              }
+            >
+              {character?.name ?? (
+                <span className="text-foreground-placeholder">
+                  Empty (create new character)
+                </span>
+              )}
+            </Menu.Item>
+          ))}
+        </Menu.List>
+      </div>
     </div>
   );
 }

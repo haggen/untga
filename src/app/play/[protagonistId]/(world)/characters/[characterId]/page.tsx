@@ -1,8 +1,10 @@
 import { Metadata } from "next";
-import Image from "next/image";
+import { Back } from "~/components/back";
+import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
 import * as Menu from "~/components/menu";
 import { db } from "~/lib/db";
+import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
 
 export async function generateMetadata({
@@ -33,7 +35,10 @@ function Actions({
     return (
       <Menu.List>
         <Menu.Item href={`/play/${characterId}/edit`}>Edit</Menu.Item>
-        <Menu.Item href="/me/characters">Switch</Menu.Item>
+        <Menu.Item href="/me/characters">Log off</Menu.Item>
+        <Back asChild>
+          <Menu.Item href="#">Cancel</Menu.Item>
+        </Back>
       </Menu.List>
     );
   }
@@ -49,27 +54,38 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
   const character = await db.character.findUniqueOrThrow({
     where: { id: characterId },
+    include: {
+      location: true,
+    },
   });
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex flex-col gap-1.5">
-        <Image
-          src="/silhouette.png"
-          alt="Nondescript silhouette of a person."
-          width={702}
-          height={702}
-          className="w-full mix-blend-multiply"
-        />
-
+    <div className="flex flex-col">
+      <header className="flex flex-col gap-2 p-section">
         <Heading size="large" asChild className="truncate">
           <h1>{character.name}</h1>
         </Heading>
 
         <p>{character.description || "No description available."}</p>
-      </div>
 
-      <Actions characterId={characterId} protagonistId={protagonistId} />
+        <Definition.List>
+          <Definition.Item label="Birth">
+            {fmt.datetime(character.createdAt, {
+              dateStyle: "short",
+            })}
+          </Definition.Item>
+          <Definition.Item label="Location">
+            {character.location.name}
+          </Definition.Item>
+          <Definition.Item label="Status">
+            {fmt.string(character.status, { title: true })}
+          </Definition.Item>
+        </Definition.List>
+      </header>
+
+      <div className="p-section">
+        <Actions characterId={characterId} protagonistId={protagonistId} />
+      </div>
     </div>
   );
 }

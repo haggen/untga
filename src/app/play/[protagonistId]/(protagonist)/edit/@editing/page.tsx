@@ -39,11 +39,12 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
   });
 
   return (
-    <section className="flex flex-col gap-9">
-      <header className="flex flex-col gap-1.5">
+    <section className="flex flex-col">
+      <header className="flex flex-col gap-text p-section">
         <Heading size="large" asChild>
           <h1>Edit character</h1>
         </Heading>
+
         <p>
           You can change some of your character&apos;s details below. This is
           how you&apos;re known in the world.

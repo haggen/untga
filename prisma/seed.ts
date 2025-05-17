@@ -9,7 +9,7 @@ const seed = {
         "A remote village where hunters live in harmony with the surrounding woods. The scent of smoke and venison lingers in the air.",
       tags: [tags.Peaceful, tags.Starting],
       area: 2,
-      difficulty: 2,
+      security: 2,
     },
     {
       name: "Mossveil Clearing",
@@ -17,7 +17,7 @@ const seed = {
         "A serene opening in the dense woods, often used as a resting ground by travelers and foraging beasts alike.",
       tags: [tags.Peaceful],
       area: 1,
-      difficulty: 1,
+      security: 1,
     },
     {
       name: "Elderstone Ruins",
@@ -25,7 +25,7 @@ const seed = {
         "Crumbling remnants of an old keep, now overrun by wild brush and creatures that thrive in shadow.",
       tags: [tags.Hostile],
       area: 3,
-      difficulty: 4,
+      security: 4,
     },
     {
       name: "Whispermeadow",
@@ -33,7 +33,7 @@ const seed = {
         "A wind-swept field where wildflowers bloom year-round. Locals say the wind carries voices, but none have proven it.",
       tags: [tags.Peaceful],
       area: 2,
-      difficulty: 1,
+      security: 1,
     },
     {
       name: "Forest of Hollow Pines",
@@ -41,7 +41,7 @@ const seed = {
         "A sprawling woodland with old pines and narrow game trails. The trees creak eerily in the wind.",
       tags: [tags.Route],
       area: 4,
-      difficulty: 2,
+      security: 2,
       destinations: [
         "Duskhollow",
         "Mossveil Clearing",
@@ -55,7 +55,7 @@ const seed = {
         "A jagged cave filled with bat colonies and the bones of past explorers. Enter only with torch and blade.",
       tags: [tags.Hostile],
       area: 3,
-      difficulty: 3,
+      security: 3,
     },
     {
       name: "Oldroot Grotto",
@@ -63,7 +63,7 @@ const seed = {
         "A damp and winding cave, overgrown with pale fungi. Strange blind creatures make their nests here.",
       tags: [tags.Hostile],
       area: 2,
-      difficulty: 4,
+      security: 4,
     },
     {
       name: "Grayhorn Pass",
@@ -71,7 +71,7 @@ const seed = {
         "A steep and narrow trail carved through the mountains. Snow falls even in summer.",
       tags: [tags.Hostile],
       area: 4,
-      difficulty: 5,
+      security: 5,
     },
     {
       name: "Stoneford",
@@ -79,7 +79,7 @@ const seed = {
         "A riverside village of stoic miners and shepherds. Life is simple, though not without danger.",
       tags: [tags.Peaceful],
       area: 2,
-      difficulty: 2,
+      security: 2,
     },
     {
       name: "The Vale of Echoes",
@@ -87,7 +87,7 @@ const seed = {
         "A misty valley where sound travels in odd ways. Shepherds warn folk wolves roam here at dusk.",
       tags: [tags.Route],
       area: 4,
-      difficulty: 3,
+      security: 3,
       destinations: [
         "Fangmaw Cavern",
         "Oldroot Grotto",
@@ -102,7 +102,7 @@ const seed = {
         "A scorched cave with sulfur vents and crumbling rock. Miners abandoned it after a series of collapses.",
       tags: [tags.Hostile],
       area: 3,
-      difficulty: 5,
+      security: 5,
     },
     {
       name: "Frosttongue Crag",
@@ -110,7 +110,7 @@ const seed = {
         "A frozen cave with strange carvings and perpetual frost. Its origins remain a mystery.",
       tags: [tags.Hostile],
       area: 2,
-      difficulty: 4,
+      security: 4,
     },
     {
       name: "Highwatch",
@@ -118,7 +118,7 @@ const seed = {
         "A remote peak used by sentinels to scout the valleys below. Rarely visited now.",
       tags: [tags.Peaceful],
       area: 3,
-      difficulty: 5,
+      security: 5,
     },
     {
       name: "The Cloudbridge",
@@ -126,7 +126,7 @@ const seed = {
         "A narrow stone bridge spanning two cliffs. Traders once crossed here before the storms returned.",
       tags: [tags.Route],
       area: 3,
-      difficulty: 3,
+      security: 3,
       destinations: [
         "Stoneford",
         "Ashveil Hollow",
@@ -140,7 +140,7 @@ const seed = {
         "A sparse woodland scattered with thorns and low brush. Often used by smugglers and foxes alike.",
       tags: [tags.Hostile],
       area: 2,
-      difficulty: 2,
+      security: 2,
     },
     {
       name: "Hillmere",
@@ -148,7 +148,7 @@ const seed = {
         "A lively town at the foot of the plains, known for its bustling markets and well-defended walls.",
       tags: [tags.Peaceful],
       area: 3,
-      difficulty: 1,
+      security: 1,
     },
     {
       name: "Timberfell Camp",
@@ -156,7 +156,7 @@ const seed = {
         "A rough logging encampment where axes sing and ale flows. Bandit raids are an unfortunate norm.",
       tags: [tags.Hostile],
       area: 2,
-      difficulty: 3,
+      security: 3,
     },
     {
       name: "Sunstain Ruins",
@@ -164,7 +164,7 @@ const seed = {
         "An overgrown temple ruin. Feral dogs and scavengers roam its sunken halls.",
       tags: [tags.Hostile],
       area: 3,
-      difficulty: 4,
+      security: 4,
     },
     {
       name: "Willowfen",
@@ -172,7 +172,7 @@ const seed = {
         "A peaceful village surrounded by willow groves and still ponds. The frogs here sing sweetly at night.",
       tags: [tags.Peaceful],
       area: 2,
-      difficulty: 1,
+      security: 1,
     },
     {
       name: "The Golden Plain",
@@ -180,7 +180,7 @@ const seed = {
         "A vast stretch of rolling grasslands dotted with stones and secrets from a forgotten age.",
       tags: [tags.Route],
       area: 5,
-      difficulty: 2,
+      security: 2,
       destinations: [
         "Grayhorn Pass",
         "Thistlebrush",
@@ -196,7 +196,7 @@ const seed = {
         "A crumbling fortress perched on the edge of a cliff. Once a seat of power, now home to outlaws and vermin.",
       tags: [tags.Hostile],
       area: 4,
-      difficulty: 5,
+      security: 5,
     },
     {
       name: "Blackmire",
@@ -204,7 +204,7 @@ const seed = {
         "A boggy mire filled with biting insects and treacherous footing. Stories of disappearances are common.",
       tags: [tags.Hostile],
       area: 4,
-      difficulty: 5,
+      security: 5,
     },
     {
       name: "Forgotten Trial",
@@ -212,7 +212,7 @@ const seed = {
         "A rarely used path that weaves through the wildlands. Only those desperate or mad tread here.",
       tags: [tags.Route],
       area: 5,
-      difficulty: 4,
+      security: 4,
       destinations: ["Cragwatch Keep", "Blackmire", "Sunstain Ruins"],
     },
   ],
@@ -371,7 +371,7 @@ const seed = {
     {
       name: "Bandage Roll",
       description: "Clean cloth strips used to dress wounds. Slows bleeding.",
-      tags: [tags.Consumable, tags.Healing],
+      tags: [tags.Consumable, tags.Stackable, tags.Healing],
     },
     {
       name: "Tarnished Locket",
@@ -387,7 +387,7 @@ const seed = {
     {
       name: "Gold Coin",
       description: "A gold coin. Used as currency.",
-      tags: [tags.Currency, tags.Starting],
+      tags: [tags.Currency, tags.Stackable, tags.Starting],
     },
     {
       name: "Bedroll",
@@ -415,6 +415,12 @@ const seed = {
       tags: [tags.Skill, tags.Starting, tags.Endurance],
     },
     {
+      name: "Combat",
+      description:
+        "In the heat of battle, you remain calm and collected. Your training and instincts guide your strikes, parries, and dodges. You know when to press the attack and when to retreat. Your skill with weapons makes you a formidable opponent.",
+      tags: [tags.Skill, tags.Starting, tags.Combat],
+    },
+    {
       name: "Health",
       description: "Health points.",
       tags: [tags.Resource, tags.Starting, tags.Health],
@@ -435,7 +441,7 @@ async function main() {
         description: location.description,
         tags: location.tags,
         area: location.area,
-        difficulty: location.difficulty,
+        security: location.security,
       })),
     });
 

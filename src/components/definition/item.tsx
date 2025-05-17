@@ -2,7 +2,7 @@ import { ComponentPropsWithRef, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
-  base: "flex items-center gap-2 py-1",
+  base: "flex items-center gap-2 h-9",
 });
 
 export function Item({

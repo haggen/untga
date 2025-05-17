@@ -24,10 +24,10 @@ export default async function Page() {
   });
 
   return (
-    <section className="flex flex-col gap-9">
-      <header className="flex flex-col gap-1.5">
+    <section className="flex flex-col gap-9 p-section">
+      <header className="flex flex-col gap-2">
         <Heading size="small" asChild>
-          <h2>Change your password</h2>
+          <h1>Change your password</h1>
         </Heading>
         <p>Type your new password in the input below and confirm.</p>
       </header>

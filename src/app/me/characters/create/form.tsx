@@ -28,7 +28,7 @@ export function Form<T extends ActionState>(props: {
   };
 
   return (
-    <form className="flex flex-col gap-9" action={action}>
+    <form className="flex flex-col gap-9 p-section" action={action}>
       <Alert state={state} />
 
       <fieldset className="flex flex-col gap-6">
@@ -45,7 +45,7 @@ export function Form<T extends ActionState>(props: {
             placeholder="e.g. Ragnar"
             pattern="[a-zA-Z0-9\s]+"
           />
-          <Button type="button" variant="secondary" onClick={getRandomName}>
+          <Button type="button" variant="alternate" onClick={getRandomName}>
             <Dices />
           </Button>
         </Field>

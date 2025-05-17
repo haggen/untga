@@ -13,12 +13,12 @@ export default function Layout(props: {
   quit: ReactNode;
 }) {
   return (
-    <div className="grow flex flex-col gap-12">
-      <header className="flex flex-col gap-1.5">
+    <div className="grow flex flex-col">
+      <header className="flex flex-col p-section">
         <Heading size="large" asChild>
-          <h1>Account</h1>
+          <h1>Settings</h1>
         </Heading>
-        <p>Manage your account.</p>
+        <p>Manage your account settings.</p>
       </header>
 
       {props.sessions}

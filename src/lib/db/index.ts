@@ -75,9 +75,9 @@ export type Location<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
-export type WithLocation = {
+export type WithLocation<T = true> = {
   include: {
-    location: true;
+    location: T;
   };
 };
 
@@ -109,8 +109,8 @@ export type WithEntry = {
   include: { entry: true };
 };
 
-export type WithRoutes = {
-  include: { routes: true };
+export type WithRoutes<T = true> = {
+  include: { routes: T };
 };
 
 export type WithUser = {
@@ -121,8 +121,8 @@ export type WithCharacters = {
   include: { characters: true };
 };
 
-export type WithDestinations = {
-  include: { destinations: true };
+export type WithDestinations<T = true> = {
+  include: { destinations: T };
 };
 
 export type WithStorage = {
@@ -903,15 +903,14 @@ const ext = Prisma.defineExtension((client) => {
   });
 });
 
-// Client is created inside a function so we can have the final type, via ReturnType<T> without instancing it.
+// Wrap with a function so we can have the client type, via ReturnType<T> without instancing it.
 function createClient() {
   return new PrismaClient(opts).$extends(ext);
 }
-
 export type Client = ReturnType<typeof createClient>;
 
-// Prisma client needs to be a singleton, otherwise it eventually exhausts the database connection pool.
+// Prisma client needs to be a singleton, otherwise it eventually exhausts the database connection pool due to code reload in development.
 export const db =
   process.env.NODE_ENV === "production"
-    ? ((global as unknown as { db: Client }).db ??= createClient())
-    : createClient();
+    ? createClient()
+    : ((global as unknown as { db: Client }).db ??= createClient());

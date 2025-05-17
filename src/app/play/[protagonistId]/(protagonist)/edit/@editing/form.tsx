@@ -18,7 +18,11 @@ export function Form<T extends ActionState>(props: {
   );
 
   return (
-    <form className="flex flex-col gap-9" action={action} aria-busy={pending}>
+    <form
+      className="flex flex-col gap-block p-section"
+      action={action}
+      aria-busy={pending}
+    >
       <Alert state={state} />
 
       <fieldset className="flex flex-col gap-6">

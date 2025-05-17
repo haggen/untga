@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { Slot } from "~/components/slot";
 
 const styles = tv({
-  base: "px-3 py-0.5 inline-flex rounded-full bg-stone-600 text-stone-100",
+  base: "px-3 h-6 inline-flex items-center rounded-full bg-slate-600 text-foreground-inverted",
 });
 
 type Props = HTMLAttributes<HTMLElement> & {

@@ -126,10 +126,10 @@ model Attribute {
   createdAt DateTime @default(now())
   /// When it was last updated.
   updatedAt DateTime @updatedAt
-  /// Attribute's current level in a range of 0-1.
-  level     Float    @default(0)
+  /// Attribute's current level.
+  level     Int      @default(0)
   /// Attribute's maximum level.
-  cap       Float    @default(1)
+  cap       Int      @default(100)
 
   /// Attribute's specification.
   specId      Int
@@ -192,10 +192,14 @@ model Container {
   sourceId    Int?       @unique
   /// Item source of the container.
   source      Item?      @relation("storage", fields: [sourceId], references: [id], onDelete: Restrict)
-  /// 
-  character   Character? @relation(fields: [characterId], references: [id], onDelete: Restrict)
-  /// Container as character slots.
+  /// Owner of the container.
   characterId Int?
+  /// Owner of the container.
+  character   Character? @relation(fields: [characterId], references: [id], onDelete: Restrict)
+  /// Container's location.
+  locationId  Int?
+  /// Container's location.
+  location    Location?  @relation(fields: [locationId], references: [id], onDelete: Restrict)
   /// Contents of the container.
   items       Item[]
 
@@ -217,7 +221,7 @@ model ItemSpecification {
   /// The item's base value.
   value       Int      @default(0)
   /// The item's quality.
-  quality     Float    @default(1)
+  quality     Int      @default(100)
   /// Item tags.
   tags        String[]
 
@@ -235,10 +239,10 @@ model Item {
   createdAt  DateTime @default(now())
   /// When it was last updated.
   updatedAt  DateTime @updatedAt
-  /// The item's current amount.
+  /// Item's stack amount.
   amount     Int      @default(1)
-  /// The item's current durability.
-  durability Float    @default(1)
+  /// Item's current durability.
+  durability Int      @default(100)
 
   /// Item's specification.
   specId      Int
@@ -266,8 +270,8 @@ model Location {
   description String?
   /// Area of the location.
   area        Int
-  /// Location difficulty.
-  difficulty  Float
+  /// Location security.
+  security    Int
   /// Location tags.
   tags        String[]
 
@@ -277,6 +281,8 @@ model Location {
   routes       Location[]  @relation("route")
   /// Locations connected to this route.
   destinations Location[]  @relation("route")
+  /// Containers bount to the location.
+  containers   Container[]
 
   @@index(tags)
 }

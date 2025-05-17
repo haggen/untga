@@ -10,13 +10,13 @@ const variants = tv({
       small: "h-6 px-3 text-xs",
     },
     variant: {
-      primary:
-        "bg-orange-800 text-neutral-100 hover:bg-orange-700 border border-orange-900",
-      secondary:
-        "text-orange-800 bg-orange-800/10 hover:text-orange-700 border-2 border-current",
+      default:
+        "bg-orange-800 text-orange-50 hover:bg-orange-700 border border-orange-900",
+      alternate:
+        "text-orange-800 bg-orange-800/10 hover:text-orange-700 hover:bg-orange-700/10",
     },
     disabled: {
-      true: "cursor-not-allowed filter-grayscale",
+      true: "cursor-not-allowed opacity-50",
     },
   },
 });
@@ -30,7 +30,7 @@ type Props = Omit<ComponentProps<"button">, "children"> & {
 
 export function Button({
   asChild,
-  variant = "primary",
+  variant = "default",
   size = "default",
   className,
   disabled,

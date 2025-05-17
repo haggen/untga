@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import { revalidatePath } from "next/cache";
-import Image from "next/image";
 import { redirect } from "next/navigation";
+import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
+import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
@@ -40,6 +41,11 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
   const location = await db.location.findUniqueOrThrow({
     where: { id: locationId },
+    include: {
+      _count: {
+        select: { characters: true },
+      },
+    },
   });
 
   const travel = createStatefulAction(
@@ -74,24 +80,33 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
   });
 
   return (
-    <div className="grow flex flex-col gap-12">
-      <header>
-        <Image
-          src="/signpost.png"
-          alt="Nondescript signpost."
-          width={702}
-          height={702}
-          className="w-full mix-blend-multiply"
-        />
+    <div className="grow flex flex-col">
+      <div className="flex flex-col gap-2 p-section">
+        <Heading size="large" asChild>
+          <h1>{location.name}</h1>
+        </Heading>
 
-        <div className="flex flex-col gap-1.5">
-          <Heading size="large" asChild>
-            <h1>{location.name}</h1>
-          </Heading>
+        <p>{location.description || "No description available."}</p>
 
-          <p>{location.description}</p>
-        </div>
-      </header>
+        <Definition.List>
+          <Definition.Item label="Security">
+            {fmt.location.security(location.security)}
+          </Definition.Item>
+          <Definition.Item label="Area">
+            {fmt.number(location.area, {
+              unit: "mile",
+              style: "unit",
+            })}
+          </Definition.Item>
+          <Definition.Item label="Population">
+            {fmt.plural(location._count.characters, {
+              one: "# person",
+              other: "# people",
+              zero: "Empty",
+            })}
+          </Definition.Item>
+        </Definition.List>
+      </div>
 
       <Form travel={travel} />
     </div>

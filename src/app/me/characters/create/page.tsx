@@ -35,8 +35,8 @@ export default async function Page() {
   });
 
   return (
-    <div className="grow flex flex-col gap-12">
-      <header className="flex flex-col gap-1.5">
+    <div className="grow flex flex-col">
+      <header className="flex flex-col gap-2 p-section">
         <Heading size="large" asChild>
           <h1>New character</h1>
         </Heading>

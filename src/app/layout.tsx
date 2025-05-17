@@ -35,11 +35,11 @@ export default function Layout({
   return (
     <html
       lang="en"
-      className={`${fontSerif.variable} ${fontSans.variable} antialiased text-neutral-100 bg-neutral-900`}
+      className={`${fontSerif.variable} ${fontSans.variable} antialiased text-foreground bg-background`}
     >
       <body>
         <div className="flex flex-col max-w-md mx-auto min-h-dvh">
-          <header className="flex items-center justify-between px-2 h-9">
+          <header className="flex items-center justify-between px-2 basis-10 sticky top-0 text-foreground-inverted bg-background">
             <h1 className="font-bold">
               <Link href="/">✠ Untga</Link>
             </h1>

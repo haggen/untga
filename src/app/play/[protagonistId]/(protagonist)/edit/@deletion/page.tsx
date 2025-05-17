@@ -38,8 +38,8 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
   });
 
   return (
-    <section className="flex flex-col gap-9">
-      <header className="flex flex-col gap-1.5">
+    <section className="flex flex-col gap-block p-section">
+      <header className="flex flex-col gap-text">
         <Heading size="small" asChild>
           <h2>Delete your character</h2>
         </Heading>

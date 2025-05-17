@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
 
 const styles = tv({
-  base: "flex flex-col items-center gap-1 px-3 font-bold text-sm text-center truncate",
+  base: "flex flex-col justify-center items-center gap-1 px-3 h-21 font-bold text-sm truncate",
   variants: {
     active: {
       true: "text-orange-800",
@@ -15,12 +15,15 @@ const styles = tv({
   },
 });
 
-type TabProps = ComponentProps<"li"> & {
+export function Tab({
+  href,
+  exact = true,
+  children,
+  ...props
+}: ComponentProps<"li"> & {
   href: string;
   exact?: boolean;
-};
-
-export function Tab({ href, exact = true, children, ...props }: TabProps) {
+}) {
   const pathname = usePathname();
 
   // @todo: Better matching algorithm to support next/link's href full specification.
@@ -42,7 +45,7 @@ export function Bar({ className, ...props }: BarProps) {
   return (
     <ul
       className={twMerge(
-        "grid auto-cols-fr grid-flow-col sticky bottom-3",
+        "grid auto-cols-fr grid-flow-col sticky bottom-0",
         className
       )}
       {...props}

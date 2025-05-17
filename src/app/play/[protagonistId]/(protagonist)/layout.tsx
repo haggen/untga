@@ -20,10 +20,10 @@ export default async function Layout({
   });
 
   return (
-    <div className="grow flex flex-col gap-12 p-3 text-neutral-800 rounded bg-slate-300 bg-[url(/concrete.png),url(/halftone.png)] bg-blend-multiply">
+    <div className="grow flex flex-col bg-[url(/limestone.jpg)]">
       {children}
 
-      <Tab.Bar>
+      <Tab.Bar className="bg-[url(/marble.jpg)]">
         <Tab.Tab href={`/play/${protagonistId}/stats`}>
           <UserCircleIcon /> Stats
         </Tab.Tab>

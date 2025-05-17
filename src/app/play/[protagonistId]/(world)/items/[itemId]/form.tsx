@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert } from "~/components/alert";
+import { Back } from "~/components/back";
 import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Character, Item, WithSlots, WithSpec, WithStorage } from "~/lib/db";
@@ -33,7 +34,7 @@ export function Form(
   const unequip = useStatefulActionState(props.unequip);
 
   return (
-    <form className="flex flex-col gap-6">
+    <form className="flex flex-col gap-6 p-section">
       <Alert state={use.state} />
       <Alert state={discard.state} />
       <Alert state={equip.state} />
@@ -49,6 +50,9 @@ export function Form(
           <Menu.Item action={use.action}>Use</Menu.Item>
         ) : null}
         <Menu.Item action={discard.action}>Discard</Menu.Item>
+        <Back asChild>
+          <Menu.Item href="#">Cancel</Menu.Item>
+        </Back>
       </Menu.List>
     </form>
   );

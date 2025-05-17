@@ -5,6 +5,7 @@ import { Heading } from "~/components/heading";
 import { Header } from "~/components/protagonist/header";
 import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
+import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
 import { tags } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
@@ -24,6 +25,10 @@ export default async function Page({
 
   const protagonist = await db.character.findUniqueOrThrow({
     where: { id: protagonistId, userId: session.userId },
+    include: {
+      attributes: { include: { spec: true } },
+      location: true,
+    },
   });
 
   const containers = await db.container.findMany({
@@ -57,22 +62,22 @@ export default async function Page({
     tags.Legs,
     tags.Feet,
     tags.Pack,
-  ].map((tag) => {
-    return ensure(
+  ].map((tag) =>
+    ensure(
       containers.find((container) => container.tags.includes(tag)),
       `Could not find slot: ${tag}.`
-    );
-  });
+    )
+  );
 
   const storage = containers.filter((container) =>
     container.items.some((item) => item.spec.tags.includes(tags.Storage))
   );
 
   return (
-    <div className="grow flex flex-col gap-12">
+    <div className="flex flex-col grow">
       <Header character={protagonist} />
 
-      <section className="flex flex-col gap-1.5">
+      <section className="flex flex-col gap-text p-section">
         <Heading size="small" asChild>
           <h1>Equipment</h1>
         </Heading>
@@ -87,7 +92,9 @@ export default async function Page({
                   : ""
               }
             >
-              <Definition.Item label={slot.slot}>
+              <Definition.Item
+                label={fmt.string(String(slot.slot), { title: true })}
+              >
                 {slot.items[0]?.spec.name ?? "Empty"}
               </Definition.Item>
             </Link>
@@ -96,10 +103,15 @@ export default async function Page({
       </section>
 
       {storage.map((container) => (
-        <section key={container.id} className="flex flex-col gap-1.5">
+        <section
+          key={container.id}
+          className="flex flex-col gap-text p-section"
+        >
           <Heading size="small" asChild>
             <h1>{container.items[0]?.spec.name}</h1>
           </Heading>
+
+          <p>{container.items[0]?.spec.description}</p>
 
           <Definition.List>
             {container.items[0]?.storage?.items.map((item) => (
