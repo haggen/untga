@@ -4,16 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prestart:development": "test -d node_modules || npm ci; test -d prisma/client || prisma generate",
-    "start": "npm run start:${NODE_ENV:-development}",
     "start:development": "next dev --turbo",
-    "prestart:production": "prisma migrate deploy",
-    "start:production": "next start",
-    "prebuild": "prisma generate",
-    "build": "next build",
+    "start:production": "test -f .next/BUILD_ID || npm run build; next start",
+    "start": "test -d node_modules || npm ci; npm run start:${NODE_ENV:-development}",
+    "build": "prisma generate; next build",
     "fix": "next lint --fix && tsc --noEmit",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "migrate": "prisma migrate deploy; prisma db seed",
     "test": "vitest"
   },
   "prisma": {
@@ -38,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.52.0",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/bcrypt": "^5.0.2",
     "@types/luxon": "^3.6.2",

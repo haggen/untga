@@ -1,8 +1,28 @@
+# Node packages.
+node_modules
+
+# Build artifacts.
+.next
+out
+build
+
+# OS files.
+.DS_Store
+*.pem
+
+# Debug artifacts.
+npm-debug.log*
+
+# Environment config.
+.env
+
+# TypeScript artifacts.
+*.tsbuildinfo
+next-env.d.ts
+
+# Playwright artifacts.
+playwright/output
+
 # Docker files.
 compose*.yml
 Dockerfile
-
-# Generated artifacts.
-node_modules 
-.next
-prisma/client

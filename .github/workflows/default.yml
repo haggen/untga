@@ -5,11 +5,23 @@ on:
   - pull_request
 
 jobs:
-  dependencies:
-    name: Linting, type checking, tests, build and CodeQL
+  build:
+    name: Linting, type checking, unit testing, build and CodeQL
     runs-on: ubuntu-latest
     permissions:
-      security-events: write # Required by CodeQL.
+      # Required by CodeQL.
+      security-events: write
+    services:
+      db:
+        image: postgres:17-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: 0123456789abcdef
+    env:
+      DATABASE_URL: postgresql://app:0123456789abcdef@localhost/app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,3 +42,12 @@ jobs:
           languages: javascript
       - run: npm run build
       - uses: github/codeql-action/analyze@v3
+      - run: npm run migrate
+      - run: npx playwright install --with-deps
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright
+          path: playwright/output
+          retention-days: 7

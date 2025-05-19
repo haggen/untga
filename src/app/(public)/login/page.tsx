@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Heading } from "~/components/heading";
@@ -7,6 +8,10 @@ import { getRemoteAddr, getUserAgent } from "~/lib/request";
 import { setActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
+
+export const metadata: Metadata = {
+  title: "Log in",
+};
 
 export default function Page() {
   const action = createStatefulAction(

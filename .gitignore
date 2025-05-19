@@ -8,9 +8,6 @@ node_modules
 out
 build
 
-# Prisma generated client.
-prisma/client
-
 # OS files.
 .DS_Store
 *.pem
@@ -27,7 +24,4 @@ compose.override.yml
 next-env.d.ts
 
 # Playwright artifacts.
-test-results
-playwright-report
-blob-report
-playwright/.cache
+playwright/output

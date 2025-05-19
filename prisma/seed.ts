@@ -434,6 +434,13 @@ const seed = {
 };
 
 async function main() {
+  const sample = await db.itemSpecification.findFirst();
+
+  if (sample) {
+    console.log("Database is already seeded. Skipping.");
+    return;
+  }
+
   await db.$transaction(async (tx) => {
     await tx.location.createManyAndReturn({
       data: seed.locations.map((location) => ({

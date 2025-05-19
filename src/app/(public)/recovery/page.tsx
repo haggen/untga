@@ -1,7 +1,12 @@
+import { Metadata } from "next";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
+
+export const metadata: Metadata = {
+  title: "Recovery",
+};
 
 export default function Page() {
   const action = createStatefulAction(async (payload: FormData) => {

@@ -2,11 +2,11 @@ import { ClipboardSignatureIcon, LifeBuoyIcon, LogInIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { Bar, Tab } from "~/components/tab";
 
-type Props = {
+export default async function Layout({
+  children,
+}: Readonly<{
   children: ReactNode;
-};
-
-export default async function Layout({ children }: Props) {
+}>) {
   return (
     <div className="grow flex flex-col bg-[url(/limestone.jpg)]">
       <div className="grow">{children}</div>

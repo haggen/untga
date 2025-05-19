@@ -6,7 +6,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.untga.rule=Host(`untga.crz.li`)"
-
 networks:
   traefik:
     external: true

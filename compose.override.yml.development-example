@@ -1,8 +1,19 @@
 services:
   app:
+    networks:
+      - default
+      - traefik
+    environment:
+      NODE_ENV: development
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.untga.rule=Host(`untga.local.crz.li`)"
     develop:
       watch:
-        - # x-initialSync was introduced in v2.29.2 but it doesn't seem to be documented.
+        - # x-initialSync was introduced in v2.29.2 
+          # but it doesn't seem to be documented.
+          # It fixes synchronization issues when files
+          # are modified while the container is down.
           x-initialSync: true
           action: sync
           path: .
@@ -11,20 +22,6 @@ services:
             - node_modules
             - .next
             - .git
-    environment:
-      NODE_ENV: development
-    networks:
-      - default
-      - traefik
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.untga.rule=Host(`untga.local.crz.li`)"
-  db:
-    ports: 
-      # Support local connections to the database.
-      # Local Prisma reads the port from .env.
-      - 5432:5432
-
 networks:
   traefik:
     external: true
