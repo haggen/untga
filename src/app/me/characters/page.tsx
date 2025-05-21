@@ -5,7 +5,7 @@ import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 
 export const metadata: Metadata = {
-  title: "Characters at Untga",
+  title: "Characters",
 };
 
 export default async function Page() {
@@ -25,7 +25,7 @@ export default async function Page() {
     .map((_, i) => characters[i]);
 
   return (
-    <div className="grow flex flex-col">
+    <div className="flex flex-col grow">
       <header className="flex flex-col gap-2 p-section">
         <Heading size="large" asChild>
           <h1>Characters</h1>

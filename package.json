@@ -11,8 +11,10 @@
     "fix": "next lint --fix && tsc --noEmit",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "migrate": "prisma migrate deploy; prisma db seed",
-    "test": "vitest"
+    "migrate": "prisma migrate deploy",
+    "seed": "prisma db seed",
+    "test": "vitest",
+    "pglite": "scripts/pglite.sh"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Linting, type checking, unit testing, build and CodeQL
+    name: Linting, type checking, build, CodeQL and testing
     runs-on: ubuntu-latest
     permissions:
       # Required by CodeQL.
@@ -27,14 +27,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 23
-      - id: cache
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
+        id: npm-cache
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             node-modules-
-      - if: steps.cache.outputs.cache-hit != 'true'
+      - if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
       - run: npm test
       - uses: github/codeql-action/init@v3
@@ -42,7 +42,14 @@ jobs:
           languages: javascript
       - run: npm run build
       - uses: github/codeql-action/analyze@v3
-      - run: npm run migrate
+      - run: npm run migrate; npm run seed
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('playwright.config.ts') }}
+          restore-keys: |
+            playwright-
       - run: npx playwright install --with-deps
       - run: npx playwright test
       - uses: actions/upload-artifact@v4

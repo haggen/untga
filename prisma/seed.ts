@@ -1,6 +1,8 @@
 import { db } from "~/lib/db";
 import { tags } from "~/lib/tags";
 
+const args = process.argv.slice(2);
+
 const seed = {
   locations: [
     {
@@ -483,6 +485,17 @@ async function main() {
       })),
     });
   });
+
+  if (args.includes("--test")) {
+    await db.$transaction(async (tx) => {
+      await tx.user.create({
+        data: {
+          email: "player@example.com",
+          password: "0123456789abcdef",
+        },
+      });
+    });
+  }
 }
 
 main()
