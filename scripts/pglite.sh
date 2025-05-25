@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Halt on error and undefined variables.
+set -ue
+
 # Delete existing DATABASE_URL from environment config.
 sed -i '' '/DATABASE_URL/d' .env 2>/dev/null
 
