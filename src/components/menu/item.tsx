@@ -7,10 +7,11 @@ const styles = tv({
   base: "flex items-center bg-neutral-100/50 min-h-12 p-3 w-full focus-visible:outline-0 hover:bg-neutral-100 focus-visible:bg-neutral-100",
 });
 
-type Props = HTMLAttributes<HTMLElement> & {
-  href?: string;
-  action?: StatelessAction<unknown, void>;
-};
+type Props = HTMLAttributes<HTMLElement> &
+  Readonly<{
+    href?: string;
+    action?: StatelessAction<FormData, void>;
+  }>;
 
 export function Item(props: Omit<Props, "href">): ReactNode;
 export function Item(props: Omit<Props, "action">): ReactNode;

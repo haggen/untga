@@ -2,24 +2,15 @@ import Link from "next/link";
 import { HTMLAttributes, ReactNode } from "react";
 import { StatelessAction } from "~/lib/actions";
 
-export function Command(
-  props: HTMLAttributes<HTMLElement> & {
-    action: StatelessAction<unknown, void>;
-  }
-): ReactNode;
-export function Command(
-  props: HTMLAttributes<HTMLElement> & {
-    href: string;
-  }
-): ReactNode;
-export function Command({
-  action,
-  href,
-  ...props
-}: HTMLAttributes<HTMLElement> & {
-  action?: StatelessAction<unknown, void>;
-  href?: string;
-}) {
+type Props = HTMLAttributes<HTMLElement> &
+  Readonly<{
+    href?: string;
+    action?: StatelessAction<FormData, void>;
+  }>;
+
+export function Command(props: Omit<Props, "href">): ReactNode;
+export function Command(props: Omit<Props, "action">): ReactNode;
+export function Command({ action, href, ...props }: Props) {
   if (href) {
     return <Link href={href} {...props} />;
   }
