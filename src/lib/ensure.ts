@@ -1,9 +1,11 @@
 /**
- * Ensure a non nullable value or throw.
+ * Throw if given value either null or undefined.
  */
-export function ensure<T>(value: T, message?: string): NonNullable<T> {
+export function ensure<T>(value: T, err?: Error | string): NonNullable<T> {
   if (value === undefined || value === null) {
-    throw new Error(message ?? "Expected a non nullable value");
+    throw err instanceof Error
+      ? err
+      : new Error(err ?? "Expected a non nullable value");
   }
   return value;
 }
