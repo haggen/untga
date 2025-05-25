@@ -263,7 +263,14 @@ export function amount(amount: number) {
   return "None";
 }
 
-function status(status: string) {
+export function area(area: number) {
+  return number(area, {
+    unit: "mile",
+    style: "unit",
+  });
+}
+
+export function status(status: string) {
   return string(status, { title: true });
 }
 
@@ -274,6 +281,7 @@ export const fmt = {
   datetime,
   userAgent,
   location: {
+    area,
     security,
     population,
   },
