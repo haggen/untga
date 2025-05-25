@@ -20,36 +20,42 @@ function isEquipped(
 
 export function Form(
   props: Readonly<{
-    use: StatefulAction<unknown, ActionState>;
-    discard: StatefulAction<unknown, ActionState>;
-    equip: StatefulAction<unknown, ActionState>;
-    unequip: StatefulAction<unknown, ActionState>;
+    action: StatefulAction<
+      { characterId: number; itemId: number; action: string },
+      ActionState
+    >;
     item: Serialized<Item<WithSpec>>;
     protagonist: Serialized<Character<WithSlots<WithStorage>>>;
   }>
 ) {
-  const use = useStatefulActionState(props.use);
-  const discard = useStatefulActionState(props.discard);
-  const equip = useStatefulActionState(props.equip);
-  const unequip = useStatefulActionState(props.unequip);
+  const { action, state } = useStatefulActionState(props.action);
+  const data = {
+    itemId: props.item.id,
+    characterId: props.protagonist.id,
+  };
 
   return (
     <form className="flex flex-col gap-6 p-section">
-      <Alert state={use.state} />
-      <Alert state={discard.state} />
-      <Alert state={equip.state} />
-      <Alert state={unequip.state} />
+      <Alert state={state} />
 
       <Menu.List>
         {isEquipped(props.protagonist, props.item.id) ? (
-          <Menu.Item action={unequip.action}>Take off</Menu.Item>
+          <Menu.Item action={action.bind(null, { ...data, action: "unequip" })}>
+            Take off
+          </Menu.Item>
         ) : props.item.spec.tags.includes(tags.Equipment) ? (
-          <Menu.Item action={equip.action}>Equip</Menu.Item>
+          <Menu.Item action={action.bind(null, { ...data, action: "equip" })}>
+            Equip
+          </Menu.Item>
         ) : null}
         {props.item.spec.tags.includes(tags.Utility) ? (
-          <Menu.Item action={use.action}>Use</Menu.Item>
+          <Menu.Item action={action.bind(null, { ...data, action: "use" })}>
+            Use
+          </Menu.Item>
         ) : null}
-        <Menu.Item action={discard.action}>Discard</Menu.Item>
+        <Menu.Item action={action.bind(null, { ...data, action: "discard" })}>
+          Discard
+        </Menu.Item>
         <Back asChild>
           <Menu.Item href="#">Cancel</Menu.Item>
         </Back>

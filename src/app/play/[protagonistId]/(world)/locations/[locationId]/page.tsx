@@ -48,11 +48,13 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     },
   });
 
-  const travel = createStatefulAction(
+  const action = createStatefulAction(
     async ({
+      action,
       characterId,
       destinationId,
     }: {
+      action: string;
       characterId: number;
       destinationId: number;
     }) => {
@@ -64,20 +66,23 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         where: { id: characterId, user: { id: session.user.id } },
       });
 
-      await db.character.travel({
-        data: {
-          characterId,
-          destinationId,
-        },
-      });
+      switch (action) {
+        case "travel":
+          await db.character.travel({
+            data: {
+              characterId,
+              destinationId,
+            },
+          });
+          break;
+        default:
+          throw new Error("Unknown action.");
+      }
 
       revalidatePath(`/play/${characterId}/location`);
       redirect(`/play/${characterId}/location`);
     }
-  ).bind(null, undefined, {
-    characterId: protagonistId,
-    destinationId: locationId,
-  });
+  );
 
   return (
     <div className="grow flex flex-col">
@@ -93,22 +98,15 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
             {fmt.location.security(location.security)}
           </Definition.Item>
           <Definition.Item label="Area">
-            {fmt.number(location.area, {
-              unit: "mile",
-              style: "unit",
-            })}
+            {fmt.location.area(location.area)}
           </Definition.Item>
           <Definition.Item label="Population">
-            {fmt.plural(location._count.characters, {
-              one: "# person",
-              other: "# people",
-              zero: "Empty",
-            })}
+            {fmt.location.population(location._count.characters)}
           </Definition.Item>
         </Definition.List>
       </div>
 
-      <Form travel={travel} />
+      <Form action={action} protagonistId={protagonistId} location={location} />
     </div>
   );
 }

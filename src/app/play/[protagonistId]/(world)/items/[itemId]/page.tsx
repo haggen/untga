@@ -66,11 +66,13 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     include: { spec: true },
   });
 
-  const use = createStatefulAction(
+  const action = createStatefulAction(
     async ({
+      action,
       characterId,
       itemId,
     }: {
+      action: string;
       characterId: number;
       itemId: number;
     }) => {
@@ -86,143 +88,41 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           throw new Error("You are not allowed to do that.", { cause });
         });
 
-      await db.character
-        .owns({
-          data: { characterId, itemId },
-        })
-        .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
-        });
-
-      await db.item.use({
-        data: { itemId, characterId },
-      });
-
-      revalidatePath(`/play/${characterId}/equipment`);
-      redirect(`/play/${characterId}/equipment`);
-    }
-  ).bind(null, undefined, {
-    characterId: protagonistId,
-    itemId: itemId,
-  });
-
-  const equip = createStatefulAction(
-    async ({
-      characterId,
-      itemId,
-    }: {
-      characterId: number;
-      itemId: number;
-    }) => {
-      "use server";
-
-      const session = await ensureActiveSession();
-
-      await db.character
-        .findUniqueOrThrow({
-          where: { id: characterId, user: { id: session.user.id } },
-        })
-        .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
-        });
-
-      await db.character
-        .owns({
-          data: { characterId, itemId },
-        })
-        .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
-        });
-
-      await db.character.equip({
-        data: {
-          characterId,
-          itemId,
-        },
-      });
+      switch (action) {
+        case "use":
+          await db.item.use({
+            data: { itemId, characterId },
+          });
+          break;
+        case "equip":
+          await db.character.equip({
+            data: {
+              characterId,
+              itemId,
+            },
+          });
+          break;
+        case "unequip":
+          await db.character.unequip({
+            data: {
+              characterId,
+              itemId,
+            },
+          });
+          break;
+        case "discard":
+          await db.item.discard({
+            data: { itemId },
+          });
+          break;
+        default:
+          throw new Error("Unknown action.");
+      }
 
       revalidatePath(`/play/${characterId}/equipment`);
       redirect(`/play/${characterId}/equipment`);
     }
-  ).bind(null, undefined, {
-    characterId: protagonistId,
-    itemId: itemId,
-  });
-
-  const unequip = createStatefulAction(
-    async ({
-      characterId,
-      itemId,
-    }: {
-      characterId: number;
-      itemId: number;
-    }) => {
-      "use server";
-
-      const session = await ensureActiveSession();
-
-      await db.character
-        .findUniqueOrThrow({
-          where: { id: characterId, user: { id: session.user.id } },
-        })
-        .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
-        });
-
-      await db.character.unequip({
-        data: {
-          characterId,
-          itemId,
-        },
-      });
-
-      revalidatePath(`/play/${characterId}/equipment`);
-      redirect(`/play/${characterId}/equipment`);
-    }
-  ).bind(null, undefined, {
-    characterId: protagonistId,
-    itemId: itemId,
-  });
-
-  const discard = createStatefulAction(
-    async ({
-      characterId,
-      itemId,
-    }: {
-      characterId: number;
-      itemId: number;
-    }) => {
-      "use server";
-
-      const session = await ensureActiveSession();
-
-      await db.character
-        .findUniqueOrThrow({
-          where: { id: characterId, user: { id: session.user.id } },
-        })
-        .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
-        });
-
-      await db.character
-        .owns({
-          data: { characterId, itemId },
-        })
-        .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
-        });
-
-      await db.item.discard({
-        data: { itemId },
-      });
-
-      revalidatePath(`/play/${characterId}/equipment`);
-      redirect(`/play/${characterId}/equipment`);
-    }
-  ).bind(null, undefined, {
-    characterId: protagonistId,
-    itemId: itemId,
-  });
+  );
 
   return (
     <div className="flex flex-col grow">
@@ -253,10 +153,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
       </div>
 
       <Form
-        use={use}
-        discard={discard}
-        equip={equip}
-        unequip={unequip}
+        action={action}
         protagonist={serialize(protagonist)}
         item={serialize(item)}
       />
