@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
-import { serialize } from "~/lib/serializable";
+import { serializable } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         </p>
       </header>
 
-      <Form action={action} value={serialize(protagonist)} />
+      <Form action={action} value={serializable(protagonist)} />
     </section>
   );
 }

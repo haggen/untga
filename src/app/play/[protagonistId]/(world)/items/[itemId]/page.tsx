@@ -6,7 +6,7 @@ import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
-import { serialize } from "~/lib/serializable";
+import { serializable } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
 import { tags } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
@@ -154,8 +154,8 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
       <Form
         action={action}
-        protagonist={serialize(protagonist)}
-        item={serialize(item)}
+        protagonist={serializable(protagonist)}
+        item={serializable(item)}
       />
     </div>
   );

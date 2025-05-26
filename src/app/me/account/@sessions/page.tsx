@@ -1,7 +1,7 @@
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
-import { serialize } from "~/lib/serializable";
+import { serializable } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
 import { List } from "./list";
 
@@ -39,7 +39,7 @@ export default async function Page() {
         </p>
       </header>
 
-      <List sessions={serialize(sessions)} invalidate={invalidate} />
+      <List sessions={serializable(sessions)} invalidate={invalidate} />
     </section>
   );
 }

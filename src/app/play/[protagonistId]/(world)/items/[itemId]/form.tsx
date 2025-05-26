@@ -5,12 +5,12 @@ import { Back } from "~/components/back";
 import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Character, Item, WithSlots, WithSpec, WithStorage } from "~/lib/db";
-import { Serialized } from "~/lib/serializable";
+import { Serializable } from "~/lib/serializable";
 import { tags } from "~/lib/tags";
 import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 
 function isEquipped(
-  character: Serialized<Character<WithSlots>>,
+  character: Serializable<Character<WithSlots>>,
   itemId: number
 ) {
   return character.slots.some((slot) =>
@@ -24,8 +24,8 @@ export function Form(
       { characterId: number; itemId: number; action: string },
       ActionState
     >;
-    item: Serialized<Item<WithSpec>>;
-    protagonist: Serialized<Character<WithSlots<WithStorage>>>;
+    item: Serializable<Item<WithSpec>>;
+    protagonist: Serializable<Character<WithSlots<WithStorage>>>;
   }>
 ) {
   const { action, state } = useStatefulActionState(props.action);

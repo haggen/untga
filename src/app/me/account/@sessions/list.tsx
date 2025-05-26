@@ -7,14 +7,14 @@ import { Geolocation, useGeolocation } from "~/components/geolocation";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Session } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
-import { Serialized } from "~/lib/serializable";
+import { Serializable } from "~/lib/serializable";
 
 function Item({
   session,
   pending,
   invalidate,
 }: {
-  session: Serialized<Session>;
+  session: Serializable<Session>;
   pending: boolean;
   invalidate: () => void;
 }) {
@@ -62,7 +62,7 @@ export function List<T extends ActionState>({
   sessions,
   ...props
 }: {
-  sessions: Serialized<Session[]>;
+  sessions: Serializable<Session[]>;
   invalidate: StatefulAction<{ id: number }, T>;
 }) {
   const [state, invalidate, pending] = useActionState(
