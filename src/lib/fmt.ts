@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { UAParser } from "ua-parser-js";
 
 type LocaleOption = { locale?: string };
@@ -122,190 +123,213 @@ export function string(string: string, options: StringFormatOptions) {
   return string;
 }
 
-/**
- * Format a location's security rating.
- */
-export function security(security: number) {
-  if (security === 100) {
-    return "Safe";
-  }
+const location = {
+  /**
+   * Format a location's security rating.
+   */
+  security(security: number) {
+    if (security === 100) {
+      return "Safe";
+    }
 
-  if (security >= 70) {
-    return "Maintained";
-  }
+    if (security >= 70) {
+      return "Maintained";
+    }
 
-  if (security >= 40) {
-    return "Unsettled";
-  }
+    if (security >= 40) {
+      return "Unsettled";
+    }
 
-  return "Lawless";
-}
+    return "Lawless";
+  },
 
-/**
- * Format a character's skill level.
- */
-export function skill(level: number) {
-  if (level === 100) {
-    return "Master";
-  }
+  /**
+   * Format a location's population level.
+   */
+  population(population: number) {
+    if (population >= 20) {
+      return "Bustling";
+    }
 
-  if (level >= 80) {
-    return "Expert";
-  }
+    if (population >= 10) {
+      return "Crowded";
+    }
 
-  if (level >= 60) {
-    return "Journeyman";
-  }
+    if (population > 0) {
+      return "Sparse";
+    }
 
-  if (level >= 40) {
-    return "Apprentice";
-  }
+    return "Uninhabited";
+  },
 
-  if (level >= 20) {
-    return "Novice";
-  }
+  /**
+   * Format a location's area.
+   */
+  area(area: number) {
+    return number(area, {
+      unit: "mile",
+      style: "unit",
+    });
+  },
+};
 
-  return "Untrained";
-}
+const character = {
+  /**
+   * Format a character's age based on their birth date.
+   */
+  age(createdAt: Date | string) {
+    // Every character is born at 18 years old.
+    const base = 18;
 
-/**
- * Format a character's health level.
- */
-export function health(level: number) {
-  if (level === 100) {
-    return "Healthy";
-  }
+    return `${Math.floor(
+      DateTime.now().diff(
+        typeof createdAt === "string"
+          ? DateTime.fromISO(createdAt)
+          : DateTime.fromJSDate(createdAt),
+        "years"
+      ).years + base
+    )} years old`;
+  },
 
-  if (level >= 80) {
-    return "Bruised";
-  }
+  /**
+   * Format a character's skill level.
+   */
+  skill(level: number) {
+    if (level === 100) {
+      return "Master";
+    }
 
-  if (level >= 40) {
-    return "Hurt";
-  }
+    if (level >= 80) {
+      return "Expert";
+    }
 
-  if (level >= 20) {
-    return "Wounded";
-  }
+    if (level >= 60) {
+      return "Journeyman";
+    }
 
-  if (level > 0) {
-    return "Incapacitated";
-  }
+    if (level >= 40) {
+      return "Apprentice";
+    }
 
-  return "Unconscious";
-}
+    if (level >= 20) {
+      return "Novice";
+    }
 
-/**
- * Format a character's stamina level.
- */
-export function stamina(level: number) {
-  if (level === 100) {
-    return "Rested";
-  }
+    return "Untrained";
+  },
 
-  if (level >= 60) {
-    return "Winded";
-  }
+  /**
+   * Format a character's health level.
+   */
+  health(level: number) {
+    if (level === 100) {
+      return "Healthy";
+    }
 
-  if (level >= 20) {
-    return "Tired";
-  }
+    if (level >= 80) {
+      return "Bruised";
+    }
 
-  return "Exhausted";
-}
+    if (level >= 40) {
+      return "Hurt";
+    }
 
-/**
- * Format an item's quality.
- */
-export function quality(quality: number) {
-  if (quality === 100) {
-    return "Masterwork";
-  }
+    if (level >= 20) {
+      return "Wounded";
+    }
 
-  if (quality >= 80) {
-    return "Exceptional";
-  }
+    if (level > 0) {
+      return "Incapacitated";
+    }
 
-  if (quality >= 60) {
-    return "Fine";
-  }
+    return "Unconscious";
+  },
 
-  if (quality >= 30) {
-    return "Regular";
-  }
+  /**
+   * Format a character's stamina level.
+   */
+  stamina(level: number) {
+    if (level === 100) {
+      return "Rested";
+    }
 
-  return "Crude";
-}
+    if (level >= 60) {
+      return "Winded";
+    }
 
-/**
- * Format an item's durability level.
- */
-export function durability(durability: number) {
-  if (durability === 100) {
-    return "Unused";
-  }
+    if (level >= 20) {
+      return "Tired";
+    }
 
-  if (durability >= 60) {
-    return "Good";
-  }
+    return "Exhausted";
+  },
 
-  if (durability >= 20) {
-    return "Worn";
-  }
+  /**
+   * Format a character's status.
+   */
+  status(status: string) {
+    return string(status, { title: true });
+  },
+};
 
-  if (durability > 0) {
-    return "Damaged";
-  }
+const item = {
+  /**
+   * Format an item's quality.
+   */
+  quality(quality: number) {
+    if (quality === 100) {
+      return "Masterwork";
+    }
 
-  return "Broken";
-}
+    if (quality >= 80) {
+      return "Exceptional";
+    }
 
-/**
- * Format a location's population level.
- */
-export function population(population: number) {
-  if (population >= 20) {
-    return "Bustling";
-  }
+    if (quality >= 60) {
+      return "Fine";
+    }
 
-  if (population >= 10) {
-    return "Crowded";
-  }
+    if (quality >= 30) {
+      return "Regular";
+    }
 
-  if (population > 0) {
-    return "Sparse";
-  }
+    return "Crude";
+  },
 
-  return "Uninhabited";
-}
+  /**
+   * Format an item's durability level.
+   */
+  durability(durability: number) {
+    if (durability === 100) {
+      return "Unused";
+    }
 
-/**
- * Format an item's amount.
- */
-export function amount(amount: number) {
-  if (amount > 0) {
-    return "×" + number(amount);
-  }
+    if (durability >= 60) {
+      return "Good";
+    }
 
-  return "None";
-}
+    if (durability >= 20) {
+      return "Worn";
+    }
 
-/**
- * Format a location's area.
- */
-export function area(area: number) {
-  return number(area, {
-    unit: "mile",
-    style: "unit",
-  });
-}
+    if (durability > 0) {
+      return "Damaged";
+    }
 
-/**
- * Format a character's status.
- */
-export function status(status: string) {
-  return string(status, { title: true });
-}
+    return "Broken";
+  },
+
+  /**
+   * Format an item's amount.
+   */
+  amount(amount: number) {
+    if (amount > 0) {
+      return "×" + number(amount);
+    }
+
+    return "None";
+  },
+};
 
 /**
  * Formatting functions.
@@ -316,20 +340,7 @@ export const fmt = {
   plural,
   datetime,
   userAgent,
-  location: {
-    area,
-    security,
-    population,
-  },
-  character: {
-    skill,
-    health,
-    stamina,
-    status,
-  },
-  item: {
-    quality,
-    durability,
-    amount,
-  },
+  location,
+  character,
+  item,
 };
