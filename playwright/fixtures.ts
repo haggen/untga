@@ -12,13 +12,13 @@ export const authenticatedTest = test.extend<
 
   workerStorageState: [
     async ({ browser }, use, { parallelIndex, project }) => {
-      const state = path.resolve(
+      const file = path.resolve(
         test.info().project.outputDir,
         `state/${parallelIndex}.json`
       );
 
-      if (existsSync(state)) {
-        await use(state);
+      if (existsSync(file)) {
+        await use(file);
         return;
       }
 
@@ -35,10 +35,10 @@ export const authenticatedTest = test.extend<
       await page.getByRole("button", { name: "Register" }).click();
       await page.waitForURL("/account/characters");
 
-      await page.context().storageState({ path: state });
+      await page.context().storageState({ path: file });
       await page.close();
 
-      await use(state);
+      await use(file);
     },
 
     { scope: "worker" },

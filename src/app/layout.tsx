@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Cabin, Macondo } from "next/font/google";
-import Link from "next/link";
 import { ReactNode } from "react";
+import { Link } from "~/components/link";
 
 import "./global.css";
 

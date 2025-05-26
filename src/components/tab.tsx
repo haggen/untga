@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
+import { Link } from "~/components/link";
 
 const styles = tv({
   base: "flex flex-col justify-center items-center gap-1 px-3 h-21 font-bold text-sm truncate",

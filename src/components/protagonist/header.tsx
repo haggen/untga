@@ -1,7 +1,7 @@
 import { EllipsisIcon } from "lucide-react";
-import Link from "next/link";
 import { Button } from "~/components/button";
 import { Heading } from "~/components/heading";
+import { Link } from "~/components/link";
 import { Character, WithAttributes, WithLocation } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";

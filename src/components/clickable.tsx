@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { HTMLAttributes, ReactNode } from "react";
+import { Link } from "~/components/link";
 import { StatelessAction } from "~/lib/actions";
 
 type Props = Readonly<

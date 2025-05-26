@@ -1,8 +1,8 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { Badge } from "~/components/badge";
 import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
+import { Link } from "~/components/link";
 import { Summary } from "~/components/location/summary";
 import { Header } from "~/components/protagonist/header";
 import { db } from "~/lib/db";
@@ -60,26 +60,7 @@ export default async function Page({
           </Heading>
         </hgroup>
 
-        <p>{location.description || "No description available."}</p>
-
-        <Definition.List>
-          <Definition.Item label="Security">
-            {fmt.location.security(location.security)}
-          </Definition.Item>
-          <Definition.Item label="Area">
-            {fmt.number(location.area, {
-              unit: "mile",
-              style: "unit",
-            })}
-          </Definition.Item>
-          <Definition.Item label="Population">
-            {fmt.plural(location._count.characters, {
-              one: "# person",
-              other: "# people",
-              zero: "Empty",
-            })}
-          </Definition.Item>
-        </Definition.List>
+        <Summary location={location} />
       </section>
 
       {routes.map((route) => (

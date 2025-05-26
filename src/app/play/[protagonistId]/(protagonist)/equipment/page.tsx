@@ -1,7 +1,7 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
+import { Link } from "~/components/link";
 import { Header } from "~/components/protagonist/header";
 import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
