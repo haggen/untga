@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert } from "~/components/alert";
+import { alert } from "~/components/alert";
 import { Back } from "~/components/back";
 import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
@@ -36,7 +36,7 @@ export function Form(
 
   return (
     <form className="flex flex-col gap-6 p-section">
-      <Alert state={state} />
+      {alert(state)}
 
       <Menu.List>
         {isEquipped(props.protagonist, props.item.id) ? (

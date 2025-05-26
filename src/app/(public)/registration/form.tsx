@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Alert } from "~/components/alert";
+import { alert } from "~/components/alert";
 import { Button } from "~/components/button";
 import { Field } from "~/components/field";
 import { Input } from "~/components/input";
@@ -17,7 +17,7 @@ export function Form<T extends ActionState>(props: {
 
   return (
     <form className="flex flex-col gap-9 p-section" action={action}>
-      <Alert state={state} />
+      {alert(state)}
 
       <fieldset className="flex flex-col gap-6">
         <Field

@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, Suspense, useActionState } from "react";
-import { Alert } from "~/components/alert";
+import { alert } from "~/components/alert";
 import { Button } from "~/components/button";
 import { Geolocation, useGeolocation } from "~/components/geolocation";
 import { ActionState, StatefulAction } from "~/lib/actions";
@@ -72,7 +72,7 @@ export function List<T extends ActionState>({
 
   return (
     <Fragment>
-      <Alert state={state} />
+      {alert(state)}
 
       <ul className="flex flex-col gap-3">
         {sessions.map((session) => (

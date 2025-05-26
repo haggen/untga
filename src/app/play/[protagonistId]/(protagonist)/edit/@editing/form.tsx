@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Alert } from "~/components/alert";
+import { alert } from "~/components/alert";
 import { Button } from "~/components/button";
 import { Field } from "~/components/field";
 import { Input } from "~/components/input";
@@ -23,7 +23,7 @@ export function Form<T extends ActionState>(props: {
       action={action}
       aria-busy={pending}
     >
-      <Alert state={state} />
+      {alert(state)}
 
       <fieldset className="flex flex-col gap-6">
         <input type="hidden" name="characterId" value={props.value.id} />
