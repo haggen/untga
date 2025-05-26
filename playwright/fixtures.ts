@@ -33,7 +33,7 @@ export const authenticatedTest = test.extend<
         .fill(`player+${parallelIndex}@example.com`);
       await page.getByLabel("Password").fill("0123456789abcdef");
       await page.getByRole("button", { name: "Register" }).click();
-      await page.waitForURL("/me/characters");
+      await page.waitForURL("/account/characters");
 
       await page.context().storageState({ path: state });
       await page.close();

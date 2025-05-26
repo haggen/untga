@@ -7,7 +7,7 @@ export async function GET() {
   const session = await getActiveSession();
 
   if (session) {
-    redirect("/me/characters");
+    redirect("/account/characters");
   }
 
   const clientId = await getClientId(await cookies());

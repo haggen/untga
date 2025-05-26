@@ -35,7 +35,7 @@ function Actions({
     return (
       <Menu.List>
         <Menu.Item href={`/play/${characterId}/edit`}>Edit</Menu.Item>
-        <Menu.Item href="/me/characters">Log off</Menu.Item>
+        <Menu.Item href="/account/characters">Log off</Menu.Item>
         <Back asChild>
           <Menu.Item href="#">Cancel</Menu.Item>
         </Back>

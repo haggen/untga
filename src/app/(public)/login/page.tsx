@@ -34,7 +34,7 @@ export default function Page() {
 
       await setActiveSession(session);
 
-      redirect("/me/characters");
+      redirect("/account/characters");
     }
   );
 

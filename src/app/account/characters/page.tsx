@@ -41,7 +41,7 @@ export default async function Page() {
               href={
                 character
                   ? `/play/${character.id}/stats`
-                  : "/me/characters/create"
+                  : "/account/characters/create"
               }
             >
               {character?.name ?? (

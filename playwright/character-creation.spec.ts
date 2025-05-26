@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 import { authenticatedTest } from "./fixtures";
 
 authenticatedTest("character creation", async ({ page }) => {
-  await page.goto("/me/characters");
+  await page.goto("/account/characters");
 
   await expect(page).toHaveTitle(/Characters/);
 

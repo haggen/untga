@@ -8,11 +8,11 @@ export default async function Layout({ children }: { children: ReactNode }) {
       {children}
 
       <Bar className="bg-[url(/marble.jpg)]">
-        <Tab href="/me/characters" exact={false}>
+        <Tab href="/account/characters" exact={false}>
           <UsersIcon />
           Characters
         </Tab>
-        <Tab href="/me/account">
+        <Tab href="/account/settings">
           <CogIcon />
           Settings
         </Tab>

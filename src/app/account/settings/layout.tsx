@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { Heading } from "~/components/heading";
 
 export const metadata: Metadata = {
-  title: "Account",
+  title: "Settings",
 };
 
 export default function Layout(props: {

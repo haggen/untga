@@ -33,8 +33,8 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
       data: { deletedAt: new Date() },
     });
 
-    revalidatePath("/me/characters");
-    redirect("/me/characters");
+    revalidatePath("/account/characters");
+    redirect("/account/characters");
   });
 
   return (
