@@ -3,13 +3,22 @@ import { redirect } from "next/navigation";
 import { db, Session } from "~/lib/db";
 import { UnauthorizedError } from "~/lib/error";
 
+/**
+ * Session cookie identifier.
+ */
 const cookieId = "session";
 
+/**
+ * Read session secret from cookies.
+ */
 export async function getActiveSessionSecret() {
   const store = await cookies();
   return store.get(cookieId)?.value;
 }
 
+/**
+ * Load a Session instance from the database using the session secret stored in cookies.
+ */
 export async function getActiveSession() {
   const secret = await getActiveSessionSecret();
 
@@ -30,7 +39,6 @@ export async function getActiveSession() {
 
 /**
  * Read active session from cookies or throw.
- *
  * @param recover - Redirect instead of throwing.
  */
 export async function ensureActiveSession(recover = false) {
@@ -58,11 +66,17 @@ export function createCookie(session: Session) {
   } as const;
 }
 
+/**
+ * Store given session secret in cookies.
+ */
 export async function setActiveSession(session: Session) {
   const store = await cookies();
   store.set(createCookie(session));
 }
 
+/**
+ * Delete session cookie.
+ */
 export async function unsetActiveSession() {
   const store = await cookies();
   store.delete(cookieId);
