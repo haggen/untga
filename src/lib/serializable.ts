@@ -16,13 +16,6 @@ export type Serializable<T> = T extends Scalar
   ? { [K in keyof T]: Serializable<T[K]> }
   : never;
 
-function reviver(key: string, value: unknown) {
-  if (value === undefined) {
-    return undefined;
-  }
-  return value;
-}
-
 function replacer(key: string, value: unknown) {
   if (typeof value === "bigint") {
     return value.toString();
@@ -38,5 +31,5 @@ export function serializable<T>(value: T): Serializable<T> {
   if (value === undefined) {
     throw new Error("Cannot serialize undefined value");
   }
-  return JSON.parse(JSON.stringify(value, replacer), reviver);
+  return JSON.parse(JSON.stringify(value, replacer));
 }
