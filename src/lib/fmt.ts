@@ -97,12 +97,15 @@ function datetime(
 function userAgent(userAgent: string) {
   const ua = UAParser(userAgent);
 
-  const browser = ua.browser ?? "unknown browser";
-  const os = ua.os?.name ?? "unknown system";
+  const browser = ua.browser.name ?? "unknown browser";
+  const os = ua.os?.name ? ` (${ua.os?.name})` : "";
 
-  return `${browser} (${os})`;
+  return `${browser}${os}`;
 }
 
+/**
+ * Format a string with case transformations.
+ */
 export function string(string: string, options: StringFormatOptions) {
   if ("lower" in options) {
     return string.toLowerCase();
@@ -119,6 +122,9 @@ export function string(string: string, options: StringFormatOptions) {
   return string;
 }
 
+/**
+ * Format a location's security rating.
+ */
 export function security(security: number) {
   if (security === 100) {
     return "Safe";
@@ -135,6 +141,9 @@ export function security(security: number) {
   return "Lawless";
 }
 
+/**
+ * Format a character's skill level.
+ */
 export function skill(level: number) {
   if (level === 100) {
     return "Master";
@@ -159,6 +168,9 @@ export function skill(level: number) {
   return "Untrained";
 }
 
+/**
+ * Format a character's health level.
+ */
 export function health(level: number) {
   if (level === 100) {
     return "Healthy";
@@ -177,12 +189,15 @@ export function health(level: number) {
   }
 
   if (level > 0) {
-    return "Critical";
+    return "Incapacitated";
   }
 
   return "Unconscious";
 }
 
+/**
+ * Format a character's stamina level.
+ */
 export function stamina(level: number) {
   if (level === 100) {
     return "Rested";
@@ -199,6 +214,9 @@ export function stamina(level: number) {
   return "Exhausted";
 }
 
+/**
+ * Format an item's quality.
+ */
 export function quality(quality: number) {
   if (quality === 100) {
     return "Masterwork";
@@ -219,6 +237,9 @@ export function quality(quality: number) {
   return "Crude";
 }
 
+/**
+ * Format an item's durability level.
+ */
 export function durability(durability: number) {
   if (durability === 100) {
     return "Unused";
@@ -239,6 +260,9 @@ export function durability(durability: number) {
   return "Broken";
 }
 
+/**
+ * Format a location's population level.
+ */
 export function population(population: number) {
   if (population >= 20) {
     return "Bustling";
@@ -255,6 +279,9 @@ export function population(population: number) {
   return "Uninhabited";
 }
 
+/**
+ * Format an item's amount.
+ */
 export function amount(amount: number) {
   if (amount > 0) {
     return "×" + number(amount);
@@ -263,6 +290,9 @@ export function amount(amount: number) {
   return "None";
 }
 
+/**
+ * Format a location's area.
+ */
 export function area(area: number) {
   return number(area, {
     unit: "mile",
@@ -270,10 +300,16 @@ export function area(area: number) {
   });
 }
 
+/**
+ * Format a character's status.
+ */
 export function status(status: string) {
   return string(status, { title: true });
 }
 
+/**
+ * Formatting functions.
+ */
 export const fmt = {
   string,
   number,
