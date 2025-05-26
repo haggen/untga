@@ -61,15 +61,13 @@ export default async function Page({
 
       <section className="flex flex-col gap-2 p-section">
         <Heading size="small" asChild>
-          <h2>Summary</h2>
+          <h1>Summary</h1>
         </Heading>
 
         <Definition.List>
           <Definition.Item label="Name">{protagonist.name}</Definition.Item>
-          <Definition.Item label="Birth">
-            {fmt.datetime(protagonist.createdAt, {
-              dateStyle: "short",
-            })}
+          <Definition.Item label="Age">
+            {fmt.character.age(protagonist.createdAt)}
           </Definition.Item>
           <Definition.Item label="Location">
             {protagonist.location.name}
@@ -88,12 +86,12 @@ export default async function Page({
 
       <section className="flex flex-col gap-2 p-section">
         <Heading size="small" asChild>
-          <h2>Skills</h2>
+          <h1>Skills</h1>
         </Heading>
 
         <Definition.List>
           {skills.map((skill) => (
-            <Definition.Item label={skill.spec.name} key={skill.id}>
+            <Definition.Item key={skill.id} label={skill.spec.name}>
               {fmt.character.skill(skill.level)}
             </Definition.Item>
           ))}

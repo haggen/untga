@@ -1,6 +1,6 @@
 import { HTMLAttributes, ReactNode } from "react";
 import { tv } from "tailwind-variants";
-import { Command } from "~/components/command";
+import { Clickable } from "~/components/clickable";
 import { StatelessAction } from "~/lib/actions";
 
 const styles = tv({
@@ -20,9 +20,9 @@ export function Item({ href, action, className, ...props }: Props) {
   if (href) {
     return (
       <li>
-        <Command href={href} className={styles({ className })}>
+        <Clickable href={href} className={styles({ className })} {...props}>
           {props.children}
-        </Command>
+        </Clickable>
       </li>
     );
   }
@@ -30,9 +30,9 @@ export function Item({ href, action, className, ...props }: Props) {
   if (action) {
     return (
       <li>
-        <Command action={action} className={styles({ className })}>
+        <Clickable action={action} className={styles({ className })} {...props}>
           {props.children}
-        </Command>
+        </Clickable>
       </li>
     );
   }

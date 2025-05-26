@@ -1,7 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { MouseEvent } from "react";
 import { alert } from "~/components/alert";
-import { Back } from "~/components/back";
 import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Character, Item, WithSlots, WithSpec, WithStorage } from "~/lib/db";
@@ -29,9 +30,16 @@ export function Form(
   }>
 ) {
   const { action, state } = useStatefulActionState(props.action);
+  const router = useRouter();
+
   const data = {
     itemId: props.item.id,
     characterId: props.protagonist.id,
+  };
+
+  const back = (event: MouseEvent) => {
+    event.preventDefault();
+    router.back();
   };
 
   return (
@@ -56,9 +64,9 @@ export function Form(
         <Menu.Item action={action.bind(null, { ...data, action: "discard" })}>
           Discard
         </Menu.Item>
-        <Back asChild>
-          <Menu.Item href="#">Cancel</Menu.Item>
-        </Back>
+        <Menu.Item href="#" onClick={back}>
+          Cancel
+        </Menu.Item>
       </Menu.List>
     </form>
   );

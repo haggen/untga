@@ -1,10 +1,10 @@
 import { Metadata } from "next";
+import { Fragment } from "react";
 import { Back } from "~/components/back";
-import * as Definition from "~/components/definition";
+import { Summary } from "~/components/character/summary";
 import { Heading } from "~/components/heading";
 import * as Menu from "~/components/menu";
 import { db } from "~/lib/db";
-import { fmt } from "~/lib/fmt";
 import { parse, schemas } from "~/lib/validation";
 
 export async function generateMetadata({
@@ -22,28 +22,6 @@ export async function generateMetadata({
   });
 
   return { title: character.name };
-}
-
-function Actions({
-  characterId,
-  protagonistId,
-}: {
-  characterId: number;
-  protagonistId: number;
-}) {
-  if (characterId === protagonistId) {
-    return (
-      <Menu.List>
-        <Menu.Item href={`/play/${characterId}/edit`}>Edit</Menu.Item>
-        <Menu.Item href="/account/characters">Log off</Menu.Item>
-        <Back asChild>
-          <Menu.Item href="#">Cancel</Menu.Item>
-        </Back>
-      </Menu.List>
-    );
-  }
-
-  return null;
 }
 
 export default async function Page({ params }: { params: Promise<unknown> }) {
@@ -66,25 +44,21 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           <h1>{character.name}</h1>
         </Heading>
 
-        <p>{character.description || "No description available."}</p>
-
-        <Definition.List>
-          <Definition.Item label="Birth">
-            {fmt.datetime(character.createdAt, {
-              dateStyle: "short",
-            })}
-          </Definition.Item>
-          <Definition.Item label="Location">
-            {character.location.name}
-          </Definition.Item>
-          <Definition.Item label="Status">
-            {fmt.string(character.status, { title: true })}
-          </Definition.Item>
-        </Definition.List>
+        <Summary character={character} />
       </header>
 
       <div className="p-section">
-        <Actions characterId={characterId} protagonistId={protagonistId} />
+        <Menu.List>
+          {protagonistId === characterId ? (
+            <Fragment>
+              <Menu.Item href={`/play/${characterId}/edit`}>Edit</Menu.Item>
+              <Menu.Item href="/account/characters">Log off</Menu.Item>
+            </Fragment>
+          ) : null}
+          <Back asChild>
+            <Menu.Item href="#">Cancel</Menu.Item>
+          </Back>
+        </Menu.List>
       </div>
     </div>
   );

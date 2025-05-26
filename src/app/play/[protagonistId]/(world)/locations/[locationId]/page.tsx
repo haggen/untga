@@ -1,11 +1,10 @@
 import { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
+import { Summary } from "~/components/location/summary";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
-import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
@@ -52,11 +51,11 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     async ({
       action,
       characterId,
-      destinationId,
+      locationId,
     }: {
       action: string;
       characterId: number;
-      destinationId: number;
+      locationId: number;
     }) => {
       "use server";
 
@@ -71,7 +70,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           await db.character.travel({
             data: {
               characterId,
-              destinationId,
+              destinationId: locationId,
             },
           });
           break;
@@ -91,19 +90,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           <h1>{location.name}</h1>
         </Heading>
 
-        <p>{location.description || "No description available."}</p>
-
-        <Definition.List>
-          <Definition.Item label="Security">
-            {fmt.location.security(location.security)}
-          </Definition.Item>
-          <Definition.Item label="Area">
-            {fmt.location.area(location.area)}
-          </Definition.Item>
-          <Definition.Item label="Population">
-            {fmt.location.population(location._count.characters)}
-          </Definition.Item>
-        </Definition.List>
+        <Summary location={location} />
       </div>
 
       <Form action={action} protagonistId={protagonistId} location={location} />

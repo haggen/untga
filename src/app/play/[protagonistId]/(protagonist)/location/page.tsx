@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge } from "~/components/badge";
 import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
+import { Summary } from "~/components/location/summary";
 import { Header } from "~/components/protagonist/header";
 import { db } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
@@ -93,26 +94,7 @@ export default async function Page({
             </Heading>
           </hgroup>
 
-          <p>{route.description || "No description available."}</p>
-
-          <Definition.List>
-            <Definition.Item label="Security">
-              {fmt.location.security(route.security)}
-            </Definition.Item>
-            <Definition.Item label="Area">
-              {fmt.number(route.area, {
-                unit: "mile",
-                style: "unit",
-              })}
-            </Definition.Item>
-            <Definition.Item label="Population">
-              {fmt.plural(route._count.characters, {
-                one: "# person",
-                other: "# people",
-                zero: "Empty",
-              })}
-            </Definition.Item>
-          </Definition.List>
+          <Summary location={route} />
 
           <Definition.List>
             {route.destinations
@@ -123,12 +105,7 @@ export default async function Page({
                   key={destination.id}
                 >
                   <Definition.Item label={destination.name}>
-                    <p>
-                      {fmt.number(destination.area, {
-                        unit: "mile",
-                        style: "unit",
-                      })}
-                    </p>
+                    {fmt.location.area(destination.area)}
                   </Definition.Item>
                 </Link>
               ))}
@@ -143,9 +120,14 @@ export default async function Page({
 
         <Definition.List>
           {characters.map((character) => (
-            <Definition.Item key={character.id} label={character.name}>
-              <p>{fmt.string(character.status, { title: true })}</p>
-            </Definition.Item>
+            <Link
+              key={character.id}
+              href={`/play/${protagonistId}/characters/${character.id}`}
+            >
+              <Definition.Item label={character.name}>
+                {fmt.character.status(character.status)}
+              </Definition.Item>
+            </Link>
           ))}
         </Definition.List>
       </section>
