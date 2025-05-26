@@ -129,6 +129,10 @@ export type WithStorage = {
   include: { items: WithSpec & { include: { storage: WithItems } } };
 };
 
+export type WithPopulation = {
+  include: { _count: { select: { characters: true } } };
+};
+
 const defaultSessionDuration = { day: 1 };
 
 const opts = {
