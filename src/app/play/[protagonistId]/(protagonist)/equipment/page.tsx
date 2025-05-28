@@ -7,7 +7,7 @@ import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
-import { tags } from "~/lib/tags";
+import { tag } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
 
 export const metadata: Metadata = {
@@ -54,14 +54,14 @@ export default async function Page({
   });
 
   const slots = [
-    tags.Head,
-    tags.Overgarment,
-    tags.Torso,
-    tags.Waist,
-    tags.Hands,
-    tags.Legs,
-    tags.Feet,
-    tags.Pack,
+    tag.Head,
+    tag.Overgarment,
+    tag.Torso,
+    tag.Waist,
+    tag.Hands,
+    tag.Legs,
+    tag.Feet,
+    tag.Pack,
   ].map((tag) =>
     ensure(
       containers.find((container) => container.tags.includes(tag)),
@@ -70,7 +70,7 @@ export default async function Page({
   );
 
   const storage = containers.filter((container) =>
-    container.items.some((item) => item.spec.tags.includes(tags.Storage))
+    container.items.some((item) => item.spec.tags.includes(tag.Storage))
   );
 
   return (

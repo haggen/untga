@@ -1,4 +1,4 @@
-export const tags = {
+export const tag = {
   Craftable: "craftable",
   Breakable: "breakable",
   /** Combat skill. */
@@ -95,23 +95,23 @@ export function replace(
 
 export function getCharacterStatus(character: { tags: string[] }) {
   return (
-    [tags.Dead, tags.Idle, tags.Resting, tags.Travelling, tags.Healing].find(
-      (tag) => character.tags.includes(tag)
-    ) ?? tags.Unknown
+    [tag.Dead, tag.Idle, tag.Resting, tag.Travelling, tag.Healing].find((tag) =>
+      character.tags.includes(tag)
+    ) ?? tag.Unknown
   );
 }
 
 export function getSlotType(thing: { tags: string[] }) {
   return (
     [
-      tags.Head,
-      tags.Overgarment,
-      tags.Torso,
-      tags.Waist,
-      tags.Hands,
-      tags.Legs,
-      tags.Feet,
-      tags.Pack,
-    ].find((tag) => thing.tags.includes(tag)) ?? tags.Unknown
+      tag.Head,
+      tag.Overgarment,
+      tag.Torso,
+      tag.Waist,
+      tag.Hands,
+      tag.Legs,
+      tag.Feet,
+      tag.Pack,
+    ].find((tag) => thing.tags.includes(tag)) ?? tag.Unknown
   );
 }

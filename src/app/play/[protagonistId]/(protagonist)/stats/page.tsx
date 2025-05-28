@@ -6,7 +6,7 @@ import { db } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
-import { tags } from "~/lib/tags";
+import { tag } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
 
 export const metadata: Metadata = {
@@ -39,20 +39,20 @@ export default async function Page({
 
   const health = ensure(
     protagonist.attributes.find((attribute) =>
-      attribute.spec.tags.includes(tags.Health)
+      attribute.spec.tags.includes(tag.Health)
     ),
     "Could not find an attribute tagged as health."
   );
 
   const stamina = ensure(
     protagonist.attributes.find((attribute) =>
-      attribute.spec.tags.includes(tags.Stamina)
+      attribute.spec.tags.includes(tag.Stamina)
     ),
     "Could not find an attribute tagged as stamina."
   );
 
   const skills = protagonist.attributes.filter((attribute) =>
-    attribute.spec.tags.includes(tags.Skill)
+    attribute.spec.tags.includes(tag.Skill)
   );
 
   return (

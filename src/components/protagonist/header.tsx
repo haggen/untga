@@ -5,18 +5,18 @@ import { Link } from "~/components/link";
 import { Character, WithAttributes, WithLocation } from "~/lib/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";
-import { tags } from "~/lib/tags";
+import { tag } from "~/lib/tags";
 
 export function Header({
   character,
 }: Readonly<{ character: Character<WithAttributes & WithLocation> }>) {
   const health = ensure(
-    character.attributes.find(({ spec }) => spec.tags.includes(tags.Health)),
+    character.attributes.find(({ spec }) => spec.tags.includes(tag.Health)),
     "Can't find health attribute."
   );
 
   const stamina = ensure(
-    character.attributes.find(({ spec }) => spec.tags.includes(tags.Stamina)),
+    character.attributes.find(({ spec }) => spec.tags.includes(tag.Stamina)),
     "Can't find stamina attribute."
   );
 

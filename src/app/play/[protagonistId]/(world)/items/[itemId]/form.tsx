@@ -7,7 +7,7 @@ import * as Menu from "~/components/menu";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Character, Item, WithSlots, WithSpec, WithStorage } from "~/lib/db";
 import { Serializable } from "~/lib/serializable";
-import { tags } from "~/lib/tags";
+import { tag } from "~/lib/tags";
 import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 
 function isEquipped(
@@ -51,12 +51,12 @@ export function Form(
           <Menu.Item action={action.bind(null, { ...data, action: "unequip" })}>
             Take off
           </Menu.Item>
-        ) : props.item.spec.tags.includes(tags.Equipment) ? (
+        ) : props.item.spec.tags.includes(tag.Equipment) ? (
           <Menu.Item action={action.bind(null, { ...data, action: "equip" })}>
             Equip
           </Menu.Item>
         ) : null}
-        {props.item.spec.tags.includes(tags.Utility) ? (
+        {props.item.spec.tags.includes(tag.Utility) ? (
           <Menu.Item action={action.bind(null, { ...data, action: "use" })}>
             Use
           </Menu.Item>

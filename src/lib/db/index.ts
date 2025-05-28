@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
 import { applyDataMod } from "~/lib/db/apply-data-mod";
 import { ensure } from "~/lib/ensure";
 import { isIndexable } from "~/lib/is-indexable";
-import { getCharacterStatus, getSlotType, tags } from "~/lib/tags";
+import { getCharacterStatus, getSlotType, tag } from "~/lib/tags";
 
 export { Prisma };
 
@@ -242,7 +242,7 @@ const ext = Prisma.defineExtension((client) => {
           data: { name: string; description?: string; userId: number };
         }) {
           const location = await db.location.findFirstOrThrow({
-            where: { tags: { has: tags.Starting } },
+            where: { tags: { has: tag.Starting } },
           });
 
           const character = await db.character.create({
@@ -250,7 +250,7 @@ const ext = Prisma.defineExtension((client) => {
               name: data.name,
               description: data.description,
               user: { connect: { id: data.userId } },
-              tags: [tags.Player, tags.Idle],
+              tags: [tag.Player, tag.Idle],
               location: { connect: { id: location.id } },
             },
           });
@@ -264,7 +264,7 @@ const ext = Prisma.defineExtension((client) => {
 
           const attributes = await db.attributeSpecification.findMany({
             where: {
-              tags: { has: tags.Starting },
+              tags: { has: tag.Starting },
             },
           });
 
@@ -273,69 +273,69 @@ const ext = Prisma.defineExtension((client) => {
               data: {
                 character: { connect: { id: character.id } },
                 spec: { connect: { id: spec.id } },
-                level: spec.tags.includes(tags.Resource) ? 1 : 0,
+                level: spec.tags.includes(tag.Resource) ? 100 : 0,
               },
             });
           }
 
           const slots = {
-            [tags.Head]: await db.container.create({
+            [tag.Head]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Head],
+                tags: [tag.Slot, tag.Head],
               },
             }),
-            [tags.Overgarment]: await db.container.create({
+            [tag.Overgarment]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Overgarment],
+                tags: [tag.Slot, tag.Overgarment],
               },
             }),
-            [tags.Torso]: await db.container.create({
+            [tag.Torso]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Torso],
+                tags: [tag.Slot, tag.Torso],
               },
             }),
-            [tags.Waist]: await db.container.create({
+            [tag.Waist]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Waist],
+                tags: [tag.Slot, tag.Waist],
               },
             }),
-            [tags.Hands]: await db.container.create({
+            [tag.Hands]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Hands],
+                tags: [tag.Slot, tag.Hands],
               },
             }),
-            [tags.Legs]: await db.container.create({
+            [tag.Legs]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Legs],
+                tags: [tag.Slot, tag.Legs],
               },
             }),
-            [tags.Feet]: await db.container.create({
+            [tag.Feet]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Feet],
+                tags: [tag.Slot, tag.Feet],
               },
             }),
-            [tags.Pack]: await db.container.create({
+            [tag.Pack]: await db.container.create({
               data: {
                 character: { connect: { id: character.id } },
-                tags: [tags.Slot, tags.Pack],
+                tags: [tag.Slot, tag.Pack],
               },
             }),
           };
 
           await db.item.create({
             data: {
-              container: { connect: { id: slots[tags.Torso].id } },
+              container: { connect: { id: slots[tag.Torso].id } },
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Equipment, tags.Torso)
+                    .findOneByTags(tag.Starting, tag.Equipment, tag.Torso)
                     .then(({ id }) => id),
                 },
               },
@@ -344,11 +344,11 @@ const ext = Prisma.defineExtension((client) => {
 
           await db.item.create({
             data: {
-              container: { connect: { id: slots[tags.Legs].id } },
+              container: { connect: { id: slots[tag.Legs].id } },
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Equipment, tags.Legs)
+                    .findOneByTags(tag.Starting, tag.Equipment, tag.Legs)
                     .then(({ id }) => id),
                 },
               },
@@ -357,11 +357,11 @@ const ext = Prisma.defineExtension((client) => {
 
           await db.item.create({
             data: {
-              container: { connect: { id: slots[tags.Feet].id } },
+              container: { connect: { id: slots[tag.Feet].id } },
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Equipment, tags.Feet)
+                    .findOneByTags(tag.Starting, tag.Equipment, tag.Feet)
                     .then(({ id }) => id),
                 },
               },
@@ -370,11 +370,11 @@ const ext = Prisma.defineExtension((client) => {
 
           const pack = await db.item.create({
             data: {
-              container: { connect: { id: slots[tags.Pack].id } },
+              container: { connect: { id: slots[tag.Pack].id } },
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Equipment, tags.Pack)
+                    .findOneByTags(tag.Starting, tag.Equipment, tag.Pack)
                     .then(({ id }) => id),
                 },
               },
@@ -384,7 +384,7 @@ const ext = Prisma.defineExtension((client) => {
           const storage = await db.container.create({
             data: {
               source: { connect: { id: pack.id } },
-              tags: [tags.Storage],
+              tags: [tag.Storage],
             },
           });
 
@@ -394,11 +394,11 @@ const ext = Prisma.defineExtension((client) => {
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Currency)
+                    .findOneByTags(tag.Starting, tag.Currency)
                     .then(({ id }) => id),
                 },
               },
-              amount: 100,
+              amount: 10,
             },
           });
 
@@ -408,7 +408,7 @@ const ext = Prisma.defineExtension((client) => {
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Utility, tags.Resting)
+                    .findOneByTags(tag.Starting, tag.Utility, tag.Resting)
                     .then(({ id }) => id),
                 },
               },
@@ -421,7 +421,7 @@ const ext = Prisma.defineExtension((client) => {
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Food)
+                    .findOneByTags(tag.Starting, tag.Food)
                     .then(({ id }) => id),
                 },
               },
@@ -435,7 +435,7 @@ const ext = Prisma.defineExtension((client) => {
               spec: {
                 connect: {
                   id: await db.itemSpecification
-                    .findOneByTags(tags.Starting, tags.Weapon)
+                    .findOneByTags(tag.Starting, tag.Weapon)
                     .then(({ id }) => id),
                 },
               },
@@ -498,7 +498,7 @@ const ext = Prisma.defineExtension((client) => {
               );
             });
 
-          if (character.status !== tags.Idle) {
+          if (character.status !== tag.Idle) {
             throw new Error(`The character is busy (${character.status}).`);
           }
 
@@ -513,22 +513,22 @@ const ext = Prisma.defineExtension((client) => {
               });
             });
 
-          if (!item.spec.tags.includes(tags.Resting)) {
+          if (!item.spec.tags.includes(tag.Resting)) {
             throw new Error(`You can only rest with resting items.`);
           }
 
           await db.attribute.updateMany({
             where: {
               character: { id: data.characterId },
-              spec: { tags: { has: tags.Stamina } },
+              spec: { tags: { has: tag.Stamina } },
             },
-            data: { level: 1 },
+            data: { level: 100 },
           });
 
           await db.log.create({
             data: {
               character: { connect: { id: data.characterId } },
-              message: `I have rested.`,
+              message: `I have rested for the day.`,
             },
           });
         },
@@ -571,27 +571,30 @@ const ext = Prisma.defineExtension((client) => {
               );
             });
 
-          ensure(
-            character.location.routes.some((route) =>
-              route.destinations.some(
-                (location) => location.id === destination.id
-              )
-            ),
-            `Destination ${destination.name} is not reachable from ${character.location.name}.`
+          const route = character.location.routes.find((route) =>
+            route.destinations.some(
+              (location) => location.id === destination.id
+            )
           );
 
-          if (character.status !== tags.Idle) {
+          if (!route) {
+            throw new Error(
+              `Destination ${destination.name} is not reachable from ${character.location.name}.`
+            );
+          }
+
+          if (character.status !== tag.Idle) {
             throw new Error(`The character is busy (${character.status}).`);
           }
 
           const stamina = ensure(
             character.attributes.find((attribute) =>
-              attribute.spec.tags.includes(tags.Stamina)
+              attribute.spec.tags.includes(tag.Stamina)
             ),
             "Stamina attribute not found."
           );
 
-          const cost = 0.1;
+          const cost = Math.min(destination.area + route.area, 100);
 
           if (stamina.level < cost) {
             throw new Error("Not enough stamina to travel.");
@@ -646,8 +649,8 @@ const ext = Prisma.defineExtension((client) => {
               });
             });
 
-          if (!item.spec.tags.includes(tags.Equipment)) {
-            throw new Error(`You can only equip equipment items.`);
+          if (!item.spec.tags.includes(tag.Equipment)) {
+            throw new Error(`You can't equip that.`);
           }
 
           const slot = await db.container
@@ -699,7 +702,7 @@ const ext = Prisma.defineExtension((client) => {
                 source: {
                   container: {
                     character: { id: data.characterId },
-                    tags: { hasEvery: [tags.Slot, tags.Pack] },
+                    tags: { hasEvery: [tag.Slot, tag.Pack] },
                   },
                 },
               },
@@ -741,12 +744,12 @@ const ext = Prisma.defineExtension((client) => {
               });
             });
 
-          if (!item.spec.tags.includes(tags.Utility)) {
+          if (!item.spec.tags.includes(tag.Utility)) {
             throw new Error(`You can only use utility items.`);
           }
 
           switch (true) {
-            case item.spec.tags.includes(tags.Resting):
+            case item.spec.tags.includes(tag.Resting):
               await db.character.rest({ data });
               break;
             default:
@@ -769,7 +772,7 @@ const ext = Prisma.defineExtension((client) => {
               });
             });
 
-          if (item.container?.tags.includes(tags.Slot)) {
+          if (item.container?.tags.includes(tag.Slot)) {
             throw new Error(`You can't discard an equipped item.`);
           }
 
@@ -890,7 +893,7 @@ const ext = Prisma.defineExtension((client) => {
         slot: {
           needs: { tags: true },
           compute(container) {
-            if (!container.tags.includes(tags.Slot)) {
+            if (!container.tags.includes(tag.Slot)) {
               return null;
             }
             return getSlotType(container);

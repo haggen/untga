@@ -8,7 +8,7 @@ import { db } from "~/lib/db";
 import { fmt } from "~/lib/fmt";
 import { serializable } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
-import { tags } from "~/lib/tags";
+import { tag } from "~/lib/tags";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
@@ -134,17 +134,17 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         <p>{item.spec.description}</p>
 
         <Definition.List>
-          {item.spec.tags.includes(tags.Craftable) ? (
+          {item.spec.tags.includes(tag.Craftable) ? (
             <Definition.Item label="Quality">
               {fmt.item.quality(item.spec.quality)}
             </Definition.Item>
           ) : null}
-          {item.spec.tags.includes(tags.Breakable) ? (
+          {item.spec.tags.includes(tag.Breakable) ? (
             <Definition.Item label="Durability">
               {fmt.item.durability(item.durability)}
             </Definition.Item>
           ) : null}
-          {item.spec.tags.includes(tags.Stackable) ? (
+          {item.spec.tags.includes(tag.Stackable) ? (
             <Definition.Item label="Amount">
               {fmt.item.amount(item.amount)}
             </Definition.Item>
