@@ -35,7 +35,10 @@ export class NotFoundError extends HttpError {
   }
 }
 
-export function toJSON(err: Error): Record<string, unknown> {
+/**
+ * Serialize an error object to JSON.
+ */
+export function toJSON(err: Error): object {
   return {
     name: err.name,
     message: err.message,
