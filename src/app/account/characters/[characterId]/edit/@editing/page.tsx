@@ -8,20 +8,20 @@ import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
 export default async function Page({ params }: { params: Promise<unknown> }) {
-  const { protagonistId } = parse(await params, {
-    protagonistId: schemas.id,
+  const { characterId } = parse(await params, {
+    characterId: schemas.id,
   });
 
   const session = await ensureActiveSession(true);
 
-  const protagonist = await db.character.findUniqueOrThrow({
-    where: { id: protagonistId, userId: session.userId },
+  const character = await db.character.findUniqueOrThrow({
+    where: { id: characterId, userId: session.userId },
   });
 
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
-    const session = await ensureActiveSession(true);
+    const session = await ensureActiveSession();
 
     const data = parse(payload, {
       characterId: schemas.id,
@@ -33,7 +33,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
       data: { description: data.description },
     });
 
-    revalidatePath("/play/[protagonistId]/(protagonist)/edit/@editing");
+    revalidatePath("/play/[characterId]/(protagonist)/edit/@editing");
 
     return { message: "Character updated successfully." };
   });
@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         </p>
       </header>
 
-      <Form action={action} value={serializable(protagonist)} />
+      <Form action={action} value={serializable(character)} />
     </section>
   );
 }

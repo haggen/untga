@@ -1,9 +1,4 @@
-import { Metadata } from "next";
 import { ReactNode } from "react";
-
-export const metadata: Metadata = {
-  title: "Editing character",
-};
 
 export default function Layout(props: {
   editing: ReactNode;

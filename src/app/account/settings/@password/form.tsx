@@ -31,7 +31,7 @@ export function Form<T extends ActionState>(props: {
 
       <footer className="flex justify-end">
         <Button type="submit" size="default" disabled={pending}>
-          {pending ? "Wait..." : "Change my password"}
+          Change my password
         </Button>
       </footer>
     </form>

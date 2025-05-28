@@ -32,7 +32,7 @@ export function Form<T extends ActionState>(props: {
 
       <footer className="flex justify-end">
         <Button type="submit" size="default" disabled={pending}>
-          {pending ? "Wait..." : "Recover access"}
+          Recover access
         </Button>
       </footer>
     </form>

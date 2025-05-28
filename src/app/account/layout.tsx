@@ -2,7 +2,7 @@ import { CogIcon, UsersIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { Bar, Tab } from "~/components/tab";
 
-export default async function Layout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="grow flex flex-col bg-[url(/limestone.jpg)]">
       {children}

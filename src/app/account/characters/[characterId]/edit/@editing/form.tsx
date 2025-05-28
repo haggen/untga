@@ -48,7 +48,7 @@ export function Form<T extends ActionState>(props: {
 
       <footer className="flex items-center justify-end gap-2">
         <Button type="submit" size="default" disabled={pending}>
-          {pending ? "Wait..." : "Update character"}
+          Update character
         </Button>
       </footer>
     </form>

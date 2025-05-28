@@ -29,8 +29,8 @@ export function Form<T extends ActionState>(props: {
       </Field>
 
       <footer className="flex justify-end">
-        <Button type="submit" size="default" disabled={pending}>
-          {pending ? "Wait..." : "Change my e-mail"}
+        <Button type="submit" disabled={pending}>
+          Change my e-mail
         </Button>
       </footer>
     </form>

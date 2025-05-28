@@ -28,7 +28,10 @@ export function Header({
         </Heading>
 
         <Button variant="alternate" size="small" asChild>
-          <Link href={`/play/${character.id}/characters/${character.id}`}>
+          <Link
+            href={`/play/${character.id}/characters/${character.id}`}
+            aria-label="Character menu"
+          >
             <EllipsisIcon />
           </Link>
         </Button>

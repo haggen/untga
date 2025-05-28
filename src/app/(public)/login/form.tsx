@@ -37,7 +37,7 @@ export function Form(props: { action: StatefulAction<FormData, ActionState> }) {
 
       <footer className="flex justify-end">
         <Button type="submit" size="default" disabled={pending}>
-          {pending ? "Wait..." : "Log in"}
+          Log in
         </Button>
       </footer>
     </form>

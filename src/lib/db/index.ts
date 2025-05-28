@@ -148,18 +148,16 @@ const ext = Prisma.defineExtension((client) => {
          * Create new session by validating given credentials.
          */
         async createByCredentials({
-          data,
+          data: { email, password, ...data },
         }: {
-          data: {
+          data: Omit<Prisma.SessionCreateInput, "user"> & {
             email: string;
             password: string;
-            userAgent: string;
-            ip: string;
           };
         }) {
           const user = await db.user
             .findUniqueOrThrow({
-              where: { email: data.email },
+              where: { email },
             })
             .catch((cause) => {
               throw new Error("E-mail not found.", { cause });
@@ -167,18 +165,14 @@ const ext = Prisma.defineExtension((client) => {
 
           if (
             await bcrypt
-              .compare(data.password, user.password)
+              .compare(password, user.password)
               .then((match) => !match)
           ) {
             throw new Error("Password doesn't match.");
           }
 
           return db.session.create({
-            data: {
-              user: { connect: { id: user.id } },
-              ip: data.ip,
-              userAgent: data.userAgent,
-            },
+            data: { ...data, user: { connect: { id: user.id } } },
           });
         },
 

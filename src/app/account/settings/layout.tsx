@@ -1,20 +1,18 @@
-import { Metadata } from "next";
 import { ReactNode } from "react";
 import { Heading } from "~/components/heading";
 
-export const metadata: Metadata = {
-  title: "Settings",
-};
-
-export default function Layout(props: {
+type Props = Readonly<{
   sessions: ReactNode;
   email: ReactNode;
   password: ReactNode;
   quit: ReactNode;
-}) {
+  children: ReactNode;
+}>;
+
+export default function Layout(props: Props) {
   return (
     <div className="grow flex flex-col">
-      <header className="flex flex-col p-section">
+      <header className="flex flex-col p-section gap-text">
         <Heading size="large" asChild>
           <h1>Settings</h1>
         </Heading>

@@ -5,7 +5,7 @@ generator client {
   // Prisma is deprecating automatic generation in node_modules
   // and instead requiring the developer to specify the output 
   // directory. But while trying out Prismock, I found that 
-  // they still rely on the old behavior. Se I'm holding out 
+  // they still rely on the old behavior. So I'm holding out 
   // on this change.
   // output   = "./client"
 }
@@ -15,22 +15,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// User of the system.
+/// Users of the system.
 model User {
-  /// The primary key.
+  /// User's primary key.
   id        Int       @id @default(autoincrement())
-  /// When it was created.
+  /// When the user was created.
   createdAt DateTime  @default(now())
-  /// When it was last updated.
+  /// When the user was last updated.
   updatedAt DateTime  @updatedAt
-  /// When it was deleted.
+  /// When the user was deleted.
   deletedAt DateTime?
-  /// User's email.
+  /// User's email address.
   email     String    @unique
-  /// Password hash
+  /// User's password hash.
   password  String
 
-  /// User's sessions.
+  /// Sessions belonging to the user.
   sessions   Session[]
   /// Characters created by the user.
   characters Character[]
@@ -38,18 +38,20 @@ model User {
 
 /// Authentication sessions.
 model Session {
-  /// The primary key.
-  id        Int      @id @default(autoincrement())
-  /// The session's secret key.
-  secret    String   @unique @default(cuid())
-  /// When it was created.
-  createdAt DateTime @default(now())
-  /// When it expires.
-  expiresAt DateTime @default(now()) // We compute the actual default value in a client extension. This only exists to make the input optional.
-  /// The remote address of the client that created the session.
-  ip        String
-  /// The user agent that created the session.
-  userAgent String
+  /// Session's primary key.
+  id          Int      @id @default(autoincrement())
+  /// Session's secret token.
+  secret      String   @unique @default(cuid())
+  /// When the session was created.
+  createdAt   DateTime @default(now())
+  /// When the session expires.
+  expiresAt   DateTime @default(now())
+  /// IP address of the client that created the session.
+  ip          String
+  /// User agent of the client that created the session.
+  userAgent   String
+  /// Geolocation of the client that created the session.
+  geolocation String   @default("unknown region")
 
   /// User to whom the session belongs.
   userId Int
@@ -61,53 +63,53 @@ model Session {
 
 /// Characters in the world, player controlled or otherwise.
 model Character {
-  /// The primary key.
+  /// Character's primary key.
   id          Int       @id @default(autoincrement())
-  /// When it was created.
+  /// When the character was created.
   createdAt   DateTime  @default(now())
-  /// When it was last updated.
+  /// When the character was last updated.
   updatedAt   DateTime  @updatedAt
-  /// When it was deleted.
+  /// When the character was deleted.
   deletedAt   DateTime?
-  /// The name of the character.
+  /// Character's name.
   name        String    @unique
-  /// Character's bio.
+  /// Character's description.
   description String?
-  /// User tags.
+  /// Character tags.
   tags        String[]
 
-  /// The user to whom the character belongs.
+  /// User to whom the character belongs.
   userId     Int?
-  /// The user to whom the character belongs.
+  /// User to whom the character belongs.
   user       User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
-  /// The current location of the character.
+  /// Current location of the character.
   locationId Int
-  /// The current location of the character.
+  /// Current location of the character.
   location   Location    @relation(fields: [locationId], references: [id], onDelete: Restrict)
-  /// The character's equipment slots.
+  /// Character's equipment slots.
   slots      Container[]
-  /// The character's attributes.
+  /// Character's attributes.
   attributes Attribute[]
-  /// The character's log entries.
+  /// Character's log entries.
   logs       Log[]
-  // The character's actions.
+  /// Character's actions.
   actions    Action[]
 
   @@index(tags)
   @@index(deletedAt)
 }
 
-/// Static information of attributes.
+/// Static information about attributes.
 model AttributeSpecification {
-  /// The primary key.
+  /// Attribute specification's primary key.
   id          Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the specification was created.
   createdAt   DateTime @default(now())
-  /// When it was last updated.
+  /// When the specification was last updated.
   updatedAt   DateTime @updatedAt
   /// Attribute's name.
   name        String   @unique
-  /// Human-readable description.
+  /// Attribute's human-readable description.
   description String?
   /// Attribute tags.
   tags        String[]
@@ -120,11 +122,11 @@ model AttributeSpecification {
 
 /// Attributes are outcome modifiers.
 model Attribute {
-  /// The primary key.
+  /// Attribute's primary key.
   id        Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the attribute was created.
   createdAt DateTime @default(now())
-  /// When it was last updated.
+  /// When the attribute was last updated.
   updatedAt DateTime @updatedAt
   /// Attribute's current level.
   level     Int      @default(0)
@@ -135,17 +137,17 @@ model Attribute {
   specId      Int
   /// Attribute's specification.
   spec        AttributeSpecification @relation(fields: [specId], references: [id], onDelete: Restrict)
-  /// The character this attribute belongs to.
+  /// Character this attribute belongs to.
   characterId Int
-  /// The character this attribute belongs to.
+  /// Character this attribute belongs to.
   character   Character              @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
 /// Actions performed by characters, such as traveling, crafting, etc.
 model Action {
-  /// The primary key.
+  /// Action's primary key.
   id          Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the action was created.
   createdAt   DateTime @default(now())
   /// When the action completes.
   completesAt DateTime
@@ -154,9 +156,9 @@ model Action {
   /// Action parameters.
   params      Json
 
-  /// The character performing the action.
+  /// Character performing the action.
   characterId Int
-  /// The character performing the action.
+  /// Character performing the action.
   character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 
   @@index(tags)
@@ -164,68 +166,68 @@ model Action {
 
 /// Logs are events involving a character.
 model Log {
-  /// The primary key.
+  /// Log entry's primary key.
   id        Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the log entry was created.
   createdAt DateTime @default(now())
-  /// The entry's message.
+  /// Log entry's message.
   message   String
 
-  /// The character that created the log entry.
+  /// Character that created the log entry.
   characterId Int
-  /// The character that created the log entry.
+  /// Character that created the log entry.
   character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
 /// Containers are item holders, such as bags, chests, character slots, etc.
 model Container {
-  /// The primary key.
+  /// Container's primary key.
   id        Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the container was created.
   createdAt DateTime @default(now())
-  /// When it was last updated.
+  /// When the container was last updated.
   updatedAt DateTime @updatedAt
   /// Container tags.
   tags      String[]
 
-  /// If the container is provided by an item, Item source of the container.
+  /// Item source of the container (if provided by an item).
   sourceId    Int?       @unique
   /// Item source of the container.
   source      Item?      @relation("storage", fields: [sourceId], references: [id], onDelete: Restrict)
-  /// Owner of the container.
+  /// Container's owner.
   characterId Int?
-  /// Owner of the container.
+  /// Container's owner.
   character   Character? @relation(fields: [characterId], references: [id], onDelete: Restrict)
   /// Container's location.
   locationId  Int?
   /// Container's location.
   location    Location?  @relation(fields: [locationId], references: [id], onDelete: Restrict)
-  /// Contents of the container.
+  /// Container's contents.
   items       Item[]
 
   @@index(tags)
 }
 
-/// Specifies item's properties and behavior.
+/// Specifications for item properties and behavior.
 model ItemSpecification {
-  /// The primary key.
+  /// Item specification's primary key.
   id          Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the specification was created.
   createdAt   DateTime @default(now())
-  /// When it was last updated.
+  /// When the specification was last updated.
   updatedAt   DateTime @updatedAt
-  /// Name of the item.
+  /// Item's name.
   name        String   @unique
-  /// Human-readable description.
+  /// Item's human-readable description.
   description String?
-  /// The item's base value.
+  /// Item's base value.
   value       Int      @default(0)
-  /// The item's quality.
+  /// Item's quality.
   quality     Int      @default(100)
   /// Item tags.
   tags        String[]
 
-  /// Items it specifies.
+  /// Items specified by this specification.
   items Item[]
 
   @@index(tags)
@@ -233,11 +235,11 @@ model ItemSpecification {
 
 /// Items in the world.
 model Item {
-  /// The primary key.
+  /// Item's primary key.
   id         Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the item was created.
   createdAt  DateTime @default(now())
-  /// When it was last updated.
+  /// When the item was last updated.
   updatedAt  DateTime @updatedAt
   /// Item's stack amount.
   amount     Int      @default(1)
@@ -248,29 +250,29 @@ model Item {
   specId      Int
   /// Item's specification.
   spec        ItemSpecification @relation(fields: [specId], references: [id], onDelete: Restrict)
-  /// The container holding the item.
+  /// Container holding the item.
   containerId Int?
-  /// The container holding the item.
+  /// Container holding the item.
   container   Container?        @relation(fields: [containerId], references: [id], onDelete: Restrict)
-  /// The storage provided by the item.
+  /// Storage provided by the item.
   storage     Container?        @relation("storage")
 }
 
 /// Locations in the world.
 model Location {
-  /// The primary key.
+  /// Location's primary key.
   id          Int      @id @default(autoincrement())
-  /// When it was created.
+  /// When the location was created.
   createdAt   DateTime @default(now())
-  /// When it was last updated.
+  /// When the location was last updated.
   updatedAt   DateTime @updatedAt
   /// Location's name.
   name        String   @unique
-  /// Human-readable description.
+  /// Location's human-readable description.
   description String?
-  /// Area of the location.
+  /// Location's area.
   area        Int
-  /// Location security.
+  /// Location's security level.
   security    Int
   /// Location tags.
   tags        String[]
@@ -281,7 +283,7 @@ model Location {
   routes       Location[]  @relation("route")
   /// Locations connected to this route.
   destinations Location[]  @relation("route")
-  /// Containers bount to the location.
+  /// Containers bound to the location.
   containers   Container[]
 
   @@index(tags)

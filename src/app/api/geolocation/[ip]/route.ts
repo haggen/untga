@@ -11,7 +11,10 @@ export async function GET(
       ip: z.ipv4(),
     });
     const response = await fetch(
-      `http://ip-api.com/json/${ip}?fields=city,regionName,country`
+      `http://ip-api.com/json/${ip}?fields=city,regionName,country`,
+      {
+        cache: "force-cache",
+      }
     );
     if (!response.ok) {
       throw new Error("Not OK", { cause: response });

@@ -1,9 +1,11 @@
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
 import { serializable } from "~/lib/serializable";
 import { ensureActiveSession } from "~/lib/session";
-import { List } from "./list";
+import { Form } from "./form";
 
 export default async function Page() {
   const session = await ensureActiveSession(true);
@@ -16,7 +18,7 @@ export default async function Page() {
   const invalidate = createStatefulAction(async (payload: { id: number }) => {
     "use server";
 
-    const session = await ensureActiveSession(true);
+    const session = await ensureActiveSession();
 
     await db.session.invalidate({
       where: {
@@ -25,12 +27,18 @@ export default async function Page() {
       },
     });
 
+    if (session.id === payload.id) {
+      redirect("/login");
+    }
+
+    revalidatePath("/account/settings");
+
     return { message: "Session invalidated." };
   });
 
   return (
-    <section className="flex flex-col gap-6 p-section">
-      <header className="flex flex-col gap-2">
+    <section className="flex flex-col gap-block p-section">
+      <header className="flex flex-col gap-text">
         <Heading size="small" asChild>
           <h1>Sessions</h1>
         </Heading>
@@ -39,7 +47,7 @@ export default async function Page() {
         </p>
       </header>
 
-      <List sessions={serializable(sessions)} invalidate={invalidate} />
+      <Form sessions={serializable(sessions)} invalidate={invalidate} />
     </section>
   );
 }

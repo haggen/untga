@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { ActionState } from "~/lib/actions";
 
 const styles = tv({
-  base: "p-3 rounded",
+  base: "p-3 rounded overflow-y-scroll scrollbar-hidden line-clamp-4",
   variants: {
     type: {
       neutral: "bg-sky-200/50 text-sky-800 ",
@@ -18,25 +18,11 @@ const styles = tv({
  */
 export function Alert({
   type = "neutral",
-  message,
   children,
 }: {
   type?: keyof typeof styles.variants.type;
-  message?: string;
   children?: ReactNode;
 }) {
-  const content = message ? (
-    <p className="overflow-y-scroll scrollbar-hidden line-clamp-4">
-      {children}
-    </p>
-  ) : (
-    children
-  );
-
-  if (!content) {
-    return null;
-  }
-
   return (
     <div
       className={styles({ type })}
@@ -44,7 +30,7 @@ export function Alert({
       aria-live={type === "negative" ? "assertive" : "polite"}
       aria-atomic="true"
     >
-      {content}
+      {children}
     </div>
   );
 }
@@ -54,11 +40,11 @@ export function Alert({
  */
 export function alert(state: ActionState) {
   if (state && "error" in state) {
-    return <Alert type="negative" message={state.error} />;
+    return <Alert type="negative">{state.error}</Alert>;
   }
 
   if (state && "message" in state) {
-    return <Alert type="positive" message={state.message} />;
+    return <Alert type="positive">{state.message}</Alert>;
   }
 
   return null;

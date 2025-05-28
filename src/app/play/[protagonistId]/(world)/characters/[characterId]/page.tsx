@@ -51,7 +51,9 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         <Menu.List>
           {protagonistId === characterId ? (
             <Fragment>
-              <Menu.Item href={`/play/${characterId}/edit`}>Edit</Menu.Item>
+              <Menu.Item href={`/account/characters/${characterId}/edit`}>
+                Edit
+              </Menu.Item>
               <Menu.Item href="/account/characters">Log off</Menu.Item>
             </Fragment>
           ) : null}

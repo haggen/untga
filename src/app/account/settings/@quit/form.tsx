@@ -19,7 +19,7 @@ export function Form<T extends ActionState>(props: {
 
       <footer className="flex justify-end">
         <Button type="submit" disabled={pending}>
-          {pending ? "Wait..." : "Delete my account"}
+          Delete my account
         </Button>
       </footer>
     </form>

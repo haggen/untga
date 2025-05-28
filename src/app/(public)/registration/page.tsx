@@ -1,9 +1,11 @@
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { Heading } from "~/components/heading";
 import { createStatefulAction } from "~/lib/actions";
 import { db } from "~/lib/db";
+import { getGeolocation } from "~/lib/geolocation";
 import { getRemoteAddr, getUserAgent } from "~/lib/request";
 import { setActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
@@ -29,6 +31,8 @@ export default function Page() {
       },
     });
 
+    const ip = getRemoteAddr(await headers());
+
     const session = await db.session.create({
       data: {
         user: {
@@ -37,11 +41,18 @@ export default function Page() {
           },
         },
         userAgent: getUserAgent(await headers()),
-        ip: getRemoteAddr(await headers()),
+        ip,
       },
     });
 
     await setActiveSession(session);
+
+    after(async () => {
+      await db.session.update({
+        where: { id: session.id },
+        data: { geolocation: await getGeolocation(ip) },
+      });
+    });
 
     redirect("/account/characters");
   });

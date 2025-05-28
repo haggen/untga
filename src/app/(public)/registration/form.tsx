@@ -46,7 +46,7 @@ export function Form<T extends ActionState>(props: {
 
       <footer className="flex justify-end">
         <Button size="default" disabled={pending}>
-          {pending ? "Wait..." : "Register"}
+          Register
         </Button>
       </footer>
     </form>

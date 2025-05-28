@@ -4,7 +4,7 @@ import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { Form } from "./form";
 
-export default async function Page() {
+export default function Page() {
   const action = createStatefulAction(async () => {
     "use server";
 

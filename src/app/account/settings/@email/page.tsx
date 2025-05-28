@@ -5,7 +5,7 @@ import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
-export default async function Page() {
+export default function Page() {
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
