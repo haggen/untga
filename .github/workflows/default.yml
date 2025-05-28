@@ -1,4 +1,4 @@
-name: Code quality control
+name: Default workflow
 
 on:
   - push
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Linting, type checking, build, CodeQL and testing
+    name: Code quality control
     runs-on: ubuntu-latest
     permissions:
       # Required by CodeQL.
