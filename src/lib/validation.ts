@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { isIndexable } from "~/lib/is-indexable";
 
 function squish(value: string) {
