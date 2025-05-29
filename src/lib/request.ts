@@ -1,19 +1,28 @@
 import { BadRequestError } from "~/lib/error";
 
+/**
+ * Get remote client IP address from proxy headers.
+ */
 export function getRemoteAddr(headers: Headers) {
   // I'm assuming it's behind a proxy that sets this header and that I can trust it.
-  return headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "";
+  return headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "127.0.0.1";
 }
 
+/**
+ * Get client's user agent string.
+ */
 export function getUserAgent(headers: Headers) {
   return headers.get("user-agent") ?? "";
 }
 
-const methodsWithPayload = ["POST", "PUT", "PATCH"];
+const methodsWithBody = ["POST", "PUT", "PATCH"];
 
-export async function getRequestPayload(request: Request): Promise<unknown> {
-  if (!methodsWithPayload.includes(request.method)) {
-    return null;
+/**
+ * Validate and return the body based on the request's content type.
+ */
+export async function getBody(request: Request): Promise<unknown> {
+  if (!methodsWithBody.includes(request.method)) {
+    throw new BadRequestError("Request method does not support a body.");
   }
 
   const contentType = request.headers.get("content-type");
@@ -39,6 +48,6 @@ export async function getRequestPayload(request: Request): Promise<unknown> {
   }
 
   throw new BadRequestError(
-    `Unsupported content type ${contentType}. Change to application/json or application/x-www-form-urlencoded.`
+    `Unsupported content type ${contentType}. Supported values are application/json and application/x-www-form-urlencoded.`
   );
 }
