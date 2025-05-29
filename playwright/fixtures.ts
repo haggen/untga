@@ -63,7 +63,7 @@ const extendedTest = test.extend<
 
     await page.getByRole("button", { name: "Create character" }).click();
 
-    await page.waitForURL(/\/play\/\d+\/stats/);
+    await page.waitForURL(/\/protagonist\/\d+\/stats/);
 
     const protagonistId = page.url().match(/\/(\d+)\//)?.[1];
 

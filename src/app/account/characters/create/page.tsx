@@ -31,7 +31,7 @@ export default async function Page() {
       },
     });
 
-    redirect(`/play/${character.id}/stats`);
+    redirect(`/protagonist/${character.id}/stats`);
   });
 
   return (

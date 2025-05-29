@@ -82,7 +82,7 @@ export default async function Page({
               .filter(({ id }) => id !== location.id)
               .map((destination) => (
                 <Link
-                  href={`/play/${protagonistId}/locations/${destination.id}`}
+                  href={`/protagonist/${protagonistId}/locations/${destination.id}`}
                   key={destination.id}
                 >
                   <Definition.Item label={destination.name}>
@@ -103,7 +103,7 @@ export default async function Page({
           {characters.map((character) => (
             <Link
               key={character.id}
-              href={`/play/${protagonistId}/characters/${character.id}`}
+              href={`/protagonist/${protagonistId}/characters/${character.id}`}
             >
               <Definition.Item label={character.name}>
                 {fmt.character.status(character.status)}

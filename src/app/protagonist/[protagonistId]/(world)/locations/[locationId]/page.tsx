@@ -78,8 +78,8 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           throw new Error("Unknown action.");
       }
 
-      revalidatePath(`/play/${characterId}/location`);
-      redirect(`/play/${characterId}/location`);
+      revalidatePath(`/protagonist/${characterId}/location`);
+      redirect(`/protagonist/${characterId}/location`);
     }
   );
 

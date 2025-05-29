@@ -40,7 +40,7 @@ export default async function Page() {
               key={i}
               href={
                 character
-                  ? `/play/${character.id}/stats`
+                  ? `/protagonist/${character.id}/stats`
                   : "/account/characters/create"
               }
             >

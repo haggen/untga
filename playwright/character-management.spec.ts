@@ -23,12 +23,12 @@ test.describe.serial("Character management", async () => {
       .getByRole("textbox", { name: "Name" })
       .fill(`Player ${Date.now()}`);
     await page.getByRole("button", { name: "Create character" }).click();
-    await expect(page).toHaveURL(/\/play\/\d+\/stats/);
+    await expect(page).toHaveURL(/\/protagonist\/\d+\/stats/);
   });
 
   test("Edit", async () => {
     await page.getByRole("link", { name: "Character menu" }).click();
-    await expect(page).toHaveURL(/\/play\/\d+\/characters\/\d+/);
+    await expect(page).toHaveURL(/\/protagonist\/\d+\/characters\/\d+/);
     await page.getByRole("link", { name: "Edit" }).click();
     await expect(page).toHaveURL(/\/account\/characters\/\d+\/edit/);
     await page.getByRole("textbox", { name: "Bio" }).fill("Something else.");

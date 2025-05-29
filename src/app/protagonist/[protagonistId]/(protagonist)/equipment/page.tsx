@@ -88,7 +88,7 @@ export default async function Page({
               key={slot.id}
               href={
                 slot.items[0]
-                  ? `/play/${protagonistId}/items/${slot.items[0].id}`
+                  ? `/protagonist/${protagonistId}/items/${slot.items[0].id}`
                   : ""
               }
             >
@@ -117,7 +117,7 @@ export default async function Page({
             {container.items[0]?.storage?.items.map((item) => (
               <Link
                 key={item.id}
-                href={`/play/${protagonistId}/items/${item.id}`}
+                href={`/protagonist/${protagonistId}/items/${item.id}`}
               >
                 <Definition.Item label={item.spec.name}>
                   &times;{item.amount}

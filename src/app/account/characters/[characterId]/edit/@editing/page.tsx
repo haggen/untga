@@ -33,7 +33,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
       data: { description: data.description },
     });
 
-    revalidatePath("/play/[characterId]/(protagonist)/edit/@editing");
+    revalidatePath("/protagonist/[characterId]/(protagonist)/edit/@editing");
 
     return { message: "Character updated successfully." };
   });
