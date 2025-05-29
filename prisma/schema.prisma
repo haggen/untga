@@ -99,6 +99,42 @@ model Character {
   @@index(deletedAt)
 }
 
+/// Actions performed by characters, such as traveling, crafting, etc.
+model Action {
+  /// Action's primary key.
+  id          Int      @id @default(autoincrement())
+  /// When the action was started.
+  startedAt   DateTime @default(now())
+  /// When the action completes.
+  completesAt DateTime
+  /// Action tags.
+  tags        String[]
+  /// Action parameters.
+  params      Json
+
+  /// Character performing the action.
+  characterId Int
+  /// Character performing the action.
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
+
+  @@index(tags)
+}
+
+/// Logs are events involving a character.
+model Log {
+  /// Log entry's primary key.
+  id        Int      @id @default(autoincrement())
+  /// When the log entry was created.
+  createdAt DateTime @default(now())
+  /// Log entry's message.
+  message   String
+
+  /// Character that created the log entry.
+  characterId Int
+  /// Character that created the log entry.
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
+}
+
 /// Static information about attributes.
 model AttributeSpecification {
   /// Attribute specification's primary key.
@@ -141,42 +177,6 @@ model Attribute {
   characterId Int
   /// Character this attribute belongs to.
   character   Character              @relation(fields: [characterId], references: [id], onDelete: Restrict)
-}
-
-/// Actions performed by characters, such as traveling, crafting, etc.
-model Action {
-  /// Action's primary key.
-  id          Int      @id @default(autoincrement())
-  /// When the action was created.
-  createdAt   DateTime @default(now())
-  /// When the action completes.
-  completesAt DateTime
-  /// Action tags.
-  tags        String[]
-  /// Action parameters.
-  params      Json
-
-  /// Character performing the action.
-  characterId Int
-  /// Character performing the action.
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
-
-  @@index(tags)
-}
-
-/// Logs are events involving a character.
-model Log {
-  /// Log entry's primary key.
-  id        Int      @id @default(autoincrement())
-  /// When the log entry was created.
-  createdAt DateTime @default(now())
-  /// Log entry's message.
-  message   String
-
-  /// Character that created the log entry.
-  characterId Int
-  /// Character that created the log entry.
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
 /// Containers are item holders, such as bags, chests, character slots, etc.
