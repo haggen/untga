@@ -10,7 +10,7 @@ const styles = tv({
 type Props = HTMLAttributes<HTMLElement> &
   Readonly<{
     href?: string;
-    action?: StatelessAction<FormData, void>;
+    action?: StatelessAction<FormData>;
   }>;
 
 export function Item(props: Omit<Props, "href">): ReactNode;

@@ -7,7 +7,7 @@ import { StatelessAction } from "~/lib/actions";
 type Props = Readonly<
   HTMLAttributes<HTMLElement> & {
     href?: string;
-    action?: StatelessAction<FormData, void>;
+    action?: StatelessAction<FormData>;
   }
 >;
 
