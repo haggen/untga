@@ -167,7 +167,7 @@ const location = {
    */
   area(area: number) {
     return number(area, {
-      unit: "mile",
+      unit: "kilometer",
       style: "unit",
     });
   },
