@@ -1,7 +1,9 @@
+import { randomUUID } from "crypto";
+import { DateTime } from "luxon";
 import { db } from "~/lib/db";
 import { tag } from "~/lib/tags";
 
-const args = process.argv.slice(2);
+// const args = process.argv.slice(2);
 
 const seed = {
   locations: [
@@ -523,16 +525,23 @@ async function main() {
     });
   });
 
-  if (args.includes("--test")) {
-    await db.$transaction(async (tx) => {
-      await tx.user.create({
-        data: {
-          email: "player@example.com",
-          password: "0123456789abcdef",
-        },
-      });
-    });
-  }
+  const system = await db.user.create({
+    data: {
+      email: "system@localhost",
+      password: randomUUID(),
+    },
+  });
+
+  const session = await db.session.create({
+    data: {
+      user: { connect: { id: system.id } },
+      expiresAt: DateTime.now().plus({ year: 10 }).toJSDate(),
+      ip: "127.0.0.1",
+      userAgent: "n/a",
+    },
+  });
+
+  console.log("System session secret:", session.secret);
 }
 
 main()

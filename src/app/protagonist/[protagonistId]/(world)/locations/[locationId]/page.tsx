@@ -66,14 +66,15 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
       });
 
       switch (action) {
-        case "travel":
-          await db.character.travel({
+        case "travel": {
+          await db.character.travel.start({
             data: {
               characterId,
               destinationId: locationId,
             },
           });
           break;
+        }
         default:
           throw new Error("Unknown action.");
       }
