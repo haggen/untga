@@ -26,9 +26,6 @@ type RouteHandler = (
 /**
  * Creates a pipeline of handlers that can be used to process a request.
  */
-export function createHandlerPipeline<S1 = unknown>(
-  ...handlers: [Handler<S1>]
-): RouteHandler;
 export function createHandlerPipeline<S1 = unknown, S2 = S1>(
   ...handlers: [Handler<S1>, Handler<S2>]
 ): RouteHandler;
@@ -52,7 +49,7 @@ export function createHandlerPipeline<
 >(
   ...handlers: [Handler<S1>, Handler<S2>, Handler<S3>, Handler<S4>, Handler<S5>]
 ): RouteHandler;
-export function createHandlerPipeline<S>(
+export function createHandlerPipeline<S extends never>(
   ...handlers: Handler<S>[]
 ): RouteHandler {
   return async (request: NextRequest, extra: { params: Promise<unknown> }) => {
