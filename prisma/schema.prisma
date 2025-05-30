@@ -107,6 +107,8 @@ model Action {
   startedAt   DateTime @default(now())
   /// When the action completes.
   completesAt DateTime
+  /// Action's status; pending or completed.
+  status      String   @default("pending")
   /// Action tags.
   tags        String[]
   /// Action parameters.

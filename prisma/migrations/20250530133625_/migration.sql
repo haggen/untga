@@ -40,6 +40,29 @@ CREATE TABLE "Character" (
 );
 
 -- CreateTable
+CREATE TABLE "Action" (
+    "id" SERIAL NOT NULL,
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completesAt" TIMESTAMP(3) NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "tags" TEXT[],
+    "params" JSONB NOT NULL,
+    "characterId" INTEGER NOT NULL,
+
+    CONSTRAINT "Action_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Log" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "message" TEXT NOT NULL,
+    "characterId" INTEGER NOT NULL,
+
+    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "AttributeSpecification" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -62,28 +85,6 @@ CREATE TABLE "Attribute" (
     "characterId" INTEGER NOT NULL,
 
     CONSTRAINT "Attribute_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Action" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "completesAt" TIMESTAMP(3) NOT NULL,
-    "tags" TEXT[],
-    "params" JSONB NOT NULL,
-    "characterId" INTEGER NOT NULL,
-
-    CONSTRAINT "Action_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Log" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "message" TEXT NOT NULL,
-    "characterId" INTEGER NOT NULL,
-
-    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -167,13 +168,13 @@ CREATE INDEX "Character_tags_idx" ON "Character"("tags");
 CREATE INDEX "Character_deletedAt_idx" ON "Character"("deletedAt");
 
 -- CreateIndex
+CREATE INDEX "Action_tags_idx" ON "Action"("tags");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "AttributeSpecification_name_key" ON "AttributeSpecification"("name");
 
 -- CreateIndex
 CREATE INDEX "AttributeSpecification_tags_idx" ON "AttributeSpecification"("tags");
-
--- CreateIndex
-CREATE INDEX "Action_tags_idx" ON "Action"("tags");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Container_sourceId_key" ON "Container"("sourceId");
@@ -206,16 +207,16 @@ ALTER TABLE "Character" ADD CONSTRAINT "Character_userId_fkey" FOREIGN KEY ("use
 ALTER TABLE "Character" ADD CONSTRAINT "Character_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_specId_fkey" FOREIGN KEY ("specId") REFERENCES "AttributeSpecification"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Action" ADD CONSTRAINT "Action_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_specId_fkey" FOREIGN KEY ("specId") REFERENCES "AttributeSpecification"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Container" ADD CONSTRAINT "Container_sourceId_fkey" FOREIGN KEY ("sourceId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
