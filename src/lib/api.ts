@@ -5,6 +5,9 @@ import { db, Session, WithUser } from "~/lib/db";
 import { HttpError, UnauthorizedError } from "~/lib/error";
 import { getBody } from "~/lib/request";
 
+/**
+ * Request context.
+ */
 export type Context<State> = {
   request: NextRequest;
   params: unknown;
@@ -12,13 +15,15 @@ export type Context<State> = {
   next: () => Promise<NextResponse>;
 };
 
+/**
+ * Handler function for processing requests.
+ */
 export type Handler<State> = (context: Context<State>) => Promise<NextResponse>;
 
-const threshold = async () => {
-  throw new Error("Handler pipeline ended without producing a response.");
-};
-
-type RouteHandler = (
+/**
+ * Next's route handler.
+ */
+type NextRouteHandler = (
   request: NextRequest,
   extra: { params: Promise<unknown> }
 ) => Promise<NextResponse>;
@@ -28,10 +33,10 @@ type RouteHandler = (
  */
 export function createHandlerPipeline<S1 = unknown, S2 = S1>(
   ...handlers: [Handler<S1>, Handler<S2>]
-): RouteHandler;
+): NextRouteHandler;
 export function createHandlerPipeline<S1 = unknown, S2 = S1, S3 = S1 & S2>(
   ...handlers: [Handler<S1>, Handler<S2>, Handler<S3>]
-): RouteHandler;
+): NextRouteHandler;
 export function createHandlerPipeline<
   S1 = unknown,
   S2 = S1,
@@ -39,7 +44,7 @@ export function createHandlerPipeline<
   S4 = S1 & S2 & S3
 >(
   ...handlers: [Handler<S1>, Handler<S2>, Handler<S3>, Handler<S4>]
-): RouteHandler;
+): NextRouteHandler;
 export function createHandlerPipeline<
   S1 = unknown,
   S2 = S1,
@@ -48,10 +53,10 @@ export function createHandlerPipeline<
   S5 = S1 & S2 & S3 & S4
 >(
   ...handlers: [Handler<S1>, Handler<S2>, Handler<S3>, Handler<S4>, Handler<S5>]
-): RouteHandler;
+): NextRouteHandler;
 export function createHandlerPipeline<S extends never>(
   ...handlers: Handler<S>[]
-): RouteHandler {
+): NextRouteHandler {
   return async (request: NextRequest, extra: { params: Promise<unknown> }) => {
     const params = await extra.params;
 
@@ -59,14 +64,16 @@ export function createHandlerPipeline<S extends never>(
       request,
       params,
       state: {} as S,
-      next: threshold,
+      async next() {
+        throw new Error("Handler pipeline ended without producing a response.");
+      },
     };
 
     const pipeline = handlers.reduceRight(
       (next, handler) => (context) =>
         handler({ ...context, next: () => next(context) }),
 
-      threshold
+      context.next
     );
 
     return await pipeline(context);
