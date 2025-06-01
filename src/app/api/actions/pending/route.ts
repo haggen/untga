@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
+import { db } from "~/db";
 import {
   createHandlerPipeline,
   withAuthorization,
   withErrorHandling,
 } from "~/lib/api";
-import { db } from "~/lib/db";
 import { getActionType, tag } from "~/lib/tags";
 
 export const PATCH = createHandlerPipeline(

@@ -3,7 +3,7 @@ import type { PrismaClientOptions } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
 import z from "zod/v4";
-import { applyDataMod } from "~/lib/db/apply-data-mod";
+import { applyDataMod } from "~/db/apply-data-mod";
 import { ensure } from "~/lib/ensure";
 import {
   getRestTime,

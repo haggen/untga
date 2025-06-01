@@ -1,7 +1,7 @@
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { NextRequest, NextResponse } from "next/server";
 import z, { ZodError, ZodRawShape } from "zod/v4";
-import { db, Session, WithUser } from "~/lib/db";
+import { db, Session, WithUser } from "~/db";
 import { HttpError, UnauthorizedError } from "~/lib/error";
 import { getBody } from "~/lib/request";
 

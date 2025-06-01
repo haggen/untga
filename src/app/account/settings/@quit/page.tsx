@@ -1,6 +1,6 @@
 import { Heading } from "~/components/heading";
+import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
-import { db } from "~/lib/db";
 import { ensureActiveSession } from "~/lib/session";
 import { Form } from "./form";
 

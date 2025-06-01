@@ -5,7 +5,7 @@ import { Heading } from "~/components/heading";
 import { Link } from "~/components/link";
 import { Summary } from "~/components/location/summary";
 import { Header } from "~/components/protagonist/header";
-import { db } from "~/lib/db";
+import { db } from "~/db";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";

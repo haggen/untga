@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { DateTime } from "luxon";
-import { db } from "~/lib/db";
+import { db } from "~/db";
 import { tag } from "~/lib/tags";
 
 // const args = process.argv.slice(2);

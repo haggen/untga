@@ -4,7 +4,7 @@ import { Back } from "~/components/back";
 import { Summary } from "~/components/character/summary";
 import { Heading } from "~/components/heading";
 import * as Menu from "~/components/menu";
-import { db } from "~/lib/db";
+import { db } from "~/db";
 import { parse, schemas } from "~/lib/validation";
 
 export async function generateMetadata({

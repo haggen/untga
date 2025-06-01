@@ -3,7 +3,7 @@ import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
 import { Link } from "~/components/link";
 import { Header } from "~/components/protagonist/header";
-import { db } from "~/lib/db";
+import { db } from "~/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";
 import { ensureActiveSession } from "~/lib/session";

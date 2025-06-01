@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import * as Definition from "~/components/definition";
-import { Location, WithPopulation } from "~/lib/db";
+import { Location, WithPopulation } from "~/db";
 import { fmt } from "~/lib/fmt";
 
 type Props = Readonly<{ location: Location<WithPopulation> }>;

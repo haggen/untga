@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { MouseEvent } from "react";
 import { alert } from "~/components/alert";
 import * as Menu from "~/components/menu";
+import { Location } from "~/db";
 import { ActionState, StatefulAction } from "~/lib/actions";
-import { Location } from "~/lib/db";
 import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 
 export function Form(

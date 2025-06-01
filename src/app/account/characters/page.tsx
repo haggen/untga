@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Heading } from "~/components/heading";
 import * as Menu from "~/components/menu";
-import { db } from "~/lib/db";
+import { db } from "~/db";
 import { ensureActiveSession } from "~/lib/session";
 
 export const metadata: Metadata = {

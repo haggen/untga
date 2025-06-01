@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { db, Session } from "~/lib/db";
+import { db, Session } from "~/db";
 import { UnauthorizedError } from "~/lib/error";
 
 /**
