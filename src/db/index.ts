@@ -2,23 +2,9 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import type { PrismaClientOptions } from "@prisma/client/runtime/library";
 import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
-import z from "zod/v4";
 import { applyDataMod } from "~/db/apply-data-mod";
-import { ensure } from "~/lib/ensure";
-import {
-  getRestTime,
-  getTravelStaminaCost,
-  getTravelTime,
-} from "~/lib/formula";
 import { isIndexable } from "~/lib/is-indexable";
-import {
-  getCharacterStatus,
-  getSlotType,
-  getUtilityType,
-  replace,
-  tag,
-} from "~/lib/tags";
-import { parse } from "~/lib/validation";
+import { getCharacterStatus, getSlotType, tag } from "~/lib/tags";
 
 export { Prisma };
 
@@ -100,10 +86,6 @@ export type WithSpec = {
 
 export type WithAttributes = {
   include: { attributes: WithSpec };
-};
-
-export type WithEffects = {
-  include: { effects: WithSpec };
 };
 
 export type WithSlots<T = WithItems> = {
@@ -202,14 +184,6 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
       itemSpecification: {
-        async idByTag(...tags: string[]) {
-          return (
-            await db.itemSpecification.findFirstOrThrow({
-              select: { id: true },
-              where: { tags: { hasEvery: tags } },
-            })
-          ).id;
-        },
         findOneByTags(...tags: string[]) {
           return db.itemSpecification.findFirstOrThrow({
             where: { tags: { hasEvery: tags } },
@@ -490,379 +464,6 @@ const ext = Prisma.defineExtension((client) => {
             .then((item) => !!item);
         },
 
-        rest: {
-          /**
-           * Start a rest.
-           */
-          async start({
-            data,
-          }: {
-            data: { characterId: number; itemId: number };
-          }) {
-            const character = await db.character
-              .findFirstOrThrow({
-                where: { id: data.characterId },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find character (${data.characterId}).`,
-                  {
-                    cause,
-                  }
-                );
-              });
-
-            if (character.status !== tag.Idle) {
-              throw new Error(`The character is busy (${character.status}).`);
-            }
-
-            const stamina = await db.attribute
-              .findFirstOrThrow({
-                where: {
-                  character: { id: character.id },
-                  spec: { tags: { has: tag.Stamina } },
-                },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find stamina attribute for character (${character.id}).`,
-                  {
-                    cause,
-                  }
-                );
-              });
-
-            const item = await db.item
-              .findFirstOrThrow({
-                where: { id: data.itemId },
-                include: { spec: true },
-              })
-              .catch((cause) => {
-                throw new Error(`Couldn't find the item (${data.itemId}).`, {
-                  cause,
-                });
-              });
-
-            if (!item.spec.tags.includes(tag.Resting)) {
-              throw new Error(`You can't rest with that.`);
-            }
-
-            const time = getRestTime({
-              stamina: stamina.level,
-              quality: item.spec.quality,
-            });
-
-            await db.$transaction([
-              db.character.update({
-                where: { id: character.id },
-                data: {
-                  tags: replace(character.tags, [tag.Idle], [tag.Resting]),
-                },
-              }),
-
-              db.log.create({
-                data: {
-                  character: { connect: { id: character.id } },
-                  message: `I laid down to rest with my ${item.spec.name}.`,
-                },
-              }),
-
-              db.action.create({
-                data: {
-                  character: { connect: { id: character.id } },
-                  tags: [tag.Rest],
-                  completesAt: DateTime.now().plus(time).toJSDate(),
-                  params: {
-                    characterId: character.id,
-                    itemId: item.id,
-                  },
-                },
-              }),
-            ]);
-          },
-
-          /**
-           * Complete a rest.
-           */
-          async complete({
-            action,
-          }: {
-            action: { id: number; params: unknown };
-          }) {
-            const data = parse(action.params, {
-              characterId: z.number(),
-              itemId: z.number(),
-            });
-
-            const character = await db.character
-              .findFirstOrThrow({
-                where: { id: data.characterId },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find character (${data.characterId}).`,
-                  {
-                    cause,
-                  }
-                );
-              });
-
-            if (character.status !== tag.Resting) {
-              throw new Error(`The character is not resting.`);
-            }
-
-            const item = await db.item
-              .findFirstOrThrow({
-                where: { id: data.itemId },
-                include: { spec: true },
-              })
-              .catch((cause) => {
-                throw new Error(`Couldn't find the item (${data.itemId}).`, {
-                  cause,
-                });
-              });
-
-            void item;
-
-            await db.$transaction([
-              db.attribute.updateMany({
-                where: {
-                  character: { id: data.characterId },
-                  spec: { tags: { has: tag.Stamina } },
-                },
-                data: { level: 100 },
-              }),
-
-              db.character.update({
-                where: { id: character.id },
-                data: {
-                  tags: replace(character.tags, [tag.Resting], [tag.Idle]),
-                },
-              }),
-
-              db.log.create({
-                data: {
-                  character: { connect: { id: data.characterId } },
-                  message: `I have woken up feeling refreshed.`,
-                },
-              }),
-
-              db.action.update({
-                where: { id: action.id },
-                data: {
-                  status: "completed",
-                },
-              }),
-            ]);
-          },
-        },
-
-        travel: {
-          /**
-           * Start a travel.
-           */
-          async start({
-            data,
-          }: {
-            data: { characterId: number; destinationId: number };
-          }) {
-            const destination = await db.location
-              .findFirstOrThrow({
-                where: { id: data.destinationId },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find destination (Location #${data.destinationId}).`,
-                  { cause }
-                );
-              });
-
-            const character = await db.character
-              .findFirstOrThrow({
-                where: { id: data.characterId },
-                include: {
-                  attributes: { include: { spec: true } },
-                  location: {
-                    include: { routes: { include: { destinations: true } } },
-                  },
-                },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find character (Character #${data.characterId}).`,
-                  {
-                    cause,
-                  }
-                );
-              });
-
-            const route = character.location.routes.find((route) =>
-              route.destinations.some(
-                (location) => location.id === destination.id
-              )
-            );
-
-            if (!route) {
-              throw new Error(
-                `Destination ${destination.name} is not reachable from ${character.location.name}.`
-              );
-            }
-
-            if (character.status !== tag.Idle) {
-              throw new Error(`The character is busy (${character.status}).`);
-            }
-
-            const stamina = ensure(
-              character.attributes.find((attribute) =>
-                attribute.spec.tags.includes(tag.Stamina)
-              ),
-              "Stamina attribute not found."
-            );
-
-            const endurance = ensure(
-              character.attributes.find((attribute) =>
-                attribute.spec.tags.includes(tag.Endurance)
-              ),
-              "Endurance skill not found."
-            );
-
-            const distance = destination.area + route.area;
-
-            const cost = getTravelStaminaCost({
-              distance,
-              skill: endurance.level,
-            });
-
-            if (stamina.level < cost) {
-              throw new Error("Not enough stamina to travel.");
-            }
-
-            const time = getTravelTime({
-              distance,
-              skill: endurance.level,
-            });
-
-            await db.$transaction([
-              db.character.update({
-                where: { id: character.id },
-                data: {
-                  location: {
-                    connect: { id: route.id },
-                  },
-                  tags: replace(character.tags, [tag.Idle], [tag.Travelling]),
-                },
-              }),
-
-              db.attribute.update({
-                where: { id: stamina.id },
-                data: {
-                  level: {
-                    decrement: cost,
-                  },
-                },
-              }),
-
-              db.log.create({
-                data: {
-                  character: { connect: { id: data.characterId } },
-                  message: `I departed ${character.location.name} towards ${destination.name} via ${route.name}.`,
-                },
-              }),
-
-              db.action.create({
-                data: {
-                  character: { connect: { id: character.id } },
-                  tags: [tag.Travel],
-                  completesAt: DateTime.now().plus(time).toJSDate(),
-                  params: {
-                    characterId: character.id,
-                    destinationId: destination.id,
-                  },
-                },
-              }),
-            ]);
-          },
-
-          /**
-           * Complete a travel.
-           */
-          async complete({
-            action,
-          }: {
-            action: { id: number; params: unknown };
-          }) {
-            const data = parse(action.params, {
-              characterId: z.number(),
-              destinationId: z.number(),
-            });
-
-            const character = await db.character
-              .findFirstOrThrow({
-                where: { id: data.characterId },
-                include: {
-                  location: { include: { routes: true } },
-                },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find character (Character #${data.characterId}).`,
-                  {
-                    cause,
-                  }
-                );
-              });
-
-            if (character.status !== tag.Travelling) {
-              throw new Error(`The character is not travelling.`);
-            }
-
-            const destination = await db.location
-              .findFirstOrThrow({
-                where: { id: data.destinationId },
-                include: { routes: true },
-              })
-              .catch((cause) => {
-                throw new Error(
-                  `Couldn't find destination (Location #${data.destinationId}).`,
-                  { cause }
-                );
-              });
-
-            if (
-              !destination.routes.some(({ id }) => id === character.locationId)
-            ) {
-              throw new Error(
-                `Destination ${destination.name} is not reachable from ${character.location.name}.`
-              );
-            }
-
-            await db.$transaction([
-              db.character.update({
-                where: { id: character.id },
-                data: {
-                  location: {
-                    connect: { id: destination.id },
-                  },
-                  tags: replace(character.tags, [tag.Travelling], [tag.Idle]),
-                },
-              }),
-
-              db.log.create({
-                data: {
-                  character: { connect: { id: data.characterId } },
-                  message: `I have arrived at ${destination.name}.`,
-                },
-              }),
-
-              db.action.update({
-                where: { id: action.id },
-                data: {
-                  status: "completed",
-                },
-              }),
-            ]);
-          },
-        },
         /**
          * Equip item on its corresponding slot on a character.
          */
@@ -964,56 +565,21 @@ const ext = Prisma.defineExtension((client) => {
         },
       },
       item: {
-        /**
-         * Use an item.
-         */
-        async use({ data }: { data: { itemId: number; characterId: number } }) {
-          const item = await db.item
-            .findFirstOrThrow({
-              where: { id: data.itemId },
-              include: { spec: true },
-            })
-            .catch((cause) => {
-              throw new Error(`Couldn't find the item (${data.itemId}).`, {
-                cause,
-              });
-            });
-
-          if (!item.spec.tags.includes(tag.Utility)) {
-            throw new Error(`You can only use utility items.`);
-          }
-
-          switch (getUtilityType(item.spec)) {
-            case tag.Resting:
-              await db.character.rest.start({ data });
-              break;
-            default:
-              throw new Error(`Don't know how to use this item.`);
-          }
-        },
-
-        /**
-         * Discard an item.
-         */
-        async discard({ data }: { data: { itemId: number } }) {
-          const item = await db.item
-            .findFirstOrThrow({
-              where: { id: data.itemId },
-              include: { spec: true, container: true },
-            })
-            .catch((cause) => {
-              throw new Error(`Couldn't find the item (${data.itemId}).`, {
-                cause,
-              });
-            });
-
-          if (item.container?.tags.includes(tag.Slot)) {
-            throw new Error(`You can't discard an equipped item.`);
-          }
-
-          await db.item.delete({
-            where: { id: data.itemId },
-          });
+        whereOwnedBy(characterId: number) {
+          return {
+            container: {
+              OR: [
+                { character: { id: characterId } },
+                {
+                  source: {
+                    container: {
+                      character: { id: characterId },
+                    },
+                  },
+                },
+              ],
+            },
+          };
         },
       },
     },

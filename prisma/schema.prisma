@@ -102,17 +102,15 @@ model Character {
 /// Actions performed by characters, such as traveling, crafting, etc.
 model Action {
   /// Action's primary key.
-  id          Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   /// When the action was started.
-  startedAt   DateTime @default(now())
-  /// When the action completes.
-  completesAt DateTime
+  startedAt DateTime @default(now())
   /// Action's status; pending or completed.
-  status      String   @default("pending")
+  status    String   @default("pending")
   /// Action tags.
-  tags        String[]
+  tags      String[]
   /// Action parameters.
-  params      Json
+  params    Json
 
   /// Character performing the action.
   characterId Int
@@ -122,7 +120,7 @@ model Action {
   @@index(tags)
 }
 
-/// Logs are events involving a character.
+/// Log is an entry written on a character's journal.
 model Log {
   /// Log entry's primary key.
   id        Int      @id @default(autoincrement())
@@ -137,9 +135,9 @@ model Log {
   character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
-/// Static information about attributes.
+/// Static information about an attribute.
 model AttributeSpecification {
-  /// Attribute specification's primary key.
+  /// Specification's primary key.
   id          Int      @id @default(autoincrement())
   /// When the specification was created.
   createdAt   DateTime @default(now())
@@ -158,7 +156,7 @@ model AttributeSpecification {
   @@index(tags)
 }
 
-/// Attributes are outcome modifiers.
+/// An attribute can represent a character's resource, such as health or stamina, or a skill.
 model Attribute {
   /// Attribute's primary key.
   id        Int      @id @default(autoincrement())
@@ -181,7 +179,7 @@ model Attribute {
   character   Character              @relation(fields: [characterId], references: [id], onDelete: Restrict)
 }
 
-/// Containers are item holders, such as bags, chests, character slots, etc.
+/// Containers are item holders, such as location chests, character slots, equippable bags, etc.
 model Container {
   /// Container's primary key.
   id        Int      @id @default(autoincrement())
@@ -210,7 +208,7 @@ model Container {
   @@index(tags)
 }
 
-/// Specifications for item properties and behavior.
+/// Static information about an item.
 model ItemSpecification {
   /// Item specification's primary key.
   id          Int      @id @default(autoincrement())
@@ -224,8 +222,6 @@ model ItemSpecification {
   description String?
   /// Item's base value.
   value       Int      @default(0)
-  /// Item's quality.
-  quality     Int      @default(100)
   /// Item tags.
   tags        String[]
 
@@ -247,6 +243,8 @@ model Item {
   amount     Int      @default(1)
   /// Item's current durability.
   durability Int      @default(100)
+  /// Item's quality.
+  quality    Int      @default(0)
 
   /// Item's specification.
   specId      Int

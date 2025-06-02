@@ -1,4 +1,5 @@
 export const tag = {
+  Action: "action",
   Breakable: "breakable",
   Combat: "combat",
   Consumable: "consumable",
@@ -9,6 +10,9 @@ export const tag = {
   Drink: "drink",
   Endurance: "endurance",
   Equipment: "equipment",
+  Start: "start",
+  Complete: "complete",
+  Tick: "tick",
   Feet: "feet",
   Food: "food",
   Foraging: "foraging",

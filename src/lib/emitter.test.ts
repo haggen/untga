@@ -1,24 +1,23 @@
 import { expect, test, vi } from "vitest";
 import { Emitter } from "./emitter";
 
-test("Emitter", () => {
-  const emitter = new Emitter<string>();
+test("Emitter", async () => {
+  const emitter = new Emitter();
 
-  const a = vi.fn();
-  const b = vi.fn();
-  const c = vi.fn();
+  const foo = vi.fn();
+  const bar = vi.fn();
+  const baz = vi.fn();
 
-  emitter.on(["foo"], a);
-  emitter.on(["bar"], b);
-  emitter.on(["foo", "bar"], c);
+  emitter.on(["Bar", "Baz", "Fez"], baz);
+  emitter.on(["Bar", "Foo"], bar);
+  emitter.on(["Foo"], foo);
 
-  emitter.emit(["foo"], "foo");
-  expect(a).toBeCalledWith("foo");
-  expect(b).not.toBeCalledWith("foo");
-  expect(c).toBeCalledWith("foo");
+  const data = {};
 
-  emitter.emit(["foo", "bar"], "foo and bar");
-  expect(c).toBeCalledWith("foo and bar");
-  expect(a).not.toBeCalledWith("foo and bar");
-  expect(b).not.toBeCalledWith("foo and bar");
+  await emitter.emit(["Foo", "Bar"], data);
+
+  expect(foo).toBeCalledWith(data);
+  expect(bar).toBeCalledWith(data);
+  expect(foo).toHaveBeenCalledBefore(bar);
+  expect(baz).not.toBeCalled();
 });

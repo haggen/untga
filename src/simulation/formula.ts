@@ -65,7 +65,7 @@ export function getTravelTime({
 /**
  * Calculate the time it takes to rest to 100% stamina.
  */
-export function getRestTime({
+export function getRestingTime({
   stamina,
   quality,
 }: {
@@ -92,4 +92,18 @@ export function getRestTime({
   return {
     hours: Math.max(minute, base * interpolate(1, 0, stamina / 100)) * scale,
   };
+}
+
+/**
+ * Calculate the distance of travel.
+ */
+export function getTravelDistance({
+  destination,
+  route,
+}: {
+  destination: { area: number };
+  route: { area: number };
+}) {
+  // The travel distance is the sum of the destination area and the route area.
+  return destination.area + route.area;
 }

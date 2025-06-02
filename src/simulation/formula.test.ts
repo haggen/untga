@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { getRestTime, getTravelStaminaCost, getTravelTime } from "./formula";
+import { getRestingTime, getTravelStaminaCost, getTravelTime } from "./formula";
 
 describe("getTravelStaminaCost", () => {
   test("30km at zero skill", () => {
@@ -40,26 +40,28 @@ describe("getTravelTime", () => {
 
 describe("getRestTime", () => {
   test("0% stamina at 0% quality", () => {
-    expect(getRestTime({ stamina: 0, quality: 0 }).hours).toBeCloseTo(12);
+    expect(getRestingTime({ stamina: 0, quality: 0 }).hours).toBeCloseTo(12);
   });
 
   test("0% stamina at 100% quality", () => {
-    expect(getRestTime({ stamina: 0, quality: 100 }).hours).toBeCloseTo(8);
+    expect(getRestingTime({ stamina: 0, quality: 100 }).hours).toBeCloseTo(8);
   });
 
   test("min cap", () => {
-    expect(getRestTime({ stamina: 100, quality: 0 }).hours).toBeCloseTo(0.016);
+    expect(getRestingTime({ stamina: 100, quality: 0 }).hours).toBeCloseTo(
+      0.016
+    );
   });
 
   test("25% stamina at 0% quality", () => {
-    expect(getRestTime({ stamina: 25, quality: 0 }).hours).toBeCloseTo(9);
+    expect(getRestingTime({ stamina: 25, quality: 0 }).hours).toBeCloseTo(9);
   });
 
   test("50% stamina at 0% quality", () => {
-    expect(getRestTime({ stamina: 50, quality: 0 }).hours).toBeCloseTo(6);
+    expect(getRestingTime({ stamina: 50, quality: 0 }).hours).toBeCloseTo(6);
   });
 
   test("75% stamina at 0% quality", () => {
-    expect(getRestTime({ stamina: 75, quality: 0 }).hours).toBeCloseTo(3);
+    expect(getRestingTime({ stamina: 75, quality: 0 }).hours).toBeCloseTo(3);
   });
 });
