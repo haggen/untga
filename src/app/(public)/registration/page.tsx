@@ -7,7 +7,7 @@ import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
 import { getGeolocation } from "~/lib/geolocation";
 import { getRemoteAddr, getUserAgent } from "~/lib/request";
-import { setActiveSession } from "~/lib/session";
+import { setSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
@@ -45,7 +45,7 @@ export default function Page() {
       },
     });
 
-    await setActiveSession(session);
+    await setSession(session);
 
     after(async () => {
       await db.session.update({

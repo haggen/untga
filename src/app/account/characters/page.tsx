@@ -2,14 +2,14 @@ import { Metadata } from "next";
 import { Heading } from "~/components/heading";
 import * as Menu from "~/components/menu";
 import { db } from "~/db";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 
 export const metadata: Metadata = {
   title: "Characters",
 };
 
 export default async function Page() {
-  const session = await ensureActiveSession(true);
+  const session = await ensureSession(true);
 
   const characters = await db.character.findMany({
     where: {

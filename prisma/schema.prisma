@@ -99,14 +99,14 @@ model Character {
   @@index(deletedAt)
 }
 
-/// Actions performed by characters, such as traveling, crafting, etc.
+/// Actions performed by characters, such as travelling, resting, crafting, etc.
 model Action {
   /// Action's primary key.
   id        Int      @id @default(autoincrement())
   /// When the action was started.
   startedAt DateTime @default(now())
-  /// Action's status; pending or completed.
-  status    String   @default("pending")
+  /// When the action was completed.
+  completedAt DateTime?
   /// Action tags.
   tags      String[]
   /// Action parameters.
@@ -118,6 +118,8 @@ model Action {
   character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 
   @@index(tags)
+  @@index(startedAt)
+  @@index(completedAt)
 }
 
 /// Log is an entry written on a character's journal.

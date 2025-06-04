@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { DateTime } from "luxon";
 import { applyDataMod } from "~/db/apply-data-mod";
 import { isIndexable } from "~/lib/is-indexable";
-import { getCharacterStatus, getSlotType, tag } from "~/lib/tags";
+import { getCharacterStatus, getSlotType, tag } from "~/lib/tag";
 
 export { Prisma };
 
@@ -137,18 +137,14 @@ const opts = {
 const ext = Prisma.defineExtension((client) => {
   return client.$extends({
     model: {
-      user: {},
-      session: {
+      user: {
         /**
-         * Create new session by validating given credentials.
+         * Find user by credentials.
          */
-        async createByCredentials({
-          data: { email, password, ...data },
+        async findByCredentials({
+          data: { email, password },
         }: {
-          data: Omit<Prisma.SessionCreateInput, "user"> & {
-            email: string;
-            password: string;
-          };
+          data: { email: string; password: string };
         }) {
           const user = await db.user
             .findUniqueOrThrow({
@@ -166,13 +162,32 @@ const ext = Prisma.defineExtension((client) => {
             throw new Error("Password doesn't match.");
           }
 
+          return user;
+        },
+      },
+      session: {
+        /**
+         * Create new session by validating given credentials.
+         */
+        async createByCredentials({
+          data: { email, password, ...data },
+        }: {
+          data: Omit<Prisma.SessionCreateInput, "user"> & {
+            email: string;
+            password: string;
+          };
+        }) {
+          const user = await db.user.findByCredentials({
+            data: { email, password },
+          });
+
           return db.session.create({
             data: { ...data, user: { connect: { id: user.id } } },
           });
         },
 
         /**
-         * Invalidate sessions.
+         * Invalidate a session.
          */
         async invalidate({ where }: { where: Prisma.SessionWhereUniqueInput }) {
           return await db.session.update({
@@ -465,103 +480,23 @@ const ext = Prisma.defineExtension((client) => {
         },
 
         /**
-         * Equip item on its corresponding slot on a character.
+         * Include character's equipment.
          */
-        async equip({
-          data,
-        }: {
-          data: { characterId: number; itemId: number };
-        }) {
-          const item = await db.item
-            .findFirstOrThrow({
-              where: {
-                id: data.itemId,
-              },
-              include: { spec: true },
-            })
-            .catch((cause) => {
-              throw new Error(`Couldn't find the item (${data.itemId}).`, {
-                cause,
-              });
-            });
-
-          if (!item.spec.tags.includes(tag.Equipment)) {
-            throw new Error(`You can't equip that.`);
-          }
-
-          const slot = await db.container
-            .findFirstOrThrow({
-              where: {
-                character: { id: data.characterId },
-                tags: { has: getSlotType(item.spec) },
-              },
+        withEquipment() {
+          return {
+            slots: {
               include: {
-                items: { include: { spec: true } },
-              },
-            })
-            .catch((cause) => {
-              throw new Error(`Couldn't find the slot for ${item.spec.name}.`, {
-                cause,
-              });
-            });
-
-          if (slot.items.length > 0) {
-            await db.character.unequip({
-              data: {
-                characterId: data.characterId,
-                itemId: slot.items[0].id,
-              },
-            });
-          }
-
-          await db.item.update({
-            where: { id: data.itemId },
-            data: {
-              container: {
-                connect: { id: slot.id },
-              },
-            },
-          });
-        },
-
-        /**
-         * Take off an item from its slot on a character.
-         */
-        async unequip({
-          data,
-        }: {
-          data: { characterId: number; itemId: number };
-        }) {
-          const storage = await db.container
-            .findFirstOrThrow({
-              where: {
-                source: {
-                  container: {
-                    character: { id: data.characterId },
-                    tags: { hasEvery: [tag.Slot, tag.Pack] },
+                items: {
+                  include: {
+                    spec: true,
+                    storage: {
+                      include: { items: { include: { spec: true } } },
+                    },
                   },
                 },
               },
-            })
-            .catch((cause) => {
-              throw new Error(
-                `Couldn't find the character's storage container.`,
-                { cause }
-              );
-            });
-
-          if (storage.sourceId === data.itemId) {
-            throw new Error(`You wouldn't have where to put it.`);
-          }
-
-          await db.item.update({
-            where: { id: data.itemId },
-            data: {
-              container: {
-                connect: { id: storage.id },
-              },
             },
-          });
+          };
         },
       },
       item: {

@@ -49,7 +49,7 @@ export function getTravelStaminaCost({
 /**
  * Calculate the time it takes to travel some distance.
  */
-export function getTravelTime({
+export function getTravelDuration({
   distance,
   skill,
 }: {
@@ -92,6 +92,23 @@ export function getRestingTime({
   return {
     hours: Math.max(minute, base * interpolate(1, 0, stamina / 100)) * scale,
   };
+}
+
+export function getStaminaRecoveryRate({ quality }: { quality: number }) {
+  // Let's assume a totally exhausted person in the worst possible bed would
+  // take 12 hours of sleep to fully recover. So the low end of stamina
+  // recovery rate would be 100% / 12h.
+  const max = 100 / 12;
+
+  // But in the best possible bed that person would
+  // only take 8 hours of sleep to fully recover.
+  const min = 100 / 8;
+
+  // The stamina recovery rate is calculated by interpolating between
+  // the minimum and maximum values based on the quality of the bed.
+  const rate = interpolate(min, max, quality / 100);
+
+  return { hourly: rate };
 }
 
 /**

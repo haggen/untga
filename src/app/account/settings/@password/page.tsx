@@ -1,7 +1,7 @@
 import { Heading } from "~/components/heading";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
@@ -9,7 +9,7 @@ export default function Page() {
   const changePassword = createStatefulAction(async (payload: FormData) => {
     "use server";
 
-    const session = await ensureActiveSession(true);
+    const session = await ensureSession(true);
 
     const data = parse(payload, {
       password: schemas.password,

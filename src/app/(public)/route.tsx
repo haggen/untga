@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getClientId } from "~/lib/client-id";
-import { getActiveSession } from "~/lib/session";
+import { getSession } from "~/lib/session";
 
 export async function GET() {
-  const session = await getActiveSession();
+  const session = await getSession();
 
   if (session) {
     redirect("/account/characters");

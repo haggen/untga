@@ -7,12 +7,11 @@ export const tag = {
   Crafting: "crafting",
   Currency: "currency",
   Dead: "dead",
+  Discard: "discard",
   Drink: "drink",
   Endurance: "endurance",
+  Equip: "equip",
   Equipment: "equipment",
-  Start: "start",
-  Complete: "complete",
-  Tick: "tick",
   Feet: "feet",
   Food: "food",
   Foraging: "foraging",
@@ -31,25 +30,32 @@ export const tag = {
   Perception: "perception",
   Player: "player",
   Resource: "resource",
-  Rest: "rest",
   Resting: "resting",
   Route: "route",
   Skill: "skill",
   Slot: "slot",
   Stackable: "stackable",
   Stamina: "stamina",
+  Start: "start",
   Starting: "starting",
   Storage: "storage",
+  Tick: "tick",
   Torso: "torso",
+  Transaction: "transaction",
   Travel: "travel",
   Travelling: "traveling",
   Trinket: "trinket",
+  Unequip: "unequip",
   Unknown: "unknown",
+  Use: "use",
   Utility: "utility",
   Waist: "waist",
   Weapon: "weapon",
-};
+} as const;
 
+/**
+ * Return a copy of tags replaceing targets with replacements.
+ */
 export function replace(
   tags: string[],
   target: string[],
@@ -83,7 +89,7 @@ export function getSlotType(thing: { tags: string[] }) {
 
 export function getActionType(action: { tags: string[] }) {
   return (
-    [tag.Rest, tag.Travel].find((tag) => action.tags.includes(tag)) ??
+    [tag.Resting, tag.Travel].find((tag) => action.tags.includes(tag)) ??
     tag.Unknown
   );
 }

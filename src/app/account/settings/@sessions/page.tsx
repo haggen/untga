@@ -4,11 +4,11 @@ import { Heading } from "~/components/heading";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
 import { serializable } from "~/lib/serializable";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { Form } from "./form";
 
 export default async function Page() {
-  const session = await ensureActiveSession(true);
+  const session = await ensureSession(true);
 
   const sessions = await db.session.findMany({
     where: { userId: session.userId },
@@ -18,7 +18,7 @@ export default async function Page() {
   const invalidate = createStatefulAction(async (payload: { id: number }) => {
     "use server";
 
-    const session = await ensureActiveSession();
+    const session = await ensureSession();
 
     await db.session.invalidate({
       where: {

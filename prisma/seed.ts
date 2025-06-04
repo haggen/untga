@@ -1,7 +1,5 @@
-import { randomUUID } from "crypto";
-import { DateTime } from "luxon";
 import { db } from "~/db";
-import { tag } from "~/lib/tags";
+import { tag } from "~/lib/tag";
 
 // const args = process.argv.slice(2);
 
@@ -397,33 +395,45 @@ const seed = {
     {
       name: "Loaf of Hard Bread",
       description: "Dense, long-lasting bread. Chewing it's half the battle.",
-      tags: [tag.Consumable, tag.Food, tag.Starting],
+      tags: [
+        tag.Consumable,
+        tag.Stackable,
+        tag.Food,
+        tag.Craftable,
+        tag.Starting,
+      ],
     },
     {
       name: "Flask of Red Wine",
       description: "Cheap village wine. Sour but warming.",
-      tags: [tag.Consumable, tag.Drink, tag.Starting],
+      tags: [
+        tag.Consumable,
+        tag.Stackable,
+        tag.Food,
+        tag.Craftable,
+        tag.Starting,
+      ],
     },
     {
       name: "Dried Apples",
       description: "Slices of apple, dried over the hearth. Sweet and chewy.",
-      tags: [tag.Consumable, tag.Food],
+      tags: [tag.Consumable, tag.Stackable, tag.Food, tag.Craftable],
     },
     {
       name: "Bandage Roll",
       description: "Clean cloth strips used to dress wounds. Slows bleeding.",
-      tags: [tag.Consumable, tag.Stackable, tag.Healing],
+      tags: [tag.Consumable, tag.Stackable, tag.Healing, tag.Craftable],
     },
     {
       name: "Tarnished Locket",
       description: "An old silver locket containing a faded portrait.",
-      tags: [tag.Trinket],
+      tags: [tag.Trinket, tag.Craftable, tag.Breakable],
     },
     {
       name: "Carved Wooden Charm",
       description:
         "A token whittled into the shape of a stag. Thought to bring luck.",
-      tags: [tag.Trinket],
+      tags: [tag.Trinket, tag.Craftable, tag.Breakable],
     },
     {
       name: "Gold Coin",
@@ -433,7 +443,13 @@ const seed = {
     {
       name: "Bedroll",
       description: "A rolled bundle of blankets for sleeping outdoors.",
-      tags: [tag.Utility, tag.Starting, tag.Resting],
+      tags: [
+        tag.Utility,
+        tag.Starting,
+        tag.Resting,
+        tag.Craftable,
+        tag.Breakable,
+      ],
     },
   ],
   attributes: [
@@ -524,24 +540,6 @@ async function main() {
       })),
     });
   });
-
-  const system = await db.user.create({
-    data: {
-      email: "system@localhost",
-      password: randomUUID(),
-    },
-  });
-
-  const session = await db.session.create({
-    data: {
-      user: { connect: { id: system.id } },
-      expiresAt: DateTime.now().plus({ year: 10 }).toJSDate(),
-      ip: "127.0.0.1",
-      userAgent: "n/a",
-    },
-  });
-
-  console.log("System session secret:", session.secret);
 }
 
 main()

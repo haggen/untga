@@ -1,14 +1,14 @@
 import { Heading } from "~/components/heading";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { Form } from "./form";
 
 export default function Page() {
   const action = createStatefulAction(async () => {
     "use server";
 
-    const session = await ensureActiveSession(true);
+    const session = await ensureSession(true);
 
     await db.user.delete({
       where: { id: session.userId },

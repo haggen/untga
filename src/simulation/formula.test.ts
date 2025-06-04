@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { getRestingTime, getTravelStaminaCost, getTravelTime } from "./formula";
+import {
+  getRestingTime,
+  getTravelDuration,
+  getTravelStaminaCost,
+} from "./formula";
 
 describe("getTravelStaminaCost", () => {
   test("30km at zero skill", () => {
@@ -22,19 +26,27 @@ describe("getTravelStaminaCost", () => {
 
 describe("getTravelTime", () => {
   test("1km at zero skill", () => {
-    expect(getTravelTime({ distance: 1, skill: 0 }).hours).toBeCloseTo(0.333);
+    expect(getTravelDuration({ distance: 1, skill: 0 }).hours).toBeCloseTo(
+      0.333
+    );
   });
 
   test("1km at 100% skill", () => {
-    expect(getTravelTime({ distance: 1, skill: 100 }).hours).toBeCloseTo(0.166);
+    expect(getTravelDuration({ distance: 1, skill: 100 }).hours).toBeCloseTo(
+      0.166
+    );
   });
 
   test("20km at 50% skill", () => {
-    expect(getTravelTime({ distance: 20, skill: 50 }).hours).toBeCloseTo(4.444);
+    expect(getTravelDuration({ distance: 20, skill: 50 }).hours).toBeCloseTo(
+      4.444
+    );
   });
 
   test("zero distance", () => {
-    expect(getTravelTime({ distance: 0, skill: 100 }).hours).toBeCloseTo(0.016);
+    expect(getTravelDuration({ distance: 0, skill: 100 }).hours).toBeCloseTo(
+      0.016
+    );
   });
 });
 

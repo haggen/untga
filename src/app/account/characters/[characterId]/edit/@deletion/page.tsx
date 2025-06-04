@@ -4,7 +4,7 @@ import { Heading } from "~/components/heading";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
 import { serializable } from "~/lib/serializable";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     characterId: schemas.id,
   });
 
-  const session = await ensureActiveSession(true);
+  const session = await ensureSession(true);
 
   const character = await db.character.findUniqueOrThrow({
     where: { id: characterId, userId: session.userId },
@@ -22,7 +22,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
-    const session = await ensureActiveSession();
+    const session = await ensureSession();
 
     const data = parse(payload, {
       characterId: schemas.id,

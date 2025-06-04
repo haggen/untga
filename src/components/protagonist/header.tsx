@@ -5,7 +5,7 @@ import { Link } from "~/components/link";
 import { Character, WithAttributes, WithLocation } from "~/db";
 import { ensure } from "~/lib/ensure";
 import { fmt } from "~/lib/fmt";
-import { tag } from "~/lib/tags";
+import { tag } from "~/lib/tag";
 
 export function Header({
   character,

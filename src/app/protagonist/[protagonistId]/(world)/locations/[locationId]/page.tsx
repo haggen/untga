@@ -5,8 +5,9 @@ import { Heading } from "~/components/heading";
 import { Summary } from "~/components/location/summary";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
+import { sim } from "~/simulation";
 import { Form } from "./form";
 
 export async function generateMetadata({
@@ -49,38 +50,39 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
   const action = createStatefulAction(
     async ({
-      action,
-      characterId,
-      locationId,
+      intent,
+      ...params
     }: {
-      action: string;
+      intent: string;
       characterId: number;
       locationId: number;
     }) => {
       "use server";
 
-      const session = await ensureActiveSession();
+      const session = await ensureSession();
 
-      await db.character.findUniqueOrThrow({
-        where: { id: characterId, user: { id: session.user.id } },
-      });
+      await db.character
+        .findUniqueOrThrow({
+          where: { id: params.characterId, user: { id: session.user.id } },
+        })
+        .catch((cause) => {
+          throw new Error("You can't do that.", { cause });
+        });
 
-      switch (action) {
-        case "travel": {
-          await db.character.travel.start({
-            data: {
-              characterId,
-              destinationId: locationId,
-            },
+      switch (intent) {
+        case "travel":
+          await sim.actions.travel.execute({
+            characterId: params.characterId,
+            destinationId: params.locationId,
           });
           break;
-        }
         default:
-          throw new Error("Unknown action.");
+          throw new Error(`Unknown intent ${intent}.`);
       }
 
-      revalidatePath(`/protagonist/${characterId}/location`);
-      redirect(`/protagonist/${characterId}/location`);
+      revalidatePath(`/protagonist/${params.characterId}`);
+
+      redirect(`/protagonist/${params.characterId}/location`);
     }
   );
 

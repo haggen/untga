@@ -4,7 +4,7 @@ import z from "zod/v4";
 import { Heading } from "~/components/heading";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 import { Form } from "./form";
 
@@ -16,7 +16,7 @@ export default async function Page() {
   const action = createStatefulAction(async (payload: FormData) => {
     "use server";
 
-    const session = await ensureActiveSession();
+    const session = await ensureSession();
 
     const data = parse(payload, {
       name: schemas.name,

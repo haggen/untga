@@ -11,7 +11,7 @@ const cookieId = "session";
 /**
  * Read session secret from cookies.
  */
-export async function getActiveSessionSecret() {
+export async function getSessionSecret() {
   const store = await cookies();
   return store.get(cookieId)?.value;
 }
@@ -19,8 +19,8 @@ export async function getActiveSessionSecret() {
 /**
  * Load a Session instance from the database using the session secret stored in cookies.
  */
-export async function getActiveSession() {
-  const secret = await getActiveSessionSecret();
+export async function getSession() {
+  const secret = await getSessionSecret();
 
   if (!secret) {
     return null;
@@ -39,13 +39,13 @@ export async function getActiveSession() {
 
 /**
  * Read active session from cookies or throw.
- * @param recover - Redirect instead of throwing.
+ * @param recoverable - Redirect instead of throwing.
  */
-export async function ensureActiveSession(recover = false) {
-  const session = await getActiveSession();
+export async function ensureSession(recoverable = false) {
+  const session = await getSession();
 
   if (!session) {
-    if (recover) {
+    if (recoverable) {
       redirect("/login");
     }
     throw new UnauthorizedError();
@@ -54,6 +54,9 @@ export async function ensureActiveSession(recover = false) {
   return session;
 }
 
+/**
+ * Create session cookie.
+ */
 export function createCookie(session: Session) {
   return {
     name: cookieId,
@@ -69,7 +72,7 @@ export function createCookie(session: Session) {
 /**
  * Store given session secret in cookies.
  */
-export async function setActiveSession(session: Session) {
+export async function setSession(session: Session) {
   const store = await cookies();
   store.set(createCookie(session));
 }
@@ -77,7 +80,7 @@ export async function setActiveSession(session: Session) {
 /**
  * Delete session cookie.
  */
-export async function unsetActiveSession() {
+export async function clearSession() {
   const store = await cookies();
   store.delete(cookieId);
 }

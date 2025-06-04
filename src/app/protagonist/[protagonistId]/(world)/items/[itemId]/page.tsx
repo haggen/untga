@@ -1,15 +1,15 @@
 import { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import * as Definition from "~/components/definition";
 import { Heading } from "~/components/heading";
+import { Summary } from "~/components/item/summary";
 import { db } from "~/db";
 import { createStatefulAction } from "~/lib/actions";
-import { fmt } from "~/lib/fmt";
 import { serializable } from "~/lib/serializable";
-import { ensureActiveSession } from "~/lib/session";
-import { tag } from "~/lib/tags";
+import { ensureSession } from "~/lib/session";
+import { tag } from "~/lib/tag";
 import { parse, schemas } from "~/lib/validation";
+import { sim } from "~/simulation";
 import { Form } from "./form";
 
 export async function generateMetadata({
@@ -35,30 +35,11 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
     itemId: schemas.id,
   });
 
-  const session = await ensureActiveSession(true);
+  const session = await ensureSession(true);
 
   const protagonist = await db.character.findUniqueOrThrow({
     where: { id: protagonistId, user: { id: session.user.id } },
-    include: {
-      slots: {
-        include: {
-          items: {
-            include: {
-              spec: true,
-              storage: {
-                include: {
-                  items: {
-                    include: {
-                      spec: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+    include: db.character.withEquipment(),
   });
 
   const item = await db.item.findUniqueOrThrow({
@@ -68,59 +49,45 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
   const action = createStatefulAction(
     async ({
-      action,
-      characterId,
-      itemId,
+      intent,
+      ...params
     }: {
-      action: string;
       characterId: number;
       itemId: number;
+      intent: string;
     }) => {
       "use server";
 
-      const session = await ensureActiveSession();
+      const session = await ensureSession();
 
       await db.character
         .findUniqueOrThrow({
-          where: { id: characterId, user: { id: session.user.id } },
+          where: { id: params.characterId, userId: session.user.id },
         })
         .catch((cause) => {
           throw new Error("You are not allowed to do that.", { cause });
         });
 
-      switch (action) {
-        case "use":
-          await db.item.use({
-            data: { itemId, characterId },
-          });
+      switch (intent) {
+        case tag.Resting:
+          sim.actions.rest.execute(params);
           break;
-        case "equip":
-          await db.character.equip({
-            data: {
-              characterId,
-              itemId,
-            },
-          });
+        case tag.Equip:
+          sim.actions.equip.execute(params);
           break;
-        case "unequip":
-          await db.character.unequip({
-            data: {
-              characterId,
-              itemId,
-            },
-          });
+        case tag.Unequip:
+          sim.actions.unequip.execute(params);
           break;
-        case "discard":
-          await db.item.discard({
-            data: { itemId },
-          });
+        case tag.Discard:
+          sim.actions.discard.execute(params);
           break;
         default:
-          throw new Error("Unknown action.");
+          throw new Error(`Unknown intent ${intent}.`);
       }
 
-      revalidatePath(`/protagonist/${characterId}/equipment`);
-      redirect(`/protagonist/${characterId}/equipment`);
+      revalidatePath(`/protagonist/${params.characterId}`);
+
+      redirect(`/protagonist/${params.characterId}/equipment`);
     }
   );
 
@@ -131,25 +98,7 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
           <h1>{item.spec.name}</h1>
         </Heading>
 
-        <p>{item.spec.description}</p>
-
-        <Definition.List>
-          {item.spec.tags.includes(tag.Craftable) ? (
-            <Definition.Item label="Quality">
-              {fmt.item.quality(item.spec.quality)}
-            </Definition.Item>
-          ) : null}
-          {item.spec.tags.includes(tag.Breakable) ? (
-            <Definition.Item label="Durability">
-              {fmt.item.durability(item.durability)}
-            </Definition.Item>
-          ) : null}
-          {item.spec.tags.includes(tag.Stackable) ? (
-            <Definition.Item label="Amount">
-              {fmt.item.amount(item.amount)}
-            </Definition.Item>
-          ) : null}
-        </Definition.List>
+        <Summary item={item} />
       </div>
 
       <Form

@@ -7,7 +7,7 @@ import * as Menu from "~/components/menu";
 import { Character, Item, WithSlots, WithSpec, WithStorage } from "~/db";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Serializable } from "~/lib/serializable";
-import { tag } from "~/lib/tags";
+import { getUtilityType, tag } from "~/lib/tag";
 import { useStatefulActionState } from "~/lib/use-stateful-action-state";
 
 function isEquipped(
@@ -22,7 +22,7 @@ function isEquipped(
 export function Form(
   props: Readonly<{
     action: StatefulAction<
-      { characterId: number; itemId: number; action: string },
+      { characterId: number; itemId: number; intent: string },
       ActionState
     >;
     item: Serializable<Item<WithSpec>>;
@@ -37,6 +37,14 @@ export function Form(
     characterId: props.protagonist.id,
   };
 
+  const use = action.bind(null, {
+    ...data,
+    intent: getUtilityType(props.item.spec),
+  });
+  const equip = action.bind(null, { ...data, intent: tag.Equip });
+  const unequip = action.bind(null, { ...data, intent: tag.Unequip });
+  const discard = action.bind(null, { ...data, intent: tag.Discard });
+
   const back = (event: MouseEvent) => {
     event.preventDefault();
     router.back();
@@ -48,22 +56,13 @@ export function Form(
 
       <Menu.List>
         {isEquipped(props.protagonist, props.item.id) ? (
-          <Menu.Item action={action.bind(null, { ...data, action: "unequip" })}>
-            Take off
-          </Menu.Item>
+          <Menu.Item action={unequip}>Take off</Menu.Item>
         ) : props.item.spec.tags.includes(tag.Equipment) ? (
-          <Menu.Item action={action.bind(null, { ...data, action: "equip" })}>
-            Equip
-          </Menu.Item>
+          <Menu.Item action={equip}>Equip</Menu.Item>
+        ) : props.item.spec.tags.includes(tag.Utility) ? (
+          <Menu.Item action={use}>Use</Menu.Item>
         ) : null}
-        {props.item.spec.tags.includes(tag.Utility) ? (
-          <Menu.Item action={action.bind(null, { ...data, action: "use" })}>
-            Use
-          </Menu.Item>
-        ) : null}
-        <Menu.Item action={action.bind(null, { ...data, action: "discard" })}>
-          Discard
-        </Menu.Item>
+        <Menu.Item action={discard}>Discard</Menu.Item>
         <Menu.Item href="#" onClick={back}>
           Cancel
         </Menu.Item>

@@ -7,7 +7,7 @@ import { Summary } from "~/components/location/summary";
 import { Header } from "~/components/protagonist/header";
 import { db } from "~/db";
 import { fmt } from "~/lib/fmt";
-import { ensureActiveSession } from "~/lib/session";
+import { ensureSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default async function Page({
     protagonistId: schemas.id,
   });
 
-  const session = await ensureActiveSession(true);
+  const session = await ensureSession(true);
 
   const protagonist = await db.character.findUniqueOrThrow({
     where: { id: protagonistId, user: { id: session.user.id } },

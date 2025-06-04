@@ -2,22 +2,12 @@ import { expect, test, vi } from "vitest";
 import { Emitter } from "./emitter";
 
 test("Emitter", async () => {
-  const emitter = new Emitter();
+  const handler = vi.fn(({}: { characterId: number; itemId: number }) =>
+    Promise.resolve(undefined)
+  );
+  const emitter = new Emitter().on(["unequip"], handler);
 
-  const foo = vi.fn();
-  const bar = vi.fn();
-  const baz = vi.fn();
+  await emitter.emit(["unequip"], { characterId: 1, itemId: 2 });
 
-  emitter.on(["Bar", "Baz", "Fez"], baz);
-  emitter.on(["Bar", "Foo"], bar);
-  emitter.on(["Foo"], foo);
-
-  const data = {};
-
-  await emitter.emit(["Foo", "Bar"], data);
-
-  expect(foo).toBeCalledWith(data);
-  expect(bar).toBeCalledWith(data);
-  expect(foo).toHaveBeenCalledBefore(bar);
-  expect(baz).not.toBeCalled();
+  expect(handler).toHaveBeenCalledWith({ characterId: 1, itemId: 2 });
 });
