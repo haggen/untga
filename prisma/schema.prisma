@@ -92,29 +92,29 @@ model Character {
   attributes Attribute[]
   /// Character's log entries.
   logs       Log[]
-  /// Character's actions.
-  actions    Action[]
+  /// Character's activities.
+  activities Activity[]
 
   @@index(tags)
   @@index(deletedAt)
 }
 
 /// Actions performed by characters, such as travelling, resting, crafting, etc.
-model Action {
-  /// Action's primary key.
-  id        Int      @id @default(autoincrement())
-  /// When the action was started.
-  startedAt DateTime @default(now())
-  /// When the action was completed.
+model Activity {
+  /// Activity's primary key.
+  id          Int       @id @default(autoincrement())
+  /// When the activity was started.
+  startedAt   DateTime  @default(now())
+  /// When the activity was completed.
   completedAt DateTime?
-  /// Action tags.
-  tags      String[]
-  /// Action parameters.
-  params    Json
+  /// Activity tags.
+  tags        String[]
+  /// Activity parameters.
+  params      Json
 
-  /// Character performing the action.
+  /// Character performing the activity.
   characterId Int
-  /// Character performing the action.
+  /// Character performing the activity.
   character   Character @relation(fields: [characterId], references: [id], onDelete: Restrict)
 
   @@index(tags)

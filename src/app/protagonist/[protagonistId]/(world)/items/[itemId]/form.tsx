@@ -5,6 +5,7 @@ import { MouseEvent } from "react";
 import { alert } from "~/components/alert";
 import * as Menu from "~/components/menu";
 import { Character, Item, WithSlots, WithSpec, WithStorage } from "~/db";
+import { type Plan } from "~/game/simulation";
 import { ActionState, StatefulAction } from "~/lib/actions";
 import { Serializable } from "~/lib/serializable";
 import { getUtilityType, tag } from "~/lib/tag";
@@ -21,10 +22,7 @@ function isEquipped(
 
 export function Form(
   props: Readonly<{
-    action: StatefulAction<
-      { characterId: number; itemId: number; intent: string },
-      ActionState
-    >;
+    action: StatefulAction<Plan<{ itemId: number }>, ActionState>;
     item: Serializable<Item<WithSpec>>;
     protagonist: Serializable<Character<WithSlots<WithStorage>>>;
   }>
@@ -32,18 +30,37 @@ export function Form(
   const { action, state } = useStatefulActionState(props.action);
   const router = useRouter();
 
-  const data = {
-    itemId: props.item.id,
-    characterId: props.protagonist.id,
-  };
-
   const use = action.bind(null, {
-    ...data,
-    intent: getUtilityType(props.item.spec),
+    tags: [getUtilityType(props.item.spec)],
+    characterId: props.protagonist.id,
+    params: {
+      itemId: props.item.id,
+    },
   });
-  const equip = action.bind(null, { ...data, intent: tag.Equip });
-  const unequip = action.bind(null, { ...data, intent: tag.Unequip });
-  const discard = action.bind(null, { ...data, intent: tag.Discard });
+
+  const equip = action.bind(null, {
+    tags: [tag.Equip],
+    characterId: props.protagonist.id,
+    params: {
+      itemId: props.item.id,
+    },
+  });
+
+  const unequip = action.bind(null, {
+    tags: [tag.Unequip],
+    characterId: props.protagonist.id,
+    params: {
+      itemId: props.item.id,
+    },
+  });
+
+  const discard = action.bind(null, {
+    tags: [tag.Discard],
+    characterId: props.protagonist.id,
+    params: {
+      itemId: props.item.id,
+    },
+  });
 
   const back = (event: MouseEvent) => {
     event.preventDefault();

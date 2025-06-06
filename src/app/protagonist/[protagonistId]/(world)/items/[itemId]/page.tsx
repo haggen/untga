@@ -4,12 +4,11 @@ import { redirect } from "next/navigation";
 import { Heading } from "~/components/heading";
 import { Summary } from "~/components/item/summary";
 import { db } from "~/db";
+import { game } from "~/game";
 import { createStatefulAction } from "~/lib/actions";
 import { serializable } from "~/lib/serializable";
 import { ensureSession } from "~/lib/session";
-import { tag } from "~/lib/tag";
 import { parse, schemas } from "~/lib/validation";
-import { sim } from "~/simulation";
 import { Form } from "./form";
 
 export async function generateMetadata({
@@ -49,12 +48,13 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
   const action = createStatefulAction(
     async ({
-      intent,
-      ...params
+      tags,
+      characterId,
+      params,
     }: {
+      tags: string[];
       characterId: number;
-      itemId: number;
-      intent: string;
+      params: { itemId: number };
     }) => {
       "use server";
 
@@ -62,32 +62,24 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
 
       await db.character
         .findUniqueOrThrow({
-          where: { id: params.characterId, userId: session.user.id },
+          where: { id: characterId, userId: session.user.id },
         })
         .catch((cause) => {
-          throw new Error("You are not allowed to do that.", { cause });
+          throw new Error("You can't do that.", { cause });
         });
 
-      switch (intent) {
-        case tag.Resting:
-          sim.actions.rest.execute(params);
-          break;
-        case tag.Equip:
-          sim.actions.equip.execute(params);
-          break;
-        case tag.Unequip:
-          sim.actions.unequip.execute(params);
-          break;
-        case tag.Discard:
-          sim.actions.discard.execute(params);
-          break;
-        default:
-          throw new Error(`Unknown intent ${intent}.`);
-      }
+      const activity = await db.activity.create({
+        data: {
+          tags,
+          characterId,
+          params,
+        },
+      });
 
-      revalidatePath(`/protagonist/${params.characterId}`);
+      await game.simulation.handle(activity);
 
-      redirect(`/protagonist/${params.characterId}/equipment`);
+      revalidatePath(`/protagonist/${characterId}`);
+      redirect(`/protagonist/${characterId}/equipment`);
     }
   );
 

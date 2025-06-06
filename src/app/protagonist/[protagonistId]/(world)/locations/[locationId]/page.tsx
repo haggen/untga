@@ -4,10 +4,12 @@ import { redirect } from "next/navigation";
 import { Heading } from "~/components/heading";
 import { Summary } from "~/components/location/summary";
 import { db } from "~/db";
+import { game } from "~/game";
+import { type Plan } from "~/game/simulation";
 import { createStatefulAction } from "~/lib/actions";
+import { serializable } from "~/lib/serializable";
 import { ensureSession } from "~/lib/session";
 import { parse, schemas } from "~/lib/validation";
-import { sim } from "~/simulation";
 import { Form } from "./form";
 
 export async function generateMetadata({
@@ -27,17 +29,13 @@ export async function generateMetadata({
   return { title: location.name };
 }
 
-export default async function Page({ params }: { params: Promise<unknown> }) {
+export default async function Page({
+  params,
+}: Readonly<{ params: Promise<unknown> }>) {
   const { protagonistId, locationId } = parse(await params, {
     protagonistId: schemas.id,
     locationId: schemas.id,
   });
-
-  // const session = await ensureActiveSession(true);
-
-  // const protagonist = await db.character.findUniqueOrThrow({
-  //   where: { id: protagonistId, user: { id: session.user.id } },
-  // });
 
   const location = await db.location.findUniqueOrThrow({
     where: { id: locationId },
@@ -49,40 +47,31 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
   });
 
   const action = createStatefulAction(
-    async ({
-      intent,
-      ...params
-    }: {
-      intent: string;
-      characterId: number;
-      locationId: number;
-    }) => {
+    async ({ tags, characterId, params }: Plan<{ destinationId: number }>) => {
       "use server";
 
       const session = await ensureSession();
 
       await db.character
         .findUniqueOrThrow({
-          where: { id: params.characterId, user: { id: session.user.id } },
+          where: { id: characterId, user: { id: session.user.id } },
         })
         .catch((cause) => {
           throw new Error("You can't do that.", { cause });
         });
 
-      switch (intent) {
-        case "travel":
-          await sim.actions.travel.execute({
-            characterId: params.characterId,
-            destinationId: params.locationId,
-          });
-          break;
-        default:
-          throw new Error(`Unknown intent ${intent}.`);
-      }
+      const activity = await db.activity.create({
+        data: {
+          tags,
+          characterId,
+          params,
+        },
+      });
 
-      revalidatePath(`/protagonist/${params.characterId}`);
+      await game.simulation.handle(activity);
 
-      redirect(`/protagonist/${params.characterId}/location`);
+      revalidatePath(`/protagonist/${characterId}`);
+      redirect(`/protagonist/${characterId}/location`);
     }
   );
 
@@ -96,7 +85,11 @@ export default async function Page({ params }: { params: Promise<unknown> }) {
         <Summary location={location} />
       </div>
 
-      <Form action={action} protagonistId={protagonistId} location={location} />
+      <Form
+        action={action}
+        protagonist={{ id: protagonistId }}
+        location={serializable(location)}
+      />
     </div>
   );
 }

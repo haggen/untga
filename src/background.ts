@@ -1,3 +1,3 @@
-import { sim } from "~/simulation";
+import { game } from "~/game";
 
-export const intervalId = setInterval(sim.tick, 60_000);
+export const intervalId = setInterval(game.tick, 60_000);

@@ -1,24 +1,24 @@
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 /**
- * Payload of a server action.
+ * Server action parameters.
  */
-export type ActionPayload = FormData | Record<string, unknown>;
+export type ActionParams = FormData | Record<string, unknown>;
 
 /**
- * State of a server action.
+ * Server action produced state.
  */
 export type ActionState = { error: string } | { message: string } | undefined;
 
 /**
- * Action produced by useActionState.
+ * Server action that produces state.
  */
-export type StatefulAction<P, S> = (state: S, payload: P) => Promise<S>;
+export type StatefulAction<P, S> = (state: S, params: P) => Promise<S>;
 
 /**
- * Server action.
+ * Server action that doesn't produce state.
  */
-export type StatelessAction<P> = (payload?: P) => void;
+export type StatelessAction<P> = (params?: P) => void;
 
 /**
  * Error handler for server/form actions.
@@ -39,13 +39,13 @@ export function handleActionError(err: unknown) {
  * Create a form action from a server action.
  */
 export function createStatefulAction<P>(
-  action: (payload: P) => Promise<ActionState>
+  action: (params: P) => Promise<ActionState>
 ) {
-  return async (_: ActionState, payload: P): Promise<ActionState> => {
+  return async (_: ActionState, params: P): Promise<ActionState> => {
     "use server";
 
     try {
-      return await action(payload);
+      return await action(params);
     } catch (err) {
       return handleActionError(err);
     }

@@ -40,7 +40,7 @@ CREATE TABLE "Character" (
 );
 
 -- CreateTable
-CREATE TABLE "Action" (
+CREATE TABLE "Activity" (
     "id" SERIAL NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "completedAt" TIMESTAMP(3),
@@ -48,7 +48,7 @@ CREATE TABLE "Action" (
     "params" JSONB NOT NULL,
     "characterId" INTEGER NOT NULL,
 
-    CONSTRAINT "Action_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Activity_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -167,13 +167,13 @@ CREATE INDEX "Character_tags_idx" ON "Character"("tags");
 CREATE INDEX "Character_deletedAt_idx" ON "Character"("deletedAt");
 
 -- CreateIndex
-CREATE INDEX "Action_tags_idx" ON "Action"("tags");
+CREATE INDEX "Activity_tags_idx" ON "Activity"("tags");
 
 -- CreateIndex
-CREATE INDEX "Action_startedAt_idx" ON "Action"("startedAt");
+CREATE INDEX "Activity_startedAt_idx" ON "Activity"("startedAt");
 
 -- CreateIndex
-CREATE INDEX "Action_completedAt_idx" ON "Action"("completedAt");
+CREATE INDEX "Activity_completedAt_idx" ON "Activity"("completedAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AttributeSpecification_name_key" ON "AttributeSpecification"("name");
@@ -212,7 +212,7 @@ ALTER TABLE "Character" ADD CONSTRAINT "Character_userId_fkey" FOREIGN KEY ("use
 ALTER TABLE "Character" ADD CONSTRAINT "Character_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Action" ADD CONSTRAINT "Action_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Activity" ADD CONSTRAINT "Activity_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

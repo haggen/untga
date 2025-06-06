@@ -26,8 +26,8 @@ export type Character<T = unknown> = Prisma.Result<
   "findFirstOrThrow"
 >;
 
-export type Action<T = unknown> = Prisma.Result<
-  typeof db.action,
+export type Activity<T = unknown> = Prisma.Result<
+  typeof db.activity,
   T,
   "findFirstOrThrow"
 >;
