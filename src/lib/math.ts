@@ -16,15 +16,15 @@ export const curves = {
 } as const;
 
 /**
- * Interpolate between min and max using a curve function.
+ * Interpolate between min and max following a curve function.
  */
 export function interpolate(
   min: number,
   max: number,
   ratio: number,
-  func: (x: number) => number = curves.linear
-): number {
-  return min + (max - min) * func(clamp(0, 1, ratio));
+  curve: (x: number) => number = curves.linear
+) {
+  return min + (max - min) * curve(clamp(0, 1, ratio));
 }
 
 /**

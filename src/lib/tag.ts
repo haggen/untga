@@ -3,6 +3,7 @@ export const tag = {
   Breakable: "breakable",
   Combat: "combat",
   Consumable: "consumable",
+  Cost: "cost",
   Craftable: "craftable",
   Crafting: "crafting",
   Currency: "currency",
@@ -33,6 +34,7 @@ export const tag = {
   Resting: "resting",
   Route: "route",
   Skill: "skill",
+  Speed: "speed",
   Slot: "slot",
   Stackable: "stackable",
   Stamina: "stamina",
@@ -52,6 +54,8 @@ export const tag = {
   Waist: "waist",
   Weapon: "weapon",
 } as const;
+
+export type tag = typeof tag;
 
 /**
  * Return a copy of tags replaceing targets with replacements.

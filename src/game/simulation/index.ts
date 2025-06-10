@@ -1,4 +1,5 @@
-import { type Activity } from "~/db";
+import { DateTime } from "luxon";
+import { db, type Activity } from "~/db";
 
 /**
  * Game activity input data.
@@ -42,6 +43,17 @@ export const simulation = {
     if (!handler) {
       throw new Error(`No handler found for tags ${activity.tags}.`);
     }
-    return await handler(activity);
+
+    try {
+      return await handler(activity);
+    } catch (err) {
+      await db.activity.update({
+        where: { id: activity.id },
+        data: {
+          completedAt: DateTime.now().toJSDate(),
+        },
+      });
+      throw err;
+    }
   },
 };

@@ -64,7 +64,7 @@ export default async function Page({
         data: {
           tags,
           characterId,
-          params,
+          params: { ...params, progress: 0 },
         },
       });
 

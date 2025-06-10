@@ -1,79 +1,72 @@
 import { describe, expect, test } from "vitest";
 import {
-  getRestingTime,
-  getTravelDuration,
+  getRestingRecoveryRate,
+  getTravelDistance,
+  getTravelSpeed,
   getTravelStaminaCost,
 } from "./formula";
 
 describe("getTravelStaminaCost", () => {
   test("30km at zero skill", () => {
-    expect(getTravelStaminaCost({ distance: 30, skill: 0 })).toBe(100);
+    expect(
+      getTravelStaminaCost({ distance: 30, endurance: { level: 0, cap: 100 } })
+    ).toBe(100);
   });
 
   test("30km at 100% skill", () => {
-    expect(getTravelStaminaCost({ distance: 30, skill: 100 })).toBe(50);
-  });
-
-  // Assuming an average distance between villages of 2km.
-  test("2km at zero skill", () => {
-    expect(getTravelStaminaCost({ distance: 2, skill: 0 })).toBe(7);
-  });
-
-  test("zero distance", () => {
-    expect(getTravelStaminaCost({ distance: 0, skill: 100 })).toBe(1);
-  });
-});
-
-describe("getTravelTime", () => {
-  test("1km at zero skill", () => {
-    expect(getTravelDuration({ distance: 1, skill: 0 }).hours).toBeCloseTo(
-      0.333
-    );
-  });
-
-  test("1km at 100% skill", () => {
-    expect(getTravelDuration({ distance: 1, skill: 100 }).hours).toBeCloseTo(
-      0.166
-    );
-  });
-
-  test("20km at 50% skill", () => {
-    expect(getTravelDuration({ distance: 20, skill: 50 }).hours).toBeCloseTo(
-      4.444
-    );
+    expect(
+      getTravelStaminaCost({
+        distance: 30,
+        endurance: { level: 100, cap: 100 },
+      })
+    ).toBe(50);
   });
 
   test("zero distance", () => {
-    expect(getTravelDuration({ distance: 0, skill: 100 }).hours).toBeCloseTo(
-      0.016
-    );
+    expect(
+      getTravelStaminaCost({ distance: 0, endurance: { level: 100, cap: 100 } })
+    ).toBe(0);
   });
 });
 
-describe("getRestTime", () => {
-  test("0% stamina at 0% quality", () => {
-    expect(getRestingTime({ stamina: 0, quality: 0 }).hours).toBeCloseTo(12);
+describe("getRestingRecoveryRate", () => {
+  test("worst bed", () => {
+    expect(getRestingRecoveryRate({ time: 1, quality: 0 })).toEqual(8);
   });
 
-  test("0% stamina at 100% quality", () => {
-    expect(getRestingTime({ stamina: 0, quality: 100 }).hours).toBeCloseTo(8);
+  test("best bed", () => {
+    expect(getRestingRecoveryRate({ time: 1, quality: 100 })).toEqual(12);
   });
 
-  test("min cap", () => {
-    expect(getRestingTime({ stamina: 100, quality: 0 }).hours).toBeCloseTo(
-      0.016
-    );
+  test("average bed", () => {
+    expect(getRestingRecoveryRate({ time: 1, quality: 50 })).toEqual(10);
+  });
+});
+
+describe("getTravelSpeed", () => {
+  test("zero skill", () => {
+    expect(getTravelSpeed({ endurance: { level: 0, cap: 100 } })).toEqual(3);
   });
 
-  test("25% stamina at 0% quality", () => {
-    expect(getRestingTime({ stamina: 25, quality: 0 }).hours).toBeCloseTo(9);
+  test("100% skill", () => {
+    expect(getTravelSpeed({ endurance: { level: 100, cap: 100 } })).toEqual(6);
   });
 
-  test("50% stamina at 0% quality", () => {
-    expect(getRestingTime({ stamina: 50, quality: 0 }).hours).toBeCloseTo(6);
+  test("50% skill", () => {
+    expect(getTravelSpeed({ endurance: { level: 50, cap: 100 } })).toEqual(4.5);
+  });
+});
+
+describe("getTravelTotalDistance", () => {
+  test("zero distance", () => {
+    expect(
+      getTravelDistance({ destination: { area: 0 }, route: { area: 0 } })
+    ).toBe(0);
   });
 
-  test("75% stamina at 0% quality", () => {
-    expect(getRestingTime({ stamina: 75, quality: 0 }).hours).toBeCloseTo(3);
+  test("10km on a 10km route", () => {
+    expect(
+      getTravelDistance({ destination: { area: 10 }, route: { area: 10 } })
+    ).toBe(20);
   });
 });

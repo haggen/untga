@@ -129,18 +129,18 @@ const location = {
    */
   security(security: number) {
     if (security === 100) {
-      return "Safe";
+      return `Safe (${security})`;
     }
 
     if (security >= 70) {
-      return "Maintained";
+      return `Maintained (${security})`;
     }
 
     if (security >= 40) {
-      return "Unsettled";
+      return `Unsettled (${security})`;
     }
 
-    return "Lawless";
+    return `Lawless (${security})`;
   },
 
   /**
@@ -148,18 +148,18 @@ const location = {
    */
   population(population: number) {
     if (population >= 20) {
-      return "Bustling";
+      return `Bustling (${population})`;
     }
 
     if (population >= 10) {
-      return "Crowded";
+      return `Crowded (${population})`;
     }
 
     if (population > 0) {
-      return "Sparse";
+      return `Sparse (${population})`;
     }
 
-    return "Uninhabited";
+    return `Uninhabited (${population})`;
   },
 
   /**
@@ -196,26 +196,26 @@ const character = {
    */
   skill(level: number) {
     if (level === 100) {
-      return "Master";
+      return `Master (${level})`;
     }
 
     if (level >= 80) {
-      return "Expert";
+      return `Expert (${level})`;
     }
 
     if (level >= 60) {
-      return "Journeyman";
+      return `Journeyman (${level})`;
     }
 
     if (level >= 40) {
-      return "Apprentice";
+      return `Apprentice (${level})`;
     }
 
     if (level >= 20) {
-      return "Novice";
+      return `Novice (${level})`;
     }
 
-    return "Untrained";
+    return `Untrained (${level})`;
   },
 
   /**
@@ -223,26 +223,26 @@ const character = {
    */
   health(level: number) {
     if (level === 100) {
-      return "Healthy";
+      return `Healthy (${level})`;
     }
 
     if (level >= 80) {
-      return "Bruised";
+      return `Bruised (${level})`;
     }
 
     if (level >= 40) {
-      return "Hurt";
+      return `Hurt (${level})`;
     }
 
     if (level >= 20) {
-      return "Wounded";
+      return `Wounded (${level})`;
     }
 
     if (level > 0) {
-      return "Incapacitated";
+      return `Incapacitated (${level})`;
     }
 
-    return "Unconscious";
+    return `Unconscious (${level})`;
   },
 
   /**
@@ -250,18 +250,18 @@ const character = {
    */
   stamina(level: number) {
     if (level === 100) {
-      return "Rested";
+      return `Rested (${level})`;
     }
 
     if (level >= 60) {
-      return "Winded";
+      return `Winded (${level})`;
     }
 
     if (level >= 20) {
-      return "Tired";
+      return `Tired (${level})`;
     }
 
-    return "Exhausted";
+    return `Exhausted (${level})`;
   },
 
   /**
@@ -278,22 +278,22 @@ const item = {
    */
   quality(quality: number) {
     if (quality === 100) {
-      return "Masterwork";
+      return `Masterwork (${quality})`;
     }
 
     if (quality >= 80) {
-      return "Exceptional";
+      return `Exceptional (${quality})`;
     }
 
     if (quality >= 60) {
-      return "Fine";
+      return `Fine (${quality})`;
     }
 
     if (quality >= 30) {
-      return "Regular";
+      return `Regular (${quality})`;
     }
 
-    return "Crude";
+    return `Crude (${quality})`;
   },
 
   /**
@@ -301,22 +301,22 @@ const item = {
    */
   durability(durability: number) {
     if (durability === 100) {
-      return "Unused";
+      return `Unused (${durability})`;
     }
 
     if (durability >= 60) {
-      return "Good";
+      return `Good (${durability})`;
     }
 
     if (durability >= 20) {
-      return "Worn";
+      return `Worn (${durability})`;
     }
 
     if (durability > 0) {
-      return "Damaged";
+      return `Damaged (${durability})`;
     }
 
-    return "Broken";
+    return `Broken (${durability})`;
   },
 
   /**

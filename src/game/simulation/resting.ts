@@ -1,8 +1,8 @@
 import z from "zod/v4";
 import { db } from "~/db";
-import { getStaminaRecoveryRate } from "~/game/formula";
-import { rate } from "~/game/rate";
+import { getRestingRecoveryRate } from "~/game/formula";
 import { simulation } from "~/game/simulation";
+import { rate } from "~/game/tick";
 import { getUtilityType, replace, tag } from "~/lib/tag";
 
 simulation.on([tag.Resting], async (activity) => {
@@ -106,10 +106,10 @@ simulation.on([tag.Resting, tag.Tick], async (activity) => {
     throw new Error(`Couldn't find the item #${itemId}.`);
   }
 
-  const increment =
-    getStaminaRecoveryRate({
-      quality: item.quality,
-    }).hourly / rate.hourly;
+  const increment = getRestingRecoveryRate({
+    time: rate,
+    quality: item.quality,
+  });
 
   const level = Math.min(stamina.level + increment, stamina.cap);
 

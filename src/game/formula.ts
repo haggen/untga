@@ -1,118 +1,71 @@
 import { interpolate } from "~/lib/math";
 
 /**
- * 1 minute in hours.
+ * Compute the travel speed.
  */
-const minute = 1 / 60;
-
-/**
- * Global action scaling factor. Make it easier to balance and test.
- */
-const scale = Number.parseFloat(process.env.ACTION_TIME_SCALE ?? "1.0");
-
-/**
- * Calculate the travel speed.
- */
-export function getTravelSpeed({ skill }: { skill: number }) {
-  // Let's assume the fastest a person can walk is 100 meters per minute (6km/h).
+export function getTravelSpeed({
+  endurance,
+}: {
+  endurance: { level: number; cap: number };
+}) {
+  // Let's assume the fastest a person can travel is 6km/h.
   const max = 6;
 
-  // And also that the slowest a person would walk is 50 meters per minute (3km/h).
+  // And that the slowest a person would travel is 3km/h.
   const min = 3;
 
-  // So the travel speed is calculated by interpolating
-  // between the minimum and maximum speeds based on the skill.
-  return interpolate(min, max, skill / 100);
+  // The travel speed is calculated by interpolating between the
+  // minimum and maximum speeds based on the character's skill.
+  return interpolate(min, max, endurance.level / endurance.cap);
 }
 
 /**
- * Calculate the stamina cost of travel.
+ * Compute the stamina cost of travel.
  */
 export function getTravelStaminaCost({
   distance,
-  skill,
+  endurance,
 }: {
   distance: number;
-  skill: number;
+  endurance: { level: number; cap: number };
 }) {
-  // Let's assume the average person could travel for about 10 hours a day on foot,
-  // and that it should consume all of their stamina, but a skilled person would
-  // be able to travel faster, covering more distance in the same time.
-  const speed = getTravelSpeed({ skill });
+  // Let's assume an average person can travel between 30km and 60km
+  // before they are exhausted, depending on their endurance.
+  const base = 100 / interpolate(30, 60, endurance.level / endurance.cap);
 
-  // So the base cost of stamina per km would be 100% stamina / (speed * 10h).
-  const base = 100 / (speed * 10);
-
-  return Math.round(Math.max(1, base * distance) * scale);
+  // The final cost is given by multiplying the base
+  // cost per kilometer by the given distance.
+  return Math.floor(base * distance);
 }
 
 /**
- * Calculate the time it takes to travel some distance.
+ * Compute resting recovery rate.
  */
-export function getTravelDuration({
-  distance,
-  skill,
-}: {
-  distance: number;
-  skill: number;
-}) {
-  const speed = getTravelSpeed({ skill });
-
-  // The travel time is then given by distance over speed.
-  return { hours: Math.max(minute, distance / speed) * scale };
-}
-
-/**
- * Calculate the time it takes to rest to 100% stamina.
- */
-export function getRestingTime({
-  stamina,
+export function getRestingRecoveryRate({
+  time,
   quality,
 }: {
-  stamina: number;
+  time: number;
   quality: number;
 }) {
-  // Let's assume a totally exhaused person in the worst bed possible would
-  // take 12 hours of sleep to fully recover. So the low end of stamina
-  // recovery rate would be 100% / 12h.
-  const max = 12;
+  // Let's assume a totally exhausted person on the worst possible
+  // bed would take 12 hours of sleep to fully recover. So the
+  // slowest recovery rate would be 100% / 12h.
+  const min = 100 / 12;
 
-  // But in the best possible bed a totally exhausted person
-  // would only take 8 hours of sleep to fully recover.
-  const min = 8;
-
-  // The base rest time to fully recover stamina is calculated
-  // by interpolating between the minimum and maximum rest times
-  // based on the quality of the bed.
-  const base = interpolate(min, max, 1 - quality / 100);
-
-  // But it should also depend on how much stamina the person has left;
-  // The more stamina they have, the less time it should take to rest.
-
-  return {
-    hours: Math.max(minute, base * interpolate(1, 0, stamina / 100)) * scale,
-  };
-}
-
-export function getStaminaRecoveryRate({ quality }: { quality: number }) {
-  // Let's assume a totally exhausted person in the worst possible bed would
-  // take 12 hours of sleep to fully recover. So the low end of stamina
-  // recovery rate would be 100% / 12h.
-  const max = 100 / 12;
-
-  // But in the best possible bed that person would
+  // But on the best possible bed that person would
   // only take 8 hours of sleep to fully recover.
-  const min = 100 / 8;
+  const max = 100 / 8;
 
-  // The stamina recovery rate is calculated by interpolating between
+  // The hourly resting recovery rate is calculated by interpolating between
   // the minimum and maximum values based on the quality of the bed.
   const rate = interpolate(min, max, quality / 100);
 
-  return { hourly: rate };
+  return Math.floor(rate * time);
 }
 
 /**
- * Calculate the distance of travel.
+ * Compute trip distance.
  */
 export function getTravelDistance({
   destination,
@@ -121,6 +74,6 @@ export function getTravelDistance({
   destination: { area: number };
   route: { area: number };
 }) {
-  // The travel distance is the sum of the destination area and the route area.
+  // The travel distance is the sum of the destination and route areas.
   return destination.area + route.area;
 }

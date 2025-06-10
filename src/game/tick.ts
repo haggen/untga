@@ -2,6 +2,14 @@ import { db } from "~/db";
 import { simulation } from "~/game/simulation";
 import { tag } from "~/lib/tag";
 
+/**
+ * How many hours are simulated per game tick.
+ */
+export const rate = 1;
+
+/**
+ * Game tick.
+ */
 export async function tick() {
   const activities = await db.activity.findMany({
     where: { completedAt: null },

@@ -1,18 +1,19 @@
-import { DateTime } from "luxon";
 import { z } from "zod/v4";
 import { db } from "~/db";
 import {
   getTravelDistance,
-  getTravelDuration,
+  getTravelSpeed,
   getTravelStaminaCost,
 } from "~/game/formula";
 import { simulation } from "~/game/simulation";
+import { rate } from "~/game/tick";
 import { replace, tag } from "~/lib/tag";
 
 simulation.on([tag.Travel], async (activity) => {
-  const { destinationId, characterId } = z
-    .object({ destinationId: z.number(), characterId: z.number() })
+  const { destinationId } = z
+    .object({ destinationId: z.number() })
     .parse(activity.params);
+  const { characterId } = activity;
 
   const character = await db.character.findFirst({
     where: { id: characterId },
@@ -74,7 +75,7 @@ simulation.on([tag.Travel], async (activity) => {
 
   const cost = getTravelStaminaCost({
     distance,
-    skill: endurance.level,
+    endurance,
   });
 
   if (stamina.level < cost) {
@@ -89,29 +90,20 @@ simulation.on([tag.Travel], async (activity) => {
         tags: replace(character.tags, [tag.Idle], [tag.Travelling]),
       },
     }),
-    db.attribute.update({
-      where: { id: stamina.id },
-      data: { level: { decrement: cost } },
-    }),
+
     db.log.create({
       data: {
         character: { connect: { id: characterId } },
         message: `I departed ${character.location.name} towards ${destination.name} via ${route.name}.`,
       },
     }),
-    db.activity.create({
-      data: {
-        characterId,
-        params: { destinationId, characterId },
-        tags: [tag.Travel],
-      },
-    }),
   ]);
 });
 
 simulation.on([tag.Travel, tag.Tick], async (activity) => {
-  const { destinationId, characterId } = z
-    .object({ destinationId: z.number(), characterId: z.number() })
+  const { characterId } = activity;
+  const params = z
+    .object({ destinationId: z.number(), progress: z.number() })
     .parse(activity.params);
 
   const character = await db.character.findFirst({
@@ -151,38 +143,67 @@ simulation.on([tag.Travel, tag.Tick], async (activity) => {
   }
 
   const destination = await db.location.findFirst({
-    where: { id: destinationId },
+    where: { id: params.destinationId },
   });
 
   if (!destination) {
-    throw new Error(`Couldn't find destination #${destinationId}.`);
+    throw new Error(`Couldn't find destination #${params.destinationId}.`);
   }
 
-  if (!character.location.destinations.some(({ id }) => id === destinationId)) {
+  if (
+    !character.location.destinations.some(
+      ({ id }) => id === params.destinationId
+    )
+  ) {
     throw new Error(
       `Destination ${destination.name} is not reachable from ${character.location.name}.`
     );
   }
 
-  const distance = getTravelDistance({
+  const speed = getTravelSpeed({ endurance });
+
+  const delta = speed * rate;
+
+  const cost = getTravelStaminaCost({
+    distance: delta,
+    endurance,
+  });
+
+  const total = getTravelDistance({
     destination,
     route: character.location,
   });
 
-  const duration = getTravelDuration({
-    distance,
-    skill: endurance.level,
-  });
+  const progress = (params.progress * total + delta) / total;
 
-  const completesAt = DateTime.fromJSDate(activity.startedAt).plus(duration);
+  if (progress < 1) {
+    await db.$transaction([
+      db.attribute.update({
+        where: { id: stamina.id },
+        data: {
+          level: Math.max(stamina.level - cost, 0),
+        },
+      }),
 
-  if (DateTime.now() >= completesAt) {
+      db.activity.update({
+        where: { id: activity.id },
+        data: { params: { ...params, progress } },
+      }),
+    ]);
+  } else {
     await db.$transaction([
       db.character.update({
         where: { id: character.id },
         data: {
-          locationId: destinationId,
+          locationId: params.destinationId,
           tags: replace(character.tags, [tag.Travelling], [tag.Idle]),
+        },
+      }),
+
+      db.attribute.update({
+        where: { id: stamina.id },
+        data: {
+          level: Math.max(stamina.level - cost, 0),
         },
       }),
 
@@ -195,7 +216,7 @@ simulation.on([tag.Travel, tag.Tick], async (activity) => {
 
       db.activity.update({
         where: { id: activity.id },
-        data: { completedAt: new Date() },
+        data: { params: { ...params, progress: 1 }, completedAt: new Date() },
       }),
     ]);
   }
